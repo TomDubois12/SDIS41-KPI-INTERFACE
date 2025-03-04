@@ -1,0 +1,71 @@
+.hiddenDiv {
+    
+    .logoSDIS {
+        max-width: 80%;
+        height: auto;
+    }
+
+    .hiddenDivTitle {
+        text-align: center;
+    }
+    
+    @media (min-width: 950px) {
+        display: none;
+    }
+    
+    @media (max-width: 950px) {
+        flex-direction: column;
+        padding-top: 5vh;
+        align-items: center;
+        width: 100%;
+    }
+
+    .hiddenDivLogoParam {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    @media (max-width: 950px) {
+        display: none;
+    }
+
+    .logoSDIS {
+        max-width: 80%;
+        height: auto;
+    }
+
+    .Title {
+        width: 55vw;
+        height: clamp(6vh, 10vh, 12.5vh);
+        text-align: center;
+        
+        h1 {
+            font-size: clamp(24px, 5vw, 48px);
+        }
+
+        @media (max-width: 950px) {
+            width: 100%;
+            height: clamp(4vh, 10vh, 8.5vh);
+        }
+
+        @media (max-width: 300px) {
+            text-align: center;
+        }
+    }
+
+    .Parametres {
+        display: flex;
+        justify-content: flex-end;
+        flex-basis: 15%;
+        margin-right: 1.5vw;
+    }
+}

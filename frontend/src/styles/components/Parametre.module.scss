@@ -1,0 +1,44 @@
+.wrapper {
+  position: relative;
+}
+
+.parametres {
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  border: solid;
+  border-color: #2B3244;
+  background: #C54844;
+  padding: 3vh 4vw;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+  justify-content: space-evenly;
+}
+
+.menu button {
+  width: 100%;
+  text-align: center;
+  background: none;
+  border: none;
+  color: #2B3244; 
+  text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+  -webkit-text-stroke: 0.5px #C2BEB5;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 1vh;
+  transition: background 0.2s ease-in-out;
+}
+
+.menu button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
