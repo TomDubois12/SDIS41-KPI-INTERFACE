@@ -1,8 +1,17 @@
 {
-    "KPI": "SDIS41 - Interface d'ICP",
-    "Entrer": "Entrer",
-    "SwitchLanguage": "Passer en anglais",
-    "SwitchToDT": "Passer en dark thème",
-    "Credits": "Crédits",
-    "BackToHome": "Retour à la page d'accueil"
+    "Global": {
+        "Entrer": "Entrer"
+    },
+    "Parametre": {    
+        "SwitchLanguage": "Passer en anglais",
+        "SwitchToDT": "Passer en dark thème",
+        "Credits": "Crédits",
+        "BackToHome": "Retour à la page d'accueil"
+    },
+    "Titles": {
+        "KPI": "SDIS41 - Interface d'ICP",
+        "PerfClarilog": "Performances Clarilog",
+        "StatsRapport": "Statistiques du rapport SIC",
+        "Alertes": "Alertes"
+    }
 }

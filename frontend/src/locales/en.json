@@ -1,9 +1,17 @@
 {
-    "KPI": "SDIS41 - KPI Interface",
-    "Entrer": "Enter",
-    "SwitchLanguage": "Switch to french",
-    "SwitchToDT": "Switch to dark theme",
-    "Credits": "Credits",
-    "BackToHome": "Back to home page"
+    "Global": {
+        "Entrer": "Enter"
+    },
+    "Parametre": {
+        "SwitchLanguage": "Switch to french",
+        "SwitchToDT": "Switch to dark theme",
+        "Credits": "Credits",
+        "BackToHome": "Back to home page"
+    },
+    "Titles": {
+        "KPI": "SDIS41 - KPI Interface",
+        "PerfClarilog": "Clarilog performances",
+        "StatsRapport": "SIC Report Statistics",
+        "Alertes": "Alerts"
+    }
 }
-  
