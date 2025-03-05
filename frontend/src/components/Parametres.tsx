@@ -17,12 +17,12 @@ const Parametres = () => {
         {isOpen && (
             <div className={styles.menu}>
                 <button onClick={() => setLang(lang === "fr" ? "en" : "fr")}>
-                    {t("SwitchLanguage")}
+                    {t("Parametre.SwitchLanguage")}
                 </button>
-                <button>{t("SwitchToDT")}</button>
-                <button>{t("Credits")}</button>
+                <button>{t("Parametre.SwitchToDT")}</button>
+                <button>{t("Parametre.Credits")}</button>
                 <Link to="/">  
-                    <button>{t("BackToHome")}</button>
+                    <button>{t("Parametre.BackToHome")}</button>
                 </Link>
             </div>
         )}

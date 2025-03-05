@@ -28,14 +28,14 @@ export default function Home() {
                 </div>
                 <div className={styles.Title}>
                     <Title 
-                        text={t("KPI")}
+                        text={t("Titles.KPI")}
                     />
                 </div>
                 <div className={styles.Button}>
                     <Link to="/hub">
                         <Button 
                             backgroundColor={"#C54844"} 
-                            text={t("Entrer")} 
+                            text={t("Global.Entrer")} 
                             textColor={"#2B3244"} 
                         />
                     </Link>
@@ -43,5 +43,4 @@ export default function Home() {
             </div>
         </div>
     );
-  }
-  
+}
