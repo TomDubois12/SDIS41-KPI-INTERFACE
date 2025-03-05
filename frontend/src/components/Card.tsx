@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import styles from '../styles/components/Card.module.scss';
 import Button from './Button';
 
@@ -5,9 +7,10 @@ interface CardProps {
     img: string;
     text: string;
     buttonText: string;
+    path: string;
 }
 
-const Card = ({ img, text, buttonText }: CardProps) => {
+const Card = ({ img, text, buttonText, path }: CardProps) => {
     return (
         <div className={styles.card}>
             <div className={styles.imageContainer}>
@@ -17,11 +20,13 @@ const Card = ({ img, text, buttonText }: CardProps) => {
                 <h1>{text}</h1>
             </div>
             <div className={styles.buttonContainer}>
-                <Button 
-                    backgroundColor={'#2B3244'} 
-                    text={buttonText} 
-                    textColor={'white'} 
-                />
+                <Link to={path}>
+                    <Button 
+                        backgroundColor={'#2B3244'} 
+                        text={buttonText} 
+                        textColor={'white'} 
+                    />
+                </Link>
             </div>
         </div>
     );
