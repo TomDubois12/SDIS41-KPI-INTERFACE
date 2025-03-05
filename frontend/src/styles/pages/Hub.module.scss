@@ -1,0 +1,12 @@
+.divCard {
+    display: flex;
+    justify-content: space-between;
+
+    @media (max-width: 1050px) {
+        margin-top: 8vh;
+    }
+
+    @media (max-width: 950px) {
+        flex-direction: column;
+    }
+}

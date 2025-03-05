@@ -3,8 +3,10 @@ import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/pages/Hub.module.scss';
 import Header from "../components/Header";
-
-
+import Card from "../components/Card";
+import Extincteur from '../assets/images/Extincteur.png';
+import Dring from '../assets/images/Dring.png';
+import Feu from '../assets/images/Feu.png';
 
 export default function Hub() {
 
@@ -12,7 +14,27 @@ export default function Hub() {
 
     return (
         <div>
-            <Header text={t("KPI")} />
+            <Header text={t("Titles.KPI")} />
+            <div className={styles.divCard}>
+                <Card 
+                    img={Extincteur}
+                    text={t("Titles.PerfClarilog")}
+                    buttonText={t("Global.Entrer")}
+                    path="/clarilog"
+                />
+                <Card 
+                    img={Dring}
+                    text={t("Titles.StatsRapport")}
+                    buttonText={t("Global.Entrer")}
+                    path="/statistiques"
+                />
+                <Card 
+                    img={Feu}
+                    text={t("Titles.Alertes")}
+                    buttonText={t("Global.Entrer")}
+                    path="/alertes"
+                />
+            </div>
         </div>
     );
 }
