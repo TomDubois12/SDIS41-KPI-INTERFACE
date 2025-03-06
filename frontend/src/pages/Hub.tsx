@@ -20,7 +20,7 @@ export default function Hub() {
                     img={Extincteur}
                     text={t("Titles.PerfClarilog")}
                     buttonText={t("Global.Entrer")}
-                    path="/clarilog"
+                    path="/clarilog_mensuel"
                 />
                 <Card 
                     img={Dring}

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
 import Header from "../components/Header";
+import TicketCount from "../components/TicketCount";
 
 export default function Clarilog() {
 
@@ -10,17 +11,32 @@ export default function Clarilog() {
     return (
         <>
             <Header text={t("Titles.PerfClarilog")} />
-            <div> global
-                <div> div de gauche
-                    <div></div> div texte
-                    <div></div> div tableau
+            {/* global */}
+            <div>
+                {/* div de gauche */}
+                <div>
+                    {/* div texte */}
+                    <div>
+                        <Link to="/clarilog_mensuel">
+                            <button>GO TO CALENDRIER</button>
+                        </Link>
+                    </div>
+                    {/* div tableau */}
+                    <div>
+                        <TicketCount />
+                    </div>
                 </div>
-                <div> div de droite
-                    <div></div> div Cadre rouge performance (caché en version pc) b
-                    <div></div> div BarChart
-                    <div></div> div PieChart
+                {/* div de droite */}
+                <div>
+                    {/* div Cadre rouge performance (caché en version pc) */}
+                    <div></div>
+                    {/* div BarChart */}
+                    <div></div>
+                    {/* div PieChart */}
+                    <div></div>
                 </div>
-                <div> div bouton revenir en haut (caché en version pc)
+                {/* div bouton revenir en haut (caché en version pc) */}
+                <div>
                     <button></button>
                 </div>
             </div>
