@@ -19,7 +19,7 @@ const Parametres = () => {
                 <button onClick={() => setLang(lang === "fr" ? "en" : "fr")}>
                     {t("Parametre.SwitchLanguage")}
                 </button>
-                <button>{t("Parametre.SwitchToDT")}</button>
+                {/* <button>{t("Parametre.SwitchToDT")}</button> */} 
                 <button>{t("Parametre.Credits")}</button>
                 <Link to="/">  
                     <button>{t("Parametre.BackToHome")}</button>
