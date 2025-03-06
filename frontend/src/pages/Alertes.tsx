@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
+import Header from "../components/Header";
+
 export default function Alertes() {
 
     const { t } = useTranslation();
     
     return (
         <>
-            <p>ALERTES</p>
+            <Header text={t("Titles.Alertes")} />
         </>
     );
 }
