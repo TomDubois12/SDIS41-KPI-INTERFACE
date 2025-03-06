@@ -18,6 +18,17 @@ const Header = ({text}: HeaderProps) => {
         <> 
             <div className={styles.hiddenDiv}>
                 <div className={styles.hiddenDivLogoParam}>
+                    <div className={styles.fleche}>
+                        <button className={styles.fleche} onClick={() => {
+                            if (document.referrer) {
+                                window.history.back();
+                            } else {
+                                window.location.href = '/hub';
+                            }
+                        }}>
+                            ⭠
+                        </button>
+                    </div>
                     <Link to="/hub">
                         <img src={logoSDIS} alt="Logo SDIS" className={styles.logoSDIS}/>
                     </Link>
