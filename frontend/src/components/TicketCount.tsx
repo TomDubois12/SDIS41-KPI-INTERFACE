@@ -64,7 +64,7 @@ const TicketCount: React.FC = () => {
 
     useEffect(() => {
         fetchInitialData();
-        const intervalId = setInterval(fetchLiveUpdates, 5000);
+        const intervalId = setInterval(fetchLiveUpdates, 10000);
 
         return () => clearInterval(intervalId);
     }, [fetchInitialData, fetchLiveUpdates]);

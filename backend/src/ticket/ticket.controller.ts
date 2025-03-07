@@ -17,6 +17,7 @@ export class TicketController {
         }
     }
 
+
     @Get('count-resolved')
     async getNbTicketsResolved(@Query('date') date: string) {
         try {
@@ -28,6 +29,7 @@ export class TicketController {
         }
     }
 
+
     @Get('tickets')
     async getTickets(@Query('date') date: string) {
         try {
@@ -38,4 +40,29 @@ export class TicketController {
             throw err;
         }
     }
+
+
+    @Get('tickets-by-operator')
+    async getTicketsByOperator(@Query('date') date: string) {
+        try {
+            const result = await this.ticketService.getTicketsByOperator(date);
+            return result;
+        } catch (err) {
+            console.error("Erreur dans la récupération : ", err);
+            throw err;
+        }
+    }
+
+
+    @Get('tickets-types')
+    async getTicketsTypes(@Query('date') date: string) {
+        try {
+            const result = await this.ticketService.getTicketsTypes(date);
+            return result;
+        } catch (err) {
+            console.error("Erreur dans la récupération : ", err);
+            throw err;
+        }
+    }
+
 }

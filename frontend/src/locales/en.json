@@ -13,5 +13,9 @@
         "PerfClarilog": "Clarilog performances",
         "StatsRapport": "SIC Report Statistics",
         "Alertes": "Alerts"
+    },
+    "Charts": {
+        "TicketsAttribution": "Ticket allocation by operator",
+        "TiketsTypes": "Type of tickets created"
     }
 }

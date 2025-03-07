@@ -13,5 +13,9 @@
         "PerfClarilog": "Performances Clarilog",
         "StatsRapport": "Statistiques du rapport SIC",
         "Alertes": "Alertes"
+    },
+    "Charts": {
+        "TicketsAttribution": "Attribution des tickets par opérateur",
+        "TiketsTypes": "Type de tickets crées"
     }
 }
