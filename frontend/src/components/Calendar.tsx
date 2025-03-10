@@ -31,7 +31,7 @@ const CalendarComponent = () => {
         <div>
             <h2>Calendrier de visualisation mensuel de la performance</h2>
             <Calendar
-                onChange={handleDateChange} // Utilisez handleDateChange
+                onChange={handleDateChange}
                 value={date}
                 tileContent={({ date }) => (
                     <div>
