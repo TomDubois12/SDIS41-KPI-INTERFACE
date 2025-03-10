@@ -34,7 +34,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, colors, title }) => {
 
         fetchData(); // Appel initial
 
-        const intervalId = setInterval(fetchData, 10000); // Actualisation toutes les 5 secondes
+        const intervalId = setInterval(fetchData, 5000); // Actualisation toutes les 5 secondes
 
         return () => clearInterval(intervalId); // Nettoyage de l'intervalle
     }, [date, apiUrl]);
