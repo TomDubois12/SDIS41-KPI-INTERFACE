@@ -75,8 +75,9 @@ const TicketCount: React.FC = () => {
     return (
         <div>
             <h2>Date : {formattedDate}</h2>
-            <h2>Nombre de nouveaux tickets créés : {NbTicketCreated}</h2>
-            <h2>Nombre de tickets résolus : {NbTicketResolved}</h2>
+            <h2>Nombre de nouveaux tickets créés dans la journée : {NbTicketCreated}</h2>
+            <h2>Nombre de tickets résolus dans la journée : {NbTicketResolved}</h2>
+            <h2>Tableau des tickets créés dans la journée</h2>
             <table>
                 <thead>
                     <tr>
