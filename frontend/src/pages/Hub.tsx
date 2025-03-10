@@ -11,6 +11,9 @@ import Feu from '../assets/images/Feu.png';
 export default function Hub() {
 
     const { t } = useTranslation();
+    const today = new Date();
+    const month = (today.getMonth() + 1).toString(); // Mois 1-indexé
+    const year = today.getFullYear().toString();
 
     return (
         <div>
@@ -20,7 +23,7 @@ export default function Hub() {
                     img={Extincteur}
                     text={t("Titles.PerfClarilog")}
                     buttonText={t("Global.Entrer")}
-                    path="/clarilog_mensuel"
+                    path={`/clarilog_mensuel?month=${month}&year=${year}`}
                 />
                 <Card 
                     img={Dring}

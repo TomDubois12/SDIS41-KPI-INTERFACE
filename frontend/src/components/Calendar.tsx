@@ -27,12 +27,22 @@ const CalendarComponent = () => {
         }
     };
 
+    const handleActiveStartDateChange = ({ activeStartDate }: { activeStartDate: Date | null }) => {
+        if (activeStartDate) {
+            const month = (activeStartDate.getMonth() + 1).toString(); // 1-indexé
+            const year = activeStartDate.getFullYear().toString();
+            navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
+        }
+    };
+    
+
     return (
         <div>
             <h2>Calendrier de visualisation mensuel de la performance</h2>
             <Calendar
                 onChange={handleDateChange}
                 value={date}
+                onActiveStartDateChange={handleActiveStartDateChange}
                 tileContent={({ date }) => (
                     <div>
                         <span

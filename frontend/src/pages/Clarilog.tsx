@@ -1,10 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Add useNavigate here
 import { useTranslation } from "../hooks/useTranslation";
 import Header from "../components/Header";
 import TicketCount from "../components/TicketCount";
 import Performance from "../components/Performance";
 import BarChart from "../components/BarChart";
-import PieChart from "../components/PieChart"
+import PieChart from "../components/PieChart";
 
 
 export default function Clarilog() {
@@ -13,15 +13,23 @@ export default function Clarilog() {
     const searchParams = new URLSearchParams(location.search);
     const selectedDate = searchParams.get('date');
 
+    const navigate = useNavigate();  // Initialize the navigate function
+
+    const goToCalendar = () => {
+        const today = new Date();
+        const month = (today.getMonth() + 1).toString(); // Mois 1-indexé
+        const year = today.getFullYear().toString();
+
+        navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
+    };
+
     return (
         <>
             <Header text={t("Titles.PerfClarilog")} />
             <div>
                 <div>
                     <div>
-                        <Link to="/clarilog_mensuel">
-                            <button>GO TO CALENDRIER</button>
-                        </Link>
+                        <button onClick={goToCalendar}>GO TO CALENDRIER</button>
                         <TicketCount />
                     </div>
                 </div>
