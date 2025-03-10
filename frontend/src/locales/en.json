@@ -15,7 +15,7 @@
         "Alertes": "Alerts"
     },
     "Charts": {
-        "TicketsAttribution": "Ticket allocation by operator",
-        "TiketsTypes": "Type of tickets created"
+        "TicketsAttribution": "Allocation of day tickets by operator",
+        "TiketsTypes": "Type of tickets created during the day"
     }
 }

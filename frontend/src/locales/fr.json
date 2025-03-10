@@ -15,7 +15,7 @@
         "Alertes": "Alertes"
     },
     "Charts": {
-        "TicketsAttribution": "Attribution des tickets par opérateur",
-        "TiketsTypes": "Type de tickets crées"
+        "TicketsAttribution": "Attribution des tickets de la journée par opérateur",
+        "TiketsTypes": "Type des tickets crées dans la journée"
     }
 }
