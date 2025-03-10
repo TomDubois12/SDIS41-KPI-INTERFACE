@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 export class TicketService {
     constructor(private dataSource: DataSource) {}
 
+    // le nombre de tickets qui ont été créés à la date spécifiée
     async getNbTicketsCreated(date: string): Promise<any> {
         return this.dataSource.query(
             `SELECT COUNT(*) 
@@ -13,15 +14,28 @@ export class TicketService {
         );
     }
 
+
+        // le nombre de tickets qui ont été créés à la date spécifiée par mois
+        async getNbTicketsByMonthYear(month: number, year: number): Promise<any> {
+            return this.dataSource.query(
+                `SELECT COUNT(*)
+                FROM [parc_db].[dbo].[SD_Tickets]
+                WHERE MONTH(SentOn) = ${month} AND YEAR(SentOn) = ${year};`
+            );
+        }
+
+
+    // le nombre de tickets qui ont été résolus à la date spécifiée
     async getNbTicketsResolved(date: string): Promise<any> {
         return this.dataSource.query(
             `SELECT COUNT(*)
             FROM [parc_db].[dbo].[SD_Tickets]
             WHERE CAST(ResolutionDate AS DATE) = '${date}'
-            AND CAST(SentOn AS DATE) = '${date}';`,
+            ;`,
         );
     }
     
+    // liste des tickets créés à une date donnée, avec leur titre, le nom de l'utilisateur qui les a créés et l'heure de création
     async getTickets(date: string): Promise<any> {
         return this.dataSource.query(
             `SELECT t.TicketId, 
