@@ -1,10 +1,5 @@
 .card {
     width: clamp(14vw, 90%, 21vw);
-
-    @media (max-width: 950px) {
-        width: 60%;
-    }
-
     min-height: clamp(25vh, 50vh, 50vh);
     margin: 1rem auto;
     padding: clamp(1rem, 2vw, 3rem);
@@ -15,6 +10,10 @@
     text-align: center;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
     
+    @media (max-width: 950px) {
+        width: 60%;
+    }
+
     .imageContainer {
         width: auto;
         max-height: 150vh;
