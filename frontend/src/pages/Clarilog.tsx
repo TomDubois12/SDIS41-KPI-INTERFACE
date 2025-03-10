@@ -2,8 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import Header from "../components/Header";
 import TicketCount from "../components/TicketCount";
+import Performance from "../components/Performance";
 import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart"
+
 
 export default function Clarilog() {
     const { t } = useTranslation();
@@ -24,7 +26,11 @@ export default function Clarilog() {
                     </div>
                 </div>
                 <div>
-                    <div></div>
+                    <div>
+                        <Performance 
+                            date={selectedDate}
+                        />
+                    </div>
                     <div>
                         <BarChart 
                             date={selectedDate} 
