@@ -11,7 +11,11 @@ export default function ClarilogMensuel() {
     return (
         <>
             <Header text={t("Titles.PerfClarilog")} />
-            <CalendarComponent /> 
+            <CalendarComponent />
+            <h2>Détails :</h2>
+            {/* COMPOSANTS POUR LES NOMBRES DE TICKETS */}
+            {/* COMPOSANT BARCHART */}
+            {/* COMPOSANT PIECHART */}
         </>
     );
 }
