@@ -8,7 +8,8 @@ interface TicketCountByMonthYearProps {
 
 export default function TicketCountByMonthYear({ month, year }: TicketCountByMonthYearProps) {
     const { t } = useTranslation();
-    const [count, setCount] = useState<number | null>(null);
+    const [countTicketCreated, setCountTicketCreated] = useState<number | null>(null);
+    const [countTicketResolved, setCountTicketResolved] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -18,18 +19,34 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
             setError(null);
             try {
                 const response = await fetch(
-                    `http://localhost:3001/tickets/count-by-month-year?month=${month}&year=${year}`
+                    `http://localhost:3001/tickets/count-created-by-month-year?month=${month}&year=${year}`
                 );
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des données");
                 }
                 const data = await response.json();
-                setCount(data.count);
+                setCountTicketCreated(data.count);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Une erreur est survenue");
             } finally {
                 setLoading(false);
             }
+
+            try {
+                const response = await fetch(
+                    `http://localhost:3001/tickets/count-resolved-by-month-year?month=${month}&year=${year}`
+                );
+                if (!response.ok) {
+                    throw new Error("Erreur lors de la récupération des données");
+                }
+                const data = await response.json();
+                setCountTicketResolved(data.count);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Une erreur est survenue");
+            } finally {
+                setLoading(false);
+            }
+
         }
 
         fetchData();
@@ -37,20 +54,19 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
 
     return (
         <div>
-            {/* <h2>{t("Charts.TicketsCreatedByMonth")}</h2>
-            {loading ? (
-                <p>{t("Loading")}</p>
-            ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-            ) : (
-                <p>{t("Tickets.Created")}: {count}</p>
-            )} */}
             {loading ? (
                 <p>Loading</p>
             ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
             ) : (
-                <p>{}Nombre total de ticket créés ce mois-ci : {count}</p>
+                <p>{}Nombre total de ticket créés ce mois-ci : {countTicketCreated}</p>
+            )}
+            {loading ? (
+                <p>Loading</p>
+            ) : error ? (
+                <p style={{ color: "red" }}>{error}</p>
+            ) : (
+                <p>{}Nombre total de ticket résolus ce mois-ci : {countTicketResolved}</p>
             )}
         </div>
     );

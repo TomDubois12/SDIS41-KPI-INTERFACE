@@ -15,7 +15,7 @@ export class TicketService {
     }
 
 
-        // le nombre de tickets qui ont été créés à la date spécifiée par mois
+        // le nombre de tickets qui ont été créés par mois et année spécifiés
         async getNbTicketsByMonthYear(month: number, year: number): Promise<any> {
             return this.dataSource.query(
                 `SELECT COUNT(*)
@@ -34,7 +34,18 @@ export class TicketService {
             ;`,
         );
     }
+
+
+    // le nombre de tickets qui ont été résolus par mois et année spécifiés
+    async getNbTicketsResolvedByMonthYear(month: number, year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT COUNT(*)
+            FROM [parc_db].[dbo].[SD_Tickets]
+            WHERE MONTH(ResolutionDate) = ${month} AND YEAR(ResolutionDate) = ${year};`
+        );
+    }
     
+
     // liste des tickets créés à une date donnée, avec leur titre, le nom de l'utilisateur qui les a créés et l'heure de création
     async getTickets(date: string): Promise<any> {
         return this.dataSource.query(
