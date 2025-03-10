@@ -17,6 +17,21 @@ export class TicketController {
         }
     }
 
+    
+    @Get('count-by-month-year')
+    async getNbTicketsByMonthYearRoute(
+        @Query('month') month: number,
+        @Query('year') year: number
+    ) {
+        try {
+            const result = await this.ticketService.getNbTicketsByMonthYear(month, year);
+            return { count: result[0][''] };
+        } catch (err) {
+            console.error("Erreur dans la récupération : ", err);
+            throw err;
+        }
+    }
+
 
     @Get('count-resolved')
     async getNbTicketsResolved(@Query('date') date: string) {
@@ -64,5 +79,6 @@ export class TicketController {
             throw err;
         }
     }
+
 
 }
