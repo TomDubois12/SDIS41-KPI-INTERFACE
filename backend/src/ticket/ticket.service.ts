@@ -24,6 +24,16 @@ export class TicketService {
             );
         }
 
+        
+        // le nombre de tickets qui ont été créés dans une année spécifiés
+        async getNbTicketsByYear(year: number): Promise<any> {
+            return this.dataSource.query(
+                `SELECT COUNT(*)
+                FROM [parc_db].[dbo].[SD_Tickets]
+                WHERE YEAR(SentOn) = ${year};`
+            );
+        }
+
 
     // le nombre de tickets qui ont été résolus à la date spécifiée
     async getNbTicketsResolved(date: string): Promise<any> {
@@ -42,6 +52,16 @@ export class TicketService {
             `SELECT COUNT(*)
             FROM [parc_db].[dbo].[SD_Tickets]
             WHERE MONTH(ResolutionDate) = ${month} AND YEAR(ResolutionDate) = ${year};`
+        );
+    }
+
+
+    // le nombre de tickets qui ont été résolus dans année spécifiés
+    async getNbTicketsResolvedByYear(year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT COUNT(*)
+            FROM [parc_db].[dbo].[SD_Tickets]
+            WHERE YEAR(ResolutionDate) = ${year};`
         );
     }
     
@@ -87,6 +107,18 @@ export class TicketService {
     }
 
 
+    async getTicketsByOperatorByYear(year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT o.operator_helpdesk_login AS operator, 
+                    COUNT(DISTINCT t.TicketId) AS ticketCount
+            FROM [parc_db].[dbo].[operator] o
+            LEFT JOIN [parc_db].[dbo].[SD_Tickets] t ON o.id_operator = t.AssignedToId
+            WHERE YEAR(t.SentOn) = ${year}
+            GROUP BY o.operator_helpdesk_login;`
+        );
+    }
+
+
     async getTicketsTypes(date: string): Promise<any> {
         return this.dataSource.query(
             `SELECT tc.TicketClassLabel, COUNT(*) AS NombreTickets
@@ -104,6 +136,17 @@ export class TicketService {
             FROM [parc_db].[dbo].[SD_Tickets] t
             LEFT JOIN [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
             WHERE MONTH(t.SentOn) = ${month} AND YEAR(t.SentOn) = ${year}
+            GROUP BY tc.TicketClassLabel;`
+        );
+    }
+
+
+    async getTicketsTypesByYear(year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT tc.TicketClassLabel, COUNT(*) AS NombreTickets
+            FROM [parc_db].[dbo].[SD_Tickets] t
+            LEFT JOIN [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
+            WHERE YEAR(t.SentOn) = ${year}
             GROUP BY tc.TicketClassLabel;`
         );
     }

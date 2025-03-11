@@ -36,9 +36,6 @@ export default function ClarilogMensuel() {
                 month={month}
                 year={year}
             />
-            {/* COMPOSANTS POUR LES NOMBRES DE TICKETS */}
-            {/* COMPOSANT BARCHART */}
-            {/* COMPOSANT PIECHART */}
         </>
     );
 }

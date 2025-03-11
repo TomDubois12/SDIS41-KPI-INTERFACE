@@ -11,8 +11,8 @@ interface PieChartProps {
 }
 
 interface DataItem {
-    label: string;
-    value: number;
+    TicketClassLabel: string;
+    count: number;
 }
 
 interface ApiDataItem {
@@ -28,15 +28,17 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
     // Construire l'URL dynamiquement
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-types?date=${date}`
-        : `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`;
+        : month
+            ? `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`
+            : `http://localhost:3001/tickets/tickets-types-by-year?year=${year}`; // Ajout pour les données annuelles
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get<ApiDataItem[]>(apiUrl);
                 const transformedData = response.data.map(item => ({
-                    label: item.TicketClassLabel || "Inconnu",
-                    value: item.NombreTickets
+                    TicketClassLabel: item.TicketClassLabel || "Inconnu",
+                    count: item.NombreTickets
                 }));
                 setChartData(transformedData);
             } catch (error) {
@@ -53,10 +55,10 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
     }, [date, month, year]);
 
     const state = {
-        series: chartData.map(item => item.value),
+        series: chartData.map(item => item.count),
         options: {
             chart: { width: 380, type: 'pie' },
-            labels: chartData.map(item => item.label),
+            labels: chartData.map(item => item.TicketClassLabel),
             responsive: [{
                 breakpoint: 480,
                 options: {
@@ -64,12 +66,13 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
                     legend: { position: 'bottom' }
                 }
             }],
-            colors: colors
+            colors: colors ? colors.split(',') : undefined
         },
     };
 
     if (loading) return <p>Chargement du graphique...</p>;
     if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
+    if (state.series.length === 0) return <p>Aucune donnée disponible.</p>;
 
     return (
         <div id="chart">

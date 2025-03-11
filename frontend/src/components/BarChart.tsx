@@ -23,7 +23,9 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
     // Construire l'URL dynamiquement
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-by-operator?date=${date}`
-        : `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`;
+        : month
+            ? `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
+            : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`; // Ajout pour les données annuelles
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,7 +51,8 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             "#FF4560", "#008FFB", "#00E396", "#FEB019", "#8E44AD", "#2C3E50",
             "#1ABC9C", "#F39C12", "#E74C3C", "#3498DB", "#2ECC71", "#F1C40F",
             "#9B59B6", "#34495E", "#16A085", "#D35400"
-        ],        plotOptions: { bar: { columnWidth: "45%", distributed: true } },
+        ],
+        plotOptions: { bar: { columnWidth: "45%", distributed: true } },
         dataLabels: { enabled: false },
         legend: { show: false },
         xaxis: {
@@ -60,6 +63,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
 
     if (loading) return <p>Chargement du graphique...</p>;
     if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
+    if (chartData.length === 0) return <p>Aucune donnée disponible.</p>;
 
     return (
         <div>
