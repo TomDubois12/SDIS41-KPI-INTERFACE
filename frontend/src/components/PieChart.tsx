@@ -3,7 +3,9 @@ import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 
 interface PieChartProps {
-    date: string;
+    date?: string;
+    month?: number;
+    year?: number;
     colors?: string;
     title: string;
 }
@@ -18,17 +20,20 @@ interface ApiDataItem {
     NombreTickets: number;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ date, colors, title }) => {
+const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title }) => {
     const [chartData, setChartData] = useState<DataItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const apiUrl = "http://localhost:3001/tickets/tickets-types";
+    const [error, setError] = useState<Error | null>(null);
+
+    // Construire l'URL dynamiquement
+    const apiUrl = date
+        ? `http://localhost:3001/tickets/tickets-types?date=${date}`
+        : `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<ApiDataItem[]>(apiUrl + `?date=${date}`);
-                // Transformation des données de l'API vers le format attendu
+                const response = await axios.get<ApiDataItem[]>(apiUrl);
                 const transformedData = response.data.map(item => ({
                     label: item.TicketClassLabel || "Inconnu",
                     value: item.NombreTickets
@@ -36,7 +41,7 @@ const PieChart: React.FC<PieChartProps> = ({ date, colors, title }) => {
                 setChartData(transformedData);
             } catch (error) {
                 console.error("Erreur lors de la récupération des données du graphique :", error);
-                setError(error);
+                setError(error as Error);
             } finally {
                 setLoading(false);
             }
@@ -45,38 +50,26 @@ const PieChart: React.FC<PieChartProps> = ({ date, colors, title }) => {
         fetchData();
         const intervalId = setInterval(fetchData, 5000);
         return () => clearInterval(intervalId);
-    }, [date, apiUrl]);
+    }, [date, month, year]);
 
     const state = {
         series: chartData.map(item => item.value),
         options: {
-            chart: {
-                width: 380,
-                type: 'pie',
-            },
+            chart: { width: 380, type: 'pie' },
             labels: chartData.map(item => item.label),
             responsive: [{
                 breakpoint: 480,
                 options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
+                    chart: { width: 200 },
+                    legend: { position: 'bottom' }
                 }
             }],
             colors: colors
         },
     };
 
-    if (loading) {
-        return <p>Chargement du graphique...</p>;
-    }
-
-    if (error) {
-        return <p>Erreur lors du chargement du graphique : {error.message}</p>;
-    }
+    if (loading) return <p>Chargement du graphique...</p>;
+    if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
 
     return (
         <div id="chart">

@@ -6,6 +6,8 @@ import TicketCountByMonthYear from "../components/TicketCountByMonthYear";
 
 import Header from "../components/Header";
 import CalendarComponent from "../components/Calendar"
+import BarChart from "../components/BarChart";
+import PieChart from "../components/PieChart";
 
 export default function ClarilogMensuel() {
 
@@ -23,6 +25,14 @@ export default function ClarilogMensuel() {
             <CalendarComponent />
             <h2>Détails :</h2>
             <TicketCountByMonthYear 
+                month={month}
+                year={year}
+            />
+            <BarChart 
+                month={month}
+                year={year}
+            />
+            <PieChart 
                 month={month}
                 year={year}
             />
