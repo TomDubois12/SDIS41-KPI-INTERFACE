@@ -20,13 +20,25 @@ const YearPicker: React.FC<YearPickerProps> = ({ initialYear }) => {
         }
     };
 
+    const handleMonthRedirect = () => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1; // Mois commence à 0 en JavaScript
+        navigate(`/clarilog_mensuel?year=${year}&month=${month}`);
+    };
+
     return (
-        <DatePicker
-            selected={selectedDate}
-            onChange={handleChange}
-            showYearPicker
-            dateFormat="yyyy"
-        />
+        <div>
+            <DatePicker
+                selected={selectedDate}
+                onChange={handleChange}
+                showYearPicker
+                dateFormat="yyyy"
+            />
+            <button onClick={handleMonthRedirect}>
+                Voir les statistiques mensuelles
+            </button>
+        </div>
     );
 };
 
