@@ -8,31 +8,52 @@ export class TicketService {
     // le nombre de tickets qui ont été créés à la date spécifiée
     async getNbTicketsCreated(date: string): Promise<any> {
         return this.dataSource.query(
-            `SELECT COUNT(*) 
-            FROM [parc_db].[dbo].[SD_Tickets] 
-            WHERE CAST(SentOn AS DATE) = '${date}';`,
+            `SELECT COUNT(DISTINCT t.TicketId)
+            FROM [parc_db].[dbo].[SD_Tickets] t
+            WHERE CAST(t.SentOn AS DATE) = '${date}'
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            );`
         );
     }
 
 
-        // le nombre de tickets qui ont été créés par mois et année spécifiés
-        async getNbTicketsByMonthYear(month: number, year: number): Promise<any> {
-            return this.dataSource.query(
-                `SELECT COUNT(*)
-                FROM [parc_db].[dbo].[SD_Tickets]
-                WHERE MONTH(SentOn) = ${month} AND YEAR(SentOn) = ${year};`
-            );
-        }
+    // le nombre de tickets qui ont été créés par mois et année spécifiés
+    async getNbTicketsByMonthYear(month: number, year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT COUNT(DISTINCT t.TicketId)
+            FROM [parc_db].[dbo].[SD_Tickets] t
+            WHERE MONTH(t.SentOn) = ${month} AND YEAR(t.SentOn) = ${year}
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            );`
+        );
+    }
 
-        
-        // le nombre de tickets qui ont été créés dans une année spécifiés
-        async getNbTicketsByYear(year: number): Promise<any> {
-            return this.dataSource.query(
-                `SELECT COUNT(*)
-                FROM [parc_db].[dbo].[SD_Tickets]
-                WHERE YEAR(SentOn) = ${year};`
-            );
-        }
+    
+    // le nombre de tickets qui ont été créés dans une année spécifiés
+    async getNbTicketsByYear(year: number): Promise<any> {
+        return this.dataSource.query(
+            `SELECT COUNT(DISTINCT t.TicketId)
+            FROM [parc_db].[dbo].[SD_Tickets] t
+            WHERE YEAR(t.SentOn) = '${year}'
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            );`
+        );
+    }
 
 
     // le nombre de tickets qui ont été résolus à la date spécifiée
