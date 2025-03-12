@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Ticket {
     TicketId: number;
     Title: string;
     CallerName: string;
     HeureDeCréation: string;
+    ResolutionDate: string | null;
 }
 
 const TicketCount: React.FC = () => {
@@ -18,6 +19,7 @@ const TicketCount: React.FC = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const selectedDate = searchParams.get('date');
+    const navigate = useNavigate();
 
     const formattedDate = selectedDate
         ? new Date(selectedDate).toLocaleDateString('fr-FR')
@@ -36,7 +38,10 @@ const TicketCount: React.FC = () => {
 
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
             if (NbTicketResolved.status === 'fulfilled') setNbTicketResolved(NbTicketResolved.value.data.count || 0);
-            if (tickets.status === 'fulfilled') setTickets(tickets.value.data || []);
+            if (tickets.status === 'fulfilled') {
+                const fetchedTickets = tickets.value.data || [];
+                setTickets(fetchedTickets);
+            }
 
             setLoading(false);
         } catch (err) {
@@ -56,7 +61,10 @@ const TicketCount: React.FC = () => {
 
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
             if (NbTicketResolved.status === 'fulfilled') setNbTicketResolved(NbTicketResolved.value.data.count || 0);
-            if (tickets.status === 'fulfilled') setTickets(tickets.value.data || []);
+            if (tickets.status === 'fulfilled') {
+                const fetchedTickets = tickets.value.data || [];
+                setTickets(fetchedTickets);
+            }
         } catch (err) {
             console.error('Erreur lors du rafraîchissement des données :', err);
         }
@@ -71,6 +79,17 @@ const TicketCount: React.FC = () => {
 
     if (loading) return <p>Chargement...</p>;
     if (error) return <p>{error}</p>;
+
+    const handleTicketClick = (ticketId: number) => {
+        navigate(`/clarilog_detail?id=${ticketId}`);
+    };
+
+    const getRowStyle = (resolutionDate: string | null): React.CSSProperties => {
+        return {
+            cursor: 'pointer',
+            backgroundColor: resolutionDate ? 'lightblue' : 'lightcoral',
+        };
+    };
 
     return (
         <div>
@@ -88,8 +107,12 @@ const TicketCount: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation }) => (
-                        <tr key={TicketId}>
+                    {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }) => (
+                        <tr
+                            key={TicketId}
+                            onClick={() => handleTicketClick(TicketId)}
+                            style={getRowStyle(ResolutionDate)}
+                        >
                             <td>{TicketId}</td>
                             <td>{Title}</td>
                             <td>{CallerName}</td>

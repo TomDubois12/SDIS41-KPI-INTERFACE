@@ -1,5 +1,5 @@
 // ticket.controller.tsx
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 
 @Controller('tickets')
@@ -96,6 +96,20 @@ export class TicketController {
         } catch (err) {
             console.error("Erreur dans la récupération : ", err);
             throw err;
+        }
+    }
+
+
+    @Get('ticket/:id')
+    async getTicketById(@Param('id') id: number) {
+        try {
+        const ticket = await this.ticketService.getTicketById(id);
+        return ticket;
+        } catch (error) {
+        if (error instanceof NotFoundException) {
+            throw error;
+        }
+        throw new NotFoundException(`Ticket with ID ${id} not found`);
         }
     }
 

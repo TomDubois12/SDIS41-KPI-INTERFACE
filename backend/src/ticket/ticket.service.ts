@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -90,17 +90,71 @@ export class TicketService {
     // liste des tickets créés à une date donnée, avec leur titre, le nom de l'utilisateur qui les a créés et l'heure de création
     async getTickets(date: string): Promise<any> {
         return this.dataSource.query(
-            `SELECT t.TicketId, 
+            `SELECT 
+                t.TicketId, 
                 t.Title, 
                 CASE 
-                    WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail'
+                    WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail' 
                     ELSE u.[user_park_helpdesk_login] 
                 END AS CallerName,
-                CONVERT(VARCHAR, t.SentOn, 108) AS HeureDeCréation
+                CONVERT(VARCHAR, t.SentOn, 108) AS HeureDeCréation,
+                t.ResolutionDate
             FROM [parc_db].[dbo].[SD_Tickets] t
             LEFT JOIN [user_park] u ON t.CallerId = u.id_user_park
             WHERE CAST(t.SentOn AS DATE) = '${date}';`,
         );
+    }
+
+
+    async getTicketById(id: number): Promise<any> {
+        try {
+            const result = await this.dataSource.query(
+                `SELECT 
+                    t.TicketId,
+                    CASE 
+                        WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail'
+                        ELSE u.[user_park_helpdesk_login] 
+                    END AS CallerName,
+                    t.SentOn,
+                    t.Title,
+                    t.TicketStatus,
+                    t.Category,
+                    t.AssignedToId,
+                    t.ResolutionDate,
+                    t.DescriptionText
+                FROM 
+                    [parc_db].[dbo].[SD_Tickets] t
+                LEFT JOIN 
+                    [user_park] u ON t.CallerId = u.id_user_park
+                WHERE 
+                    t.TicketId = ${id}
+                `,
+            );
+
+            if (!result || result.length === 0) {
+                throw new NotFoundException(`Ticket with ID ${id} not found`);
+            }
+
+            const ticket = result[0];
+
+            // Calculate resolution time
+            const resolutionTimeResult = await this.dataSource.query(
+                `SELECT 
+                    FLOOR(SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId)) AS Minutes,
+                    CAST((SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId) - FLOOR(SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId))) * 60 AS INT) AS Secondes
+                FROM [parc_db].[dbo].[SD_Tickets] t
+                JOIN [parc_db].[dbo].[SD_Planning] w ON t.TicketId = w.TicketId
+                WHERE t.TicketId = ${id}
+                `,
+            );
+
+            ticket.resolutionTime = resolutionTimeResult[0] || { Minutes: 0, Secondes: 0 }; // Add resolution time to ticket
+
+            return ticket;
+        } catch (error) {
+            console.error('Error fetching ticket details:', error);
+            throw error;
+        }
     }
 
 
