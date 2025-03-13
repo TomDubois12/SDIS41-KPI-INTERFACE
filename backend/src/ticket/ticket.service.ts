@@ -109,37 +109,41 @@ export class TicketService {
     async getTicketById(id: number): Promise<any> {
         try {
             const result = await this.dataSource.query(
-                `SELECT 
+                `SELECT
                     t.TicketId,
-                    CASE 
+                    CASE
                         WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail'
-                        ELSE u.[user_park_helpdesk_login] 
+                        ELSE u.[user_park_helpdesk_login]
                     END AS CallerName,
                     t.SentOn,
                     t.Title,
-                    t.TicketStatus,
-                    t.Category,
+                    ts.StatusString AS TicketStatus,
+                    tc.TicketClassLabel AS Category,  -- Fetch the category name
                     t.AssignedToId,
                     t.ResolutionDate,
                     t.DescriptionText
-                FROM 
+                FROM
                     [parc_db].[dbo].[SD_Tickets] t
-                LEFT JOIN 
+                LEFT JOIN
                     [user_park] u ON t.CallerId = u.id_user_park
-                WHERE 
+                LEFT JOIN
+                    [parc_db].[dbo].[SD_TicketStatusStrings] ts ON t.TicketStatus = ts.TicketStatus AND ts.Language = 'fr'
+                LEFT JOIN
+                    [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId -- Join to get category name
+                WHERE
                     t.TicketId = ${id}
                 `,
             );
-
+    
             if (!result || result.length === 0) {
                 throw new NotFoundException(`Ticket with ID ${id} not found`);
             }
-
+    
             const ticket = result[0];
-
+    
             // Calculate resolution time
             const resolutionTimeResult = await this.dataSource.query(
-                `SELECT 
+                `SELECT
                     FLOOR(SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId)) AS Minutes,
                     CAST((SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId) - FLOOR(SUM(w.Duration * 60) / COUNT(DISTINCT t.TicketId))) * 60 AS INT) AS Secondes
                 FROM [parc_db].[dbo].[SD_Tickets] t
@@ -147,9 +151,9 @@ export class TicketService {
                 WHERE t.TicketId = ${id}
                 `,
             );
-
+    
             ticket.resolutionTime = resolutionTimeResult[0] || { Minutes: 0, Secondes: 0 }; // Add resolution time to ticket
-
+    
             return ticket;
         } catch (error) {
             console.error('Error fetching ticket details:', error);

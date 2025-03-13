@@ -16,7 +16,7 @@ interface OperatorData {
 }
 
 const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title }) => {
-    const [chartData, setChartData] = useState<OperatorData[]>([]);
+    const [chartData, setChartData] = useState<OperatorData[]>([]); // Initialize as empty array
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -27,11 +27,38 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             ? `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
             : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`; // Ajout pour les données annuelles
 
+    const formatOperatorName = (operatorName: string): string => {
+        if (!operatorName) {
+            return '';
+        }
+
+        const parts = operatorName.split('\\');
+
+        if (parts.length === 2) {
+            let namePart = parts[1];
+            if (namePart.includes('.') || namePart.includes('-')) {
+                namePart = namePart.replace(/\./g, ' ').replace(/-/g, ' ');
+            }
+
+            const capitalize = (str: string): string => {
+                return str.replace(/\b\w/g, (char) => char.toUpperCase());
+            };
+
+            return capitalize(namePart);
+        }
+
+        return operatorName;
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(apiUrl);
-                setChartData(response.data);
+                const response = await axios.get<OperatorData[]>(apiUrl); // Type assertion for array
+                const formattedData = response.data.map((item: OperatorData) => ({ // Explicit type annotation
+                    ...item,
+                    operator: formatOperatorName(item.operator),
+                }));
+                setChartData(formattedData);
             } catch (error) {
                 console.error("Erreur lors de la récupération des données du graphique :", error);
                 setError(error as Error);

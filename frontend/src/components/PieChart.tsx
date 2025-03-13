@@ -40,7 +40,7 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
                 
                 // Transformer les données
                 let transformedData = response.data.map(item => ({
-                    TicketClassLabel: item.TicketClassLabel || "Inconnu",
+                    TicketClassLabel: item.TicketClassLabel || "Pas de catégorie attribuée",
                     count: item.NombreTickets
                 }));
                 
