@@ -118,8 +118,9 @@ export class TicketService {
                     t.SentOn,
                     t.Title,
                     ts.StatusString AS TicketStatus,
-                    tc.TicketClassLabel AS Category,  -- Fetch the category name
+                    tc.TicketClassLabel AS Category,
                     t.AssignedToId,
+                    op.operator_helpdesk_login AS AssignedToName,  -- Fetch operator name from operator table
                     t.ResolutionDate,
                     t.DescriptionText
                 FROM
@@ -129,7 +130,9 @@ export class TicketService {
                 LEFT JOIN
                     [parc_db].[dbo].[SD_TicketStatusStrings] ts ON t.TicketStatus = ts.TicketStatus AND ts.Language = 'fr'
                 LEFT JOIN
-                    [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId -- Join to get category name
+                    [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
+                LEFT JOIN
+                    [parc_db].[dbo].[operator] op ON t.AssignedToId = op.id_operator  -- Join with operator table
                 WHERE
                     t.TicketId = ${id}
                 `,

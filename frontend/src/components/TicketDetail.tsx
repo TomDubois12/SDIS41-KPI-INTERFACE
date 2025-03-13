@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface TicketDetail {
     TicketId: number;
@@ -10,6 +10,7 @@ interface TicketDetail {
     TicketStatus: string;
     Category: string;
     AssignedToId: number;
+    AssignedToName: string | null;
     ResolutionDate: string | null;
     DescriptionText: string;
     resolutionTime: {
@@ -25,7 +26,8 @@ const ClarilogTicketDetail: React.FC = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const ticketId = searchParams.get('id');
-    const navigate = useNavigate(); // Initialize useNavigate
+
+    const navigate = useNavigate();
 
     const formatOperatorName = (operatorName: string): string => {
         if (!operatorName) {
@@ -62,9 +64,14 @@ const ClarilogTicketDetail: React.FC = () => {
             try {
                 const response = await axios.get<TicketDetail>(`http://localhost:3001/tickets/ticket/${ticketId}`);
                 if (response.data) {
+                    let formattedAssignedToName = response.data.AssignedToName;
+                    if (formattedAssignedToName) {
+                        formattedAssignedToName = formatOperatorName(formattedAssignedToName);
+                    }
                     setTicket({
                         ...response.data,
                         CallerName: formatOperatorName(response.data.CallerName),
+                        AssignedToName: formattedAssignedToName, // Apply formatOperatorName here
                     });
                 } else {
                     setError('Ticket non trouvé.');
@@ -80,13 +87,13 @@ const ClarilogTicketDetail: React.FC = () => {
         fetchTicketDetails();
     }, [ticketId]);
 
-    if (loading) return <p>Chargement des détails du ticket...</p>;
-    if (error) return <p>{error}</p>;
-    if (!ticket) return <p>Ticket non trouvé.</p>;
-
     const handleGoBack = () => {
         navigate(-1);
     };
+
+    if (loading) return <p>Chargement des détails du ticket...</p>;
+    if (error) return <p>{error}</p>;
+    if (!ticket) return <p>Ticket non trouvé.</p>;
 
     return (
         <div>
@@ -97,7 +104,9 @@ const ClarilogTicketDetail: React.FC = () => {
             <p><strong>Date de création :</strong> {new Date(ticket.SentOn).toLocaleDateString('fr-FR')}</p>
             <p><strong>Statut :</strong> {ticket.TicketStatus}</p>
             <p><strong>Catégorie :</strong> {ticket.Category || "Pas de catégorie attribuée"}</p>
-            <p><strong>Assigné à (ID) :</strong> {ticket.AssignedToId || "Non attribué"}</p>
+            <p>
+                <strong>Assigné à :</strong> {ticket.AssignedToName ? ticket.AssignedToName : ticket.AssignedToId || "Non attribué"}
+            </p>
             <p><strong>Date de résolution :</strong> {ticket.ResolutionDate ? new Date(ticket.ResolutionDate).toLocaleDateString('fr-FR') : 'Non résolu'}</p>
             <p><strong>Description :</strong> {ticket.DescriptionText || "Pas de description"}</p>
             {ticket.ResolutionDate && (
