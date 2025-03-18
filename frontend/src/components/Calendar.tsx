@@ -1,14 +1,23 @@
 import { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import { Tooltip } from "react-tooltip";
 import { useNavigate } from 'react-router-dom';
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import '../styles/components/Calendar.css';
+//import "react-calendar/dist/Calendar.css";
+
+import Calendar from "react-calendar";
+import Button from "../components/Button";
+
+
 const CalendarComponent = () => {
+    
+    const { t } = useTranslation();
     const [date, setDate] = useState<Date | null>(new Date());
     const [calendarView, setCalendarView] = useState<'month' | 'year' | 'decade'>('month');
     const navigate = useNavigate();
-
+    
     const handleDateChange = (newDate: Date | null) => {
         setDate(newDate);
         if (newDate) {
@@ -76,7 +85,7 @@ const CalendarComponent = () => {
 
     return (
         <div>
-            <h2>Calendrier de visualisation mensuel de la performance</h2>
+            <h2>{t("Calendar.TitleCalendar")}</h2>
             <Calendar
                 onChange={handleDateChange}
                 value={date}
@@ -90,7 +99,12 @@ const CalendarComponent = () => {
                 onClickDecade={() => setCalendarView('decade')}
                 onClickView={handleHeaderClick}
             />
-            <button onClick={handleYearPageClick}>Voir les statistiques annuelles</button>
+            <Button 
+                backgroundColor={"#2B3244"} 
+                text={t("Calendar.GoToYear")}
+                textColor={"white"}
+                onClick={handleYearPageClick}                       
+            />
         </div>
     );
 };

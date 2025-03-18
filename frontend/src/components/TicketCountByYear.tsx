@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
+
 import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/TicketCountByMonthYear.module.scss';
 
 interface TicketCountByYearProps {
     year: number;
 }
 
 export default function TicketCountByYear({ year }: TicketCountByYearProps) {
+    
     const { t } = useTranslation();
     const [countTicketCreated, setCountTicketCreated] = useState<number | null>(null);
     const [countTicketResolved, setCountTicketResolved] = useState<number | null>(null);
@@ -52,20 +56,23 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
     }, [year]);
 
     return (
-        <div>
+        <div className={styles.container}>
+            <h2 className={styles.ticket}>{t("Global.Details")} :</h2> 
             {loading ? (
-                <p>Loading</p>
+                <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
+                <p className={styles.error}>{error}</p>
             ) : (
-                <p>{}Nombre total de ticket créés cette année : {countTicketCreated}</p>
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsCreesAnnee")} : 
+                <span className={styles.result}> {countTicketCreated}</span> </p>
             )}
             {loading ? (
-                <p>Loading</p>
+                <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
+                <p className={styles.error}>{error}</p>
             ) : (
-                <p>{}Nombre total de ticket résolus cette année : {countTicketResolved}</p>
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsResolusAnnee")} : 
+                <span className={styles.result}> {countTicketResolved}</span> </p>
             )}
         </div>
     );

@@ -1,6 +1,8 @@
 {
     "Global": {
-        "Entrer": "Enter"
+        "Entrer": "Enter",
+        "Chargement": "Loading...",
+        "Details": "Details"
     },
     "Parametre": {
         "SwitchLanguage": "Switch to french",
@@ -14,8 +16,64 @@
         "StatsRapport": "SIC Report Statistics",
         "Alertes": "Alerts"
     },
+    "Performance":{
+        "Atteint": "The team met or exceeded the goal of",
+        "PasAtteint":"The team did not reach the goal of",
+        "Suite": "resolved tickets."
+    },
+    "Calendar":{
+        "TitleCalendar": "Monthly Performance Visualization Calendar",
+        "GoToMonth": "View monthly statistics",
+        "GoToYear": "View annual statistics",
+        "SelectDate": "Please select a year"
+    },
     "Charts": {
-        "TicketsAttribution": "Allocation of day tickets by operator",
-        "TiketsTypes": "Type of tickets created during the day"
+        "TicketsAttributionDay": "Allocation of day tickets by operator",
+        "TicketsAttributionMonth": "Allocation of monthly tickets by operator",
+        "TicketsAttributionYear": "Allocation of tickets for the year by operator",
+        "TiketsTypesDay": "Type of tickets created during the day",
+        "TiketsTypesMonth": "Type of tickets created during the month",
+        "TiketsTypesYear": "Type of tickets created during the year",
+        "Chargement": "Loading chart...",
+        "Erreur": "Error loading chart",
+        "PasDeDonnees": "No data available regarding this chart"
+    },
+    "NbTicketMois": {
+        "NbTicketsCreesMois": "Total number of tickets created this month",
+        "NbTicketsResolusMois": "Total number of tickets resolved this month"
+    },
+    "NbTicketAnnee": {
+        "NbTicketsCreesAnnee": "Total number of tickets created this year",
+        "NbTicketsResolusAnnee": "Total number of tickets resolved this year"
+    },
+    "TicketCount": {
+        "NbTicketsCreesJour": "Number of new tickets created during the day",
+        "NbTicketsResolusJour": "Number of tickets resolved during the day",
+        "TitleTableau": "Table of tickets created during the day",
+        "ID": "Ticket ID",
+        "TitreDemande": "Request title",
+        "Demandeur": "Applicant",
+        "Heure": "Hour"
+    },
+    "TicketDetail": {
+        "ChargementDetail": "Loading ticket details...",
+        "TicketNonTrouve": "Ticket not found",
+        "DetailTitle": "Ticket Details",
+        "Titre": "Title",
+        "Demandeur": "Applicant",
+        "DateCreation": "Creation Date",
+        "Statut": "Status",
+        "Categorie": "Category",
+        "CategoriePasAttrib": "No category assigned",
+        "AssigneA": "Assigned to",
+        "NonAssigne": "Not assigned",
+        "DateReso": "Resolution Date",
+        "NonReso": "Not resolved",
+        "Description": "Description",
+        "PasDeDescription": "No description",
+        "TempsReso": "Resolution time",
+        "TempsReso2": "minutes and",
+        "TempsReso3": "seconds",
+        "Retour": "Return to daily viewing"
     }
 }

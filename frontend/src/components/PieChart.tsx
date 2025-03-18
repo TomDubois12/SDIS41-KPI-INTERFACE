@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/PieChart.module.scss';
+
 interface PieChartProps {
     date?: string;
     month?: number;
@@ -22,9 +26,12 @@ interface ApiDataItem {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title }) => {
+    
     const [chartData, setChartData] = useState<DataItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const { t } = useTranslation();
+    
 
     // Construire l'URL dynamiquement
     const apiUrl = date
@@ -77,9 +84,12 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
             responsive: [{
                 breakpoint: 960,
                 options: {
+                    chart: {
+                        width: '100%',
+                        height: 'auto'
+                    },
                     legend: {
                         position: 'bottom',
-                        width: 500
                     }
                 }
             }],
@@ -87,14 +97,14 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
         },
     };
 
-    if (loading) return <p>Chargement du graphique...</p>;
-    if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
-    if (state.series.length === 0) return <p>Aucune donnée disponible.</p>;
+    if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
+    if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
+    if (state.series.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonnees")}.</p>;
 
     return (
         <div id="chart">
-            <ReactApexChart options={state.options} series={state.series} type="pie" width={650} />
-            <h2>{title}</h2>
+            <ReactApexChart options={state.options} series={state.series} type="pie" width="100%" height="auto" />
+            <h2 className={styles.title}>{title}</h2>
         </div>
     );
 };

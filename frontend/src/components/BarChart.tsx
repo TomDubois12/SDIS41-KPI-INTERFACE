@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/BarChart.module.scss';
+
 interface BarChartProps {
     date?: string;
     month?: number;
@@ -16,10 +20,12 @@ interface OperatorData {
 }
 
 const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title }) => {
+    
     const [chartData, setChartData] = useState<OperatorData[]>([]); // Initialize as empty array
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-
+    const { t } = useTranslation();
+    
     // Construire l'URL dynamiquement
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-by-operator?date=${date}`
@@ -53,8 +59,8 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<OperatorData[]>(apiUrl); // Type assertion for array
-                const formattedData = response.data.map((item: OperatorData) => ({ // Explicit type annotation
+                const response = await axios.get<OperatorData[]>(apiUrl);
+                const formattedData = response.data.map((item: OperatorData) => ({
                     ...item,
                     operator: formatOperatorName(item.operator),
                 }));
@@ -86,16 +92,22 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             categories: chartData.map(item => item.operator),
             labels: { style: { fontSize: "12px" } }
         },
+        tooltip: {
+            enabled: true,
+            fixed: { enabled: true, position: "topRight" },
+        }
     };
+    
+    
 
-    if (loading) return <p>Chargement du graphique...</p>;
-    if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
-    if (chartData.length === 0) return <p>Aucune donnée disponible.</p>;
+    if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
+    if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
+    if (chartData.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonnees")}.</p>;
 
     return (
         <div>
-            <ReactApexChart options={chartOptions} series={[{ data: chartData.map(item => item.ticketCount) }]} type="bar" height={350} />
-            <h2>{title}</h2>
+            <ReactApexChart options={chartOptions} series={[{ data: chartData.map(item => item.ticketCount) }]} type="bar" width="90%" height="auto" />
+            <h2 className={styles.title}>{title}</h2>
         </div>
     );
 };

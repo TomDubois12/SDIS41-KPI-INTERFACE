@@ -1,0 +1,54 @@
+.container {
+    display: flex;
+}
+
+.divTab {
+    display: flex;
+    align-items: center;
+    flex-basis: 70%;
+    
+    h2 {
+        margin-left: 1vw;
+    }
+    
+    button {
+        margin-left: 1vw;
+        margin-top: 3vh;
+        padding: 1.5vh 3vw;
+    }
+}
+
+
+.divStats {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 30%;
+}
+
+@media (max-width: 1600px) {
+    .container {
+        display: block;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .divTab{
+        .tablecontainer {
+            width: 100%;
+        }
+    }
+
+    .divTab button {
+        margin-left: 0;
+    }
+
+    .divStats div {
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    h2 {
+        margin-left: 0;
+    }
+}

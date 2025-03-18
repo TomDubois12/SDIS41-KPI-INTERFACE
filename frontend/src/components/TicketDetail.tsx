@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/TicketDetail.module.scss';
+
+import Button from "../components/Button";
+
 interface TicketDetail {
     TicketId: number;
     CallerName: string;
@@ -26,7 +32,7 @@ const ClarilogTicketDetail: React.FC = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const ticketId = searchParams.get('id');
-
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const formatOperatorName = (operatorName: string): string => {
@@ -91,29 +97,56 @@ const ClarilogTicketDetail: React.FC = () => {
         navigate(-1);
     };
 
-    if (loading) return <p>Chargement des détails du ticket...</p>;
+    if (loading) return <p>{t("TicketDetail.ChargementDetail")}</p>;
     if (error) return <p>{error}</p>;
-    if (!ticket) return <p>Ticket non trouvé.</p>;
-
+    if (!ticket) return <p>{t("TicketDetail.TicketNonTrouve")}</p>;
     return (
-        <div>
-            <h2>Détails du Ticket {ticket.TicketId}</h2>
-            <button onClick={handleGoBack}>Retour</button>
-            <p><strong>Titre :</strong> {ticket.Title}</p>
-            <p><strong>Demandeur :</strong> {ticket.CallerName}</p>
-            <p><strong>Date de création :</strong> {new Date(ticket.SentOn).toLocaleDateString('fr-FR')}</p>
-            <p><strong>Statut :</strong> {ticket.TicketStatus}</p>
-            <p><strong>Catégorie :</strong> {ticket.Category || "Pas de catégorie attribuée"}</p>
+        <div className={styles.container}>
+            <h2>{t("TicketDetail.DetailTitle")} n° <span className={styles.important}>{ticket.TicketId}</span> : </h2>
+            <p>{t("TicketDetail.Titre")} : <span className={styles.important}>{ticket.Title}</span></p>
+            <p>{t("TicketDetail.Demandeur")} : <span className={styles.important}>{ticket.CallerName}</span></p>
+            <p>{t("TicketDetail.DateCreation")} : <span className={styles.important}>{new Date(ticket.SentOn).toLocaleDateString('fr-FR')}</span></p>
             <p>
-                <strong>Assigné à :</strong> {ticket.AssignedToName ? ticket.AssignedToName : ticket.AssignedToId || "Non attribué"}
+                {t("TicketDetail.Statut")} : <span className={ticket.TicketStatus === "En cours" 
+                ? styles.inProgress 
+                : ["Résolu", "Clôturé"].includes(ticket.TicketStatus) 
+                ? styles.resolved 
+                : styles.defaultStatus}> {ticket.TicketStatus}</span>
+            </p>            
+            <p>{t("TicketDetail.Categorie")} : <span className={styles.important}>{ticket.Category || t("TicketDetail.CategoriePasAttrib")}</span></p>
+            <p>{t("TicketDetail.AssigneA")} : <span 
+                    className={
+                        ticket.AssignedToName 
+                            ? styles.resolved 
+                            : ticket.AssignedToId 
+                            ? styles.defaultStatus 
+                            : styles.important
+                    }
+                >
+                    {ticket.AssignedToName 
+                        ? ticket.AssignedToName 
+                        : ticket.AssignedToId || t("TicketDetail.NonAssigne")
+                    }
+                </span>
             </p>
-            <p><strong>Date de résolution :</strong> {ticket.ResolutionDate ? new Date(ticket.ResolutionDate).toLocaleDateString('fr-FR') : 'Non résolu'}</p>
-            <p><strong>Description :</strong> {ticket.DescriptionText || "Pas de description"}</p>
+            <p>
+                {t("TicketDetail.DateReso")} : <span className={ticket.ResolutionDate ? styles.resolved : styles.important}> 
+                    {ticket.ResolutionDate 
+                        ? new Date(ticket.ResolutionDate).toLocaleDateString('fr-FR') 
+                        : t("TicketDetail.NonReso")
+                    }
+                </span>
+            </p>
+            <p>{t("TicketDetail.Description")} : <span>{ticket.DescriptionText || t("TicketDetail.PasDeDescription")}</span></p>
             {ticket.ResolutionDate && (
-                <p>
-                    <strong>Temps de résolution :</strong> {ticket.resolutionTime.Minutes} minutes et {ticket.resolutionTime.Secondes} secondes
-                </p>
+                <p>{t("TicketDetail.TempsReso")} : <span className={styles.resolved}>{ticket.resolutionTime.Minutes} {t("TicketDetail.TempsReso2")} {ticket.resolutionTime.Secondes} {t("TicketDetail.TempsReso3")}</span></p>
             )}
+            <Button
+                backgroundColor={"#2B3244"}
+                text={t("TicketDetail.Retour")}
+                textColor={"white"}
+                onClick={handleGoBack}
+            />
         </div>
     );
 };

@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/pages/ClarilogTicketDetail.module.scss';
 
 import Header from "../components/Header";
 import TicketDetail from "../components/TicketDetail";
@@ -10,7 +11,9 @@ export default function ClarilogTicketDetail() {
     
     return (
         <>
-            <Header text={t("Titles.PerfClarilog")} />
+            <Header 
+                text={t("Titles.PerfClarilog")} 
+            />
             <TicketDetail />
         </>
     );

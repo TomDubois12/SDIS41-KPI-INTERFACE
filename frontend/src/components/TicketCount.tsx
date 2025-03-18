@@ -1,6 +1,12 @@
+import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
+
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/TicketCount.module.scss';
+
+import Button from "../components/Button";
 
 interface Ticket {
     TicketId: number;
@@ -11,6 +17,7 @@ interface Ticket {
 }
 
 const TicketCount: React.FC = () => {
+    
     const [NbTicketCreated, setNbTicketCreated] = useState<number | null>(null);
     const [NbTicketResolved, setNbTicketResolved] = useState<number | null>(null);
     const [tickets, setTickets] = useState<Ticket[]>([]); // Correction ici
@@ -20,6 +27,7 @@ const TicketCount: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const selectedDate = searchParams.get('date');
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const formattedDate = selectedDate
         ? new Date(selectedDate).toLocaleDateString('fr-FR')
@@ -108,7 +116,7 @@ const TicketCount: React.FC = () => {
         return () => clearInterval(intervalId);
     }, [fetchInitialData, fetchLiveUpdates]);
 
-    if (loading) return <p>Chargement...</p>;
+    if (loading) return <p>{t("Global.Chargement")}</p>;
     if (error) return <p>{error}</p>;
 
     const handleTicketClick = (ticketId: number) => {
@@ -118,40 +126,55 @@ const TicketCount: React.FC = () => {
     const getRowStyle = (resolutionDate: string | null): React.CSSProperties => {
         return {
             cursor: 'pointer',
-            backgroundColor: resolutionDate ? 'lightblue' : 'lightcoral',
+            color: resolutionDate ? '#2B3244' : '#C54844',
         };
+    };
+
+    const goToCalendar = () => {
+        const today = new Date();
+        const month = (today.getMonth() + 1).toString();
+        const year = today.getFullYear().toString();
+        navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
     };
 
     return (
         <div>
-            <h2>Date : {formattedDate}</h2>
-            <h2>Nombre de nouveaux tickets créés dans la journée : {NbTicketCreated}</h2>
-            <h2>Nombre de tickets résolus dans la journée : {NbTicketResolved}</h2>
-            <h2>Tableau des tickets créés dans la journée</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID du ticket</th>
-                        <th>Titre de la demande</th>
-                        <th>Demandeur</th>
-                        <th>Heure</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }) => (
-                        <tr
-                            key={TicketId}
-                            onClick={() => handleTicketClick(TicketId)}
-                            style={getRowStyle(ResolutionDate)}
-                        >
-                            <td>{TicketId}</td>
-                            <td>{Title}</td>
-                            <td>{CallerName}</td>
-                            <td>{HeureDeCréation}</td>
+            <h2 className={styles.ticket}>Date : <span className={styles.result}>{formattedDate}</span></h2>
+            <h2 className={styles.ticket}>{t("TicketCount.NbTicketsCreesJour")} : <span className={styles.result}>{NbTicketCreated}</span></h2>
+            <h2 className={styles.ticket}>{t("TicketCount.NbTicketsResolusJour")} : <span className={styles.result}>{NbTicketResolved}</span></h2>
+            <h2 className={styles.ticket}>{t("TicketCount.TitleTableau")}</h2>
+            <div className={styles.tablecontainer}>   
+                <table className={styles.tickettable}>
+                    <thead>
+                        <tr>
+                            <th>{t("TicketCount.ID")}</th>
+                            <th>{t("TicketCount.TitreDemande")}</th>
+                            <th>{t("TicketCount.Demandeur")}</th>
+                            <th>{t("TicketCount.Heure")}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }) => (
+                            <tr
+                                key={TicketId}
+                                onClick={() => handleTicketClick(TicketId)}
+                                style={getRowStyle(ResolutionDate)}
+                            >
+                                <td>{TicketId}</td>
+                                <td>{Title}</td>
+                                <td>{CallerName}</td>
+                                <td>{HeureDeCréation}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div> 
+            <Button 
+                backgroundColor={"#2B3244"} 
+                text={t("Calendar.GoToMonth")}
+                textColor={"white"}
+                onClick={goToCalendar}                       
+            />
         </div>
     );
 };

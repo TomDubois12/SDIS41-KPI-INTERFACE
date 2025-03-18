@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+
 import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/TicketCountByMonthYear.module.scss';
 
 interface TicketCountByMonthYearProps {
     month: number;
@@ -7,6 +10,7 @@ interface TicketCountByMonthYearProps {
 }
 
 export default function TicketCountByMonthYear({ month, year }: TicketCountByMonthYearProps) {
+    
     const { t } = useTranslation();
     const [countTicketCreated, setCountTicketCreated] = useState<number | null>(null);
     const [countTicketResolved, setCountTicketResolved] = useState<number | null>(null);
@@ -53,20 +57,23 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
     }, [month, year]);
 
     return (
-        <div>
+        <div className={styles.container}>
+            <h2 className={styles.ticket}>{t("Global.Details")} :</h2> 
             {loading ? (
-                <p>Loading</p>
+                <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
+                <p className={styles.error}>{error}</p>
             ) : (
-                <p>{}Nombre total de ticket créés ce mois-ci : {countTicketCreated}</p>
+                <p className={styles.ticket}>{t("NbTicketMois.NbTicketsCreesMois")} : 
+                <span className={styles.result}> {countTicketCreated}</span> </p>
             )}
             {loading ? (
-                <p>Loading</p>
+                <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
+                <p className={styles.error}>{error}</p>
             ) : (
-                <p>{}Nombre total de ticket résolus ce mois-ci : {countTicketResolved}</p>
+                <p className={styles.ticket}>{t("NbTicketMois.NbTicketsResolusMois")} : 
+                <span className={styles.result}> {countTicketResolved}</span> </p>
             )}
         </div>
     );
