@@ -1,6 +1,8 @@
 {
     "Global": {
-        "Entrer": "Entrer"
+        "Entrer": "Entrer",
+        "Chargement": "Chargement...",
+        "Details": "Détails"
     },
     "Parametre": {    
         "SwitchLanguage": "Passer en anglais",
@@ -14,8 +16,64 @@
         "StatsRapport": "Statistiques du rapport SIC",
         "Alertes": "Alertes"
     },
+    "Performance":{
+        "Atteint": "L'équipe a atteint ou dépassé l'objectif de",
+        "PasAtteint":"L'équipe n'a pas atteint l'objectif de",
+        "Suite": "tickets résolus."
+    },
+    "Calendar":{
+        "TitleCalendar": "Calendrier de visualisation mensuel de la performance",
+        "GoToMonth": "Voir les statistiques mensuelles",
+        "GoToYear": "Voir les statistiques annuelles",
+        "SelectDate": "Veuillez selectionner une année"
+    },
     "Charts": {
-        "TicketsAttribution": "Attribution des tickets de la journée par opérateur",
-        "TiketsTypes": "Type des tickets crées dans la journée"
+        "TicketsAttributionDay": "Attribution des tickets de la journée par opérateur",
+        "TicketsAttributionMonth": "Attribution des tickets du mois par opérateur",
+        "TicketsAttributionYear": "Attribution des tickets de l'année par opérateur",
+        "TiketsTypesDay": "Type des tickets crées dans la journée",
+        "TiketsTypesMonth": "Type des tickets crées dans le mois",
+        "TiketsTypesYear": "Type des tickets crées dans l'année",
+        "Chargement": "Chargement du graphique...",
+        "Erreur": "Erreur lors duc hargement du graphique",
+        "PasDeDonnees": "Aucune donnée disponible concernant ce graphique"
+    },
+    "NbTicketMois": {
+        "NbTicketsCreesMois": "Nombre total de ticket créés ce mois-ci",
+        "NbTicketsResolusMois": "Nombre total de ticket résolus ce mois-ci"
+    },
+    "NbTicketAnnee": {
+        "NbTicketsCreesAnnee": "Nombre total de ticket créés cette année",
+        "NbTicketsResolusAnnee": "Nombre total de ticket résolus cette année"
+    },
+    "TicketCount": {
+        "NbTicketsCreesJour": "Nombre de nouveaux tickets créés dans la journée",
+        "NbTicketsResolusJour": "Nombre de tickets résolus dans la journée",
+        "TitleTableau": "Tableau des tickets créés dans la journée",
+        "ID": "ID du ticket",
+        "TitreDemande": "Titre de la demande",
+        "Demandeur": "Demandeur",
+        "Heure": "Heure"
+    },
+    "TicketDetail": {
+        "ChargementDetail": "Chargement des détails du ticket...",
+        "TicketNonTrouve": "Ticket non trouvé",
+        "DetailTitle": "Détail du Ticket",
+        "Titre": "Titre",
+        "Demandeur": "Demandeur",
+        "DateCreation": "Date de création",
+        "Statut": "Statut",
+        "Categorie": "Catégorie",
+        "CategoriePasAttrib": "Pas de catégorie attribuée",
+        "AssigneA": "Assigné à",
+        "NonAssigne": "Non assigné",
+        "DateReso": "Date de résolution",
+        "NonReso": "Non résolu",
+        "Description": "Description",
+        "PasDeDescription": "Pas de description",
+        "TempsReso": "Temps de résolution",
+        "TempsReso2": "minutes et",
+        "TempsReso3": "secondes",
+        "Retour": "Retour à la visualisation journalière"
     }
 }

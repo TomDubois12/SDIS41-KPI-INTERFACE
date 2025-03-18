@@ -1,0 +1,29 @@
+.container {
+    margin-top: 5vh;
+    p {
+        font-size: 24px;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+}
+
+.inProgress, .defaultStatus {
+    color: orange;
+    font-weight: bold;
+}
+
+.resolved {
+    color: rgb(30, 181, 30);
+    font-weight: bold;
+}
+
+.important {
+    color: #b83230;
+    font-weight: bold;
+}
+
+button {
+    margin-top: 3vh;
+    padding: 1.5vh 3vw;
+}

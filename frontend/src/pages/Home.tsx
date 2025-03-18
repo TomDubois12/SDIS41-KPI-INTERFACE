@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/pages/Home.module.scss';
+
 import logoSDIS from '../assets/images/LogoSDIS.png';
 import ImagesPompiers from '../assets/images/ImagesPompiers.png'
+
 import Title from "../components/Title";
 import Button from "../components/Button"
 import Parametres from "../components/Parametres";

@@ -1,0 +1,16 @@
+.title {
+    color: #2B3244;
+    font-weight: 900;
+    -webkit-text-stroke: 0.25px #C2BEB5;
+    margin: 0;
+}
+
+.chartContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+}
+

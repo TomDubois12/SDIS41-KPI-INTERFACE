@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/PieChart.module.scss';
+
 interface PieChartProps {
     date?: string;
     month?: number;
@@ -11,8 +15,9 @@ interface PieChartProps {
 }
 
 interface DataItem {
-    label: string;
-    value: number;
+    TicketClassLabel: string;
+    count: number;
+    percentage?: number;
 }
 
 interface ApiDataItem {
@@ -21,23 +26,42 @@ interface ApiDataItem {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title }) => {
+    
     const [chartData, setChartData] = useState<DataItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const { t } = useTranslation();
+    
 
     // Construire l'URL dynamiquement
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-types?date=${date}`
-        : `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`;
+        : month
+            ? `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`
+            : `http://localhost:3001/tickets/tickets-types-by-year?year=${year}`;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get<ApiDataItem[]>(apiUrl);
-                const transformedData = response.data.map(item => ({
-                    label: item.TicketClassLabel || "Inconnu",
-                    value: item.NombreTickets
+                
+                // Transformer les données
+                let transformedData = response.data.map(item => ({
+                    TicketClassLabel: item.TicketClassLabel || "Pas de catégorie attribuée",
+                    count: item.NombreTickets
                 }));
+                
+                // Calcul du total des tickets
+                const totalTickets = transformedData.reduce((sum, item) => sum + item.count, 0);
+                
+                // Ajout du pourcentage et tri par ordre décroissant
+                transformedData = transformedData
+                    .map(item => ({
+                        ...item,
+                        percentage: (item.count / totalTickets) * 100
+                    }))
+                    .sort((a, b) => b.percentage! - a.percentage!); // Tri du plus grand au plus petit
+
                 setChartData(transformedData);
             } catch (error) {
                 console.error("Erreur lors de la récupération des données du graphique :", error);
@@ -53,28 +77,34 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
     }, [date, month, year]);
 
     const state = {
-        series: chartData.map(item => item.value),
+        series: chartData.map(item => item.count),
         options: {
-            chart: { width: 380, type: 'pie' },
-            labels: chartData.map(item => item.label),
+            chart: { width: 900, type: 'pie' },
+            labels: chartData.map(item => `${item.TicketClassLabel}: ${item.percentage!.toFixed(1)}%`),
             responsive: [{
-                breakpoint: 480,
+                breakpoint: 960,
                 options: {
-                    chart: { width: 200 },
-                    legend: { position: 'bottom' }
+                    chart: {
+                        width: '100%',
+                        height: 'auto'
+                    },
+                    legend: {
+                        position: 'bottom',
+                    }
                 }
             }],
-            colors: colors
+            colors: colors ? colors.split(',') : undefined
         },
     };
 
-    if (loading) return <p>Chargement du graphique...</p>;
-    if (error) return <p>Erreur lors du chargement du graphique : {error.message}</p>;
+    if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
+    if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
+    if (state.series.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonnees")}.</p>;
 
     return (
         <div id="chart">
-            <ReactApexChart options={state.options} series={state.series} type="pie" width={380} />
-            <h2>{title}</h2>
+            <ReactApexChart options={state.options} series={state.series} type="pie" width="100%" height="auto" />
+            <h2 className={styles.title}>{title}</h2>
         </div>
     );
 };

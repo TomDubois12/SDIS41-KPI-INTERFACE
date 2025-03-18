@@ -4,12 +4,11 @@ import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/TicketCountByMonthYear.module.scss';
 
-interface TicketCountByMonthYearProps {
-    month: number;
+interface TicketCountByYearProps {
     year: number;
 }
 
-export default function TicketCountByMonthYear({ month, year }: TicketCountByMonthYearProps) {
+export default function TicketCountByYear({ year }: TicketCountByYearProps) {
     
     const { t } = useTranslation();
     const [countTicketCreated, setCountTicketCreated] = useState<number | null>(null);
@@ -23,7 +22,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
             setError(null);
             try {
                 const response = await fetch(
-                    `http://localhost:3001/tickets/count-created-by-month-year?month=${month}&year=${year}`
+                    `http://localhost:3001/tickets/count-created-by-year?year=${year}`
                 );
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des données");
@@ -38,7 +37,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
 
             try {
                 const response = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-month-year?month=${month}&year=${year}`
+                    `http://localhost:3001/tickets/count-resolved-by-year?year=${year}`
                 );
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des données");
@@ -54,7 +53,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
         }
 
         fetchData();
-    }, [month, year]);
+    }, [year]);
 
     return (
         <div className={styles.container}>
@@ -64,7 +63,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
             ) : error ? (
                 <p className={styles.error}>{error}</p>
             ) : (
-                <p className={styles.ticket}>{t("NbTicketMois.NbTicketsCreesMois")} : 
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsCreesAnnee")} : 
                 <span className={styles.result}> {countTicketCreated}</span> </p>
             )}
             {loading ? (
@@ -72,7 +71,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
             ) : error ? (
                 <p className={styles.error}>{error}</p>
             ) : (
-                <p className={styles.ticket}>{t("NbTicketMois.NbTicketsResolusMois")} : 
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsResolusAnnee")} : 
                 <span className={styles.result}> {countTicketResolved}</span> </p>
             )}
         </div>

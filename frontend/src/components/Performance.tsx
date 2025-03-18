@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 
+import styles from '../styles/components/Performance.module.scss'
+
 
 interface PerformanceProps {
     date: string;
@@ -36,7 +38,7 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
             onMouseLeave={() => setIsTooltipVisible(false)}
             style={{ position: 'relative' }}
         >
-            <p>Performance: {performance}</p>
+            <p className={styles.title}>Performance: {performance}</p>
             {isTooltipVisible && (
                 <div 
                     style={{ 
@@ -52,9 +54,9 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
                 >
                     {/* Contenu de l'info-bulle */}
                     {performance === '✅' ? (
-                        <p>L'équipe a atteint ou dépassé l'objectif de {averageTickets} tickets résolus.</p>
+                        <p>{t("Performance.Atteint")} {averageTickets} {t("Performance.Suite")}</p>
                     ) : (
-                        <p>L'équipe n'a pas atteint l'objectif de {averageTickets} tickets résolus.</p>
+                        <p>{t("Performance.PasAtteint")} {averageTickets} {t("Performance.Suite")}</p>
                     )}
                 </div>
             )}
