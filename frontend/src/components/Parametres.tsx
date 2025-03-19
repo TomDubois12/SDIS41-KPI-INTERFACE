@@ -20,7 +20,9 @@ const Parametres = () => {
                     {t("Parametre.SwitchLanguage")}
                 </button>
                 {/* <button>{t("Parametre.SwitchToDT")}</button> */} 
-                <button>{t("Parametre.Credits")}</button>
+                <Link to="/credits">  
+                  <button>{t("Parametre.Credits")}</button>
+                </Link>
                 <Link to="/">  
                     <button>{t("Parametre.BackToHome")}</button>
                 </Link>

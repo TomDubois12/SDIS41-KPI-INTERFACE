@@ -35,7 +35,7 @@
         "TiketsTypesMonth": "Type des tickets crées dans le mois",
         "TiketsTypesYear": "Type des tickets crées dans l'année",
         "Chargement": "Chargement du graphique...",
-        "Erreur": "Erreur lors duc hargement du graphique",
+        "Erreur": "Erreur lors du chargement du graphique",
         "PasDeDonnees": "Aucune donnée disponible concernant ce graphique"
     },
     "NbTicketMois": {
@@ -75,5 +75,20 @@
         "TempsReso2": "minutes et",
         "TempsReso3": "secondes",
         "Retour": "Retour à la visualisation journalière"
+    },
+    "Credits": {
+        "Title": {
+            "Credit": "Crédit",
+            "Objectif": "Objectif du projet",
+            "TechUse": "Technologies utilisées",
+            "Contact": "Contact"
+        },
+        "CreditTxt": "Cette application a été réalisée par M. DUBOIS Tom dans le cadre d'un stage au SDIS 41, visant à valider son année de Bachelor Universitaire de Technologie en Informatique.",
+        "ObjectifTxt": "Ce projet a été développé afin de proposer au service SIC une application capable de regrouper des indicateurs de performance concernant leur système de ticket Clarilog, un système d'auto complétion du rapport mensuel SIC, ainsi qu'un système d'alerte concernant les mails importants.",
+        "TechUse1": "React/HTML/CSS/SCSS",
+        "TechUse2": "NestJS/JS/TS",
+        "ContactTxt": "Pour toute demande d'amélioration, de correction ou d'évolution de cette application, veuillez contacter son créateur :",
+        "Contact1": "Mail - tom.dubois12@gmail.com",
+        "FinalTxt": "Un grand merci au SDIS 41 pour l'accueil et les ressources mises à disposition durant ce projet."
     }
 }

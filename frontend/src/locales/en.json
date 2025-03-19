@@ -75,5 +75,21 @@
         "TempsReso2": "minutes and",
         "TempsReso3": "seconds",
         "Retour": "Return to daily viewing"
+    },
+    "Credits": {
+        "Title": {
+            "Credit": "Credit",
+            "Objectif": "Project Objective",
+            "TechUse": "Technologies Used",
+            "Contact": "Contact"
+        },
+        "CreditTxt": "This application was developed by Mr. Tom DUBOIS as part of an internship at SDIS 41, aiming to validate his year of University Bachelor of Technology in Computer Science.",
+        "ObjectifTxt": "This project was developed to provide the SIC service with an application capable of gathering performance indicators regarding their Clarilog ticketing system, an auto-completion system for the SIC monthly report, as well as an alert system for important emails.",
+        "TechUse1": "React/HTML/CSS/SCSS",
+        "TechUse2": "NestJS/JS/TS",
+        "ContactTxt": "For any request for improvement, correction, or evolution of this application, please contact its creator:",
+        "Contact1": "Email - tom.dubois12@gmail.com",
+        "FinalTxt": "A big thank you to SDIS 41 for the warm welcome and the resources made available during this project."
     }
+
 }
