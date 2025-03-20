@@ -10,7 +10,7 @@ interface BarChartProps {
     date?: string;
     month?: number;
     year?: number;
-    colors?: string;
+    colors?: string | string[];
     title: string;
 }
 
@@ -25,6 +25,11 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const { t } = useTranslation();
+    colors = [
+        "#FF4560", "#008FFB", "#00E396", "#FEB019", "#8E44AD", "#2C3E50",
+        "#1ABC9C", "#F39C12", "#E74C3C", "#3498DB", "#2ECC71", "#F1C40F",
+        "#9B59B6", "#34495E", "#16A085", "#D35400"
+    ]
     
     // Construire l'URL dynamiquement
     const apiUrl = date
@@ -80,11 +85,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
 
     const chartOptions = {
         chart: { height: 350, type: "bar" as const },
-        colors: colors || [
-            "#FF4560", "#008FFB", "#00E396", "#FEB019", "#8E44AD", "#2C3E50",
-            "#1ABC9C", "#F39C12", "#E74C3C", "#3498DB", "#2ECC71", "#F1C40F",
-            "#9B59B6", "#34495E", "#16A085", "#D35400"
-        ],
+        colors: Array.isArray(colors) ? colors : [colors],
         plotOptions: { bar: { columnWidth: "45%", distributed: true } },
         dataLabels: { enabled: false },
         legend: { show: false },

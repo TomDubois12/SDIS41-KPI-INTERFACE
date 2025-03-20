@@ -154,9 +154,9 @@ const TicketCount: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }) => (
+                        {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }, index) => (
                             <tr
-                                key={TicketId}
+                                key={TicketId ?? `fallback-key-${index}`}
                                 onClick={() => handleTicketClick(TicketId)}
                                 style={getRowStyle(ResolutionDate)}
                             >
