@@ -103,8 +103,8 @@ const ClarilogTicketDetail: React.FC = () => {
     return (
         <div className={styles.container}>
             <h2>{t("TicketDetail.DetailTitle")} n° <span className={styles.important}>{ticket.TicketId}</span> : </h2>
-            <p>{t("TicketDetail.Titre")} : <span className={styles.important}>{ticket.Title}</span></p>
-            <p>{t("TicketDetail.Demandeur")} : <span className={styles.important}>{ticket.CallerName}</span></p>
+            <p>{t("TicketDetail.Titre")} : <span className={styles.important}>{ticket.Title || t("TicketCount.Erreur.Titre")}</span></p>
+            <p>{t("TicketDetail.Demandeur")} : <span className={styles.important}>{ticket.CallerName || t("TicketCount.Erreur.Demandeur")}</span></p>
             <p>{t("TicketDetail.DateCreation")} : <span className={styles.important}>{new Date(ticket.SentOn).toLocaleDateString('fr-FR')}</span></p>
             <p>
                 {t("TicketDetail.Statut")} : <span className={ticket.TicketStatus === "En cours" 
