@@ -53,7 +53,13 @@
         "ID": "ID du ticket",
         "TitreDemande": "Titre de la demande",
         "Demandeur": "Demandeur",
-        "Heure": "Heure"
+        "Heure": "Heure",
+        "Erreur": {
+            "ID": "ID non trouvé",
+            "Titre": "Pas de titre indiqué par le demandeur",
+            "Demandeur": "Demandeur non trouvé",
+            "Heure": "Heure non trouvé"
+        }
     },
     "TicketDetail": {
         "ChargementDetail": "Chargement des détails du ticket...",

@@ -53,7 +53,13 @@
         "ID": "Ticket ID",
         "TitreDemande": "Request title",
         "Demandeur": "Applicant",
-        "Heure": "Hour"
+        "Heure": "Hour",
+        "Erreur": {
+            "ID": "ID not found",
+            "Titre": "No title specified by applicant",
+            "Demandeur": "Applicant not found",
+            "Heure": "Hour not found"
+        }
     },
     "TicketDetail": {
         "ChargementDetail": "Loading ticket details...",

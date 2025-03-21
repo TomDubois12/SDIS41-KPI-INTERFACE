@@ -154,16 +154,16 @@ const TicketCount: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }) => (
+                        {tickets.map(({ TicketId, Title, CallerName, HeureDeCréation, ResolutionDate }, index) => (
                             <tr
-                                key={TicketId}
+                                key={TicketId ?? `fallback-key-${index}`}
                                 onClick={() => handleTicketClick(TicketId)}
                                 style={getRowStyle(ResolutionDate)}
                             >
-                                <td>{TicketId}</td>
-                                <td>{Title}</td>
-                                <td>{CallerName}</td>
-                                <td>{HeureDeCréation}</td>
+                                <td>{TicketId || t("TicketCount.Erreur.ID")}</td>
+                                <td>{Title || t("TicketCount.Erreur.Titre")}</td>
+                                <td>{CallerName || t("TicketCount.Erreur.Demandeur")}</td>
+                                <td>{HeureDeCréation || t("TicketCount.Erreur.Heure")}</td>
                             </tr>
                         ))}
                     </tbody>
