@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TicketModule } from './ticket/ticket.module';
+import { ExcelModule } from './excel/excel.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TicketModule } from './ticket/ticket.module';
       synchronize: false, // À ne pas activer en production !
     }),
     TicketModule,
+    ExcelModule,
   ],
 })
 export class AppModule {}

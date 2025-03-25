@@ -29,7 +29,7 @@ export default function Hub() {
                     img={Dring}
                     text={t("Titles.StatsRapport")}
                     buttonText={t("Global.Entrer")}
-                    path="/statistiques"
+                    path={`/statistiques_mensuelles?month=${month}&year=${year}`}
                 />
                 <Card 
                     img={Feu}
