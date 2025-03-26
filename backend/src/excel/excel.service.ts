@@ -5,7 +5,14 @@ import { Response } from 'express';
 
 @Injectable()
 export class ExcelService {
-    async generateReport(data: { countTicketCreated: number; resolutionRate: string, telephonyAvailability: string, maintenanceMinutes: string }, res: Response) {
+    async generateReport(data: {
+        countTicketCreated: number;
+        resolutionRate: string;
+        telephonyAvailability: string;
+        maintenanceMinutes: string;
+        upMeanTimeMPLS: string;
+        upMeanTimeESX: string;
+    }, res: Response) {
         try {
             const templatePath = path.join(process.cwd(), './src/templates/template-rapport-sic.xlsx');
             const workbook = new Workbook();
@@ -42,7 +49,9 @@ export class ExcelService {
             }
             worksheet.getCell('B6').value = data.countTicketCreated || 0;
             worksheet.getCell('B7').value = data.resolutionRate ? `${data.resolutionRate}%` : '0%';
+            worksheet.getCell('B9').value = data.upMeanTimeMPLS;
             worksheet.getCell('B10').value = data.telephonyAvailability;
+            worksheet.getCell('B11').value = data.upMeanTimeESX;
             worksheet.getCell('D10').value = data.maintenanceMinutes + " minutes";
 
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

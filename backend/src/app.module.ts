@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TicketModule } from './ticket/ticket.module';
 import { ExcelModule } from './excel/excel.module';
+import { CsvModule } from './csv/csv.module';
+
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { ExcelModule } from './excel/excel.module';
     }),
     TicketModule,
     ExcelModule,
+    CsvModule,
   ],
 })
 export class AppModule {}

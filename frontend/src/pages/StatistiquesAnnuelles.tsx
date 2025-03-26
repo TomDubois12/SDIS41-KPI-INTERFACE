@@ -8,6 +8,8 @@ import { useTranslation } from "../hooks/useTranslation";
 import Header from "../components/Header";
 import YearPickerStats, { YearPickerStatsHandle } from "../components/YearPickerStats";
 import Telephonie from "../components/Telephonie";
+import DisponibiliteMPLS from "../components/DisponibiliteMPLS";
+import DisponibiliteESX from "../components/DisponibiliteESX";
 
 export default function StatistiquesAnnuelles() {
     const { t } = useTranslation();
@@ -17,6 +19,8 @@ export default function StatistiquesAnnuelles() {
     const yearPickerRef = useRef<YearPickerStatsHandle>(null);
     const [maintenanceMinutes, setMaintenanceMinutes] = useState<string>("");
     const [telephonyAvailability, setTelephonyAvailability] = useState<string>("100%");
+    const [networkAvailability, setNetworkAvailability] = useState<string | null>(null);
+    const [networkAvailabilityESX, setNetworkAvailabilityESX] = useState<string | null>(null)
     
     const handleMaintenanceDataChange = (
         maintenance: boolean,
@@ -44,6 +48,8 @@ export default function StatistiquesAnnuelles() {
                     resolutionRate,
                     telephonyAvailability, 
                     maintenanceMinutes,
+                    upMeanTimeMPLS: networkAvailability,
+                    upMeanTimeESX: networkAvailabilityESX,
             }),
             }
         );
@@ -59,30 +65,44 @@ export default function StatistiquesAnnuelles() {
         }
     };
 
+    const handleNetworkAvailabilityChange = (availability: string) => {
+        setNetworkAvailability(availability);
+    };
+
+    const handleNetworkAvailabilityESXChange = (availability: string) => {
+        setNetworkAvailabilityESX(availability);
+    };
+
     return (
         <>
             <Header text={t("Titles.StatsRapport")} />
             <div>
-                <h2>Donnée Clarilog</h2>
-                <YearPickerStats ref={yearPickerRef}/>
+                <div>
+                    <p>Statistiques pour le rapport annuel "Indicateur de la performance SIC"</p>
+                    <p>Toutes les données en rouge seront enregistrées dans le rapport à la fin de la manipulation</p>
+                    <Link to={`/statistiques_mensuelles?month=${currentMonth}&year=${currentYear}`}>
+                        <button>Aller au rapport mensuel</button>
+                    </Link>
+                </div>
+                <div>
+                    <h2>Donnée Clarilog</h2>
+                    <YearPickerStats ref={yearPickerRef}/>
+                </div>
+                <div>
+                    <h2>Taux de disponibilité du réseau</h2>
+                    <DisponibiliteMPLS onAvailabilityData={handleNetworkAvailabilityChange}/>
+                </div>
+                <div>
+                    <h2>Taux de disponibilité de la téléphonie</h2>
+                    <Telephonie onMaintenanceDataChange={handleMaintenanceDataChange}/>
+                    
+                </div>
+                <div>
+                    <h2>Taux de disponibilité du système</h2>
+                    <DisponibiliteESX onAvailabilityData={handleNetworkAvailabilityESXChange}/> 
+                </div>
+                <button onClick={handleExportToExcel}>Confirmer les données et télécharger le rapport</button>
             </div>
-            <div>
-                <h2>Taux de disponibilité du réseau</h2>
-                {/* Composant drag n drop */} 
-            </div>
-            <div>
-                <h2>Taux de disponibilité de la téléphonie</h2>
-                <Telephonie onMaintenanceDataChange={handleMaintenanceDataChange}/>
-                
-            </div>
-            <div>
-                <h2>Taux de disponibilité du système</h2>
-                {/* Composant drag n drop */} 
-            </div>
-            <Link to={`/statistiques_mensuelles?month=${currentMonth}&year=${currentYear}`}>
-                <button>Aller au rapport mensuel</button>
-            </Link>
-            <button onClick={handleExportToExcel}>Confirmer les données et télécharger le rapport</button>
         </>
     );
 }

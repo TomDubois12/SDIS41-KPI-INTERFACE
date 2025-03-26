@@ -7,6 +7,8 @@ import { useTranslation } from "../hooks/useTranslation";
 import Header from "../components/Header";
 import MonthPickerStats, {MonthPickerStatsHandle,} from "../components/MonthPickerStats";
 import Telephonie from "../components/Telephonie";
+import DisponibiliteMPLS from "../components/DisponibiliteMPLS";
+import DisponibiliteESX from "../components/DisponibiliteESX";
 
 export default function StatistiquesMensuelles() {
     const { t } = useTranslation();
@@ -15,6 +17,8 @@ export default function StatistiquesMensuelles() {
     const monthPickerRef = useRef<MonthPickerStatsHandle>(null);
     const [maintenanceMinutes, setMaintenanceMinutes] = useState<string>("");
     const [telephonyAvailability, setTelephonyAvailability] = useState<string>("100%");
+    const [networkAvailability, setNetworkAvailability] = useState<string | null>(null);
+    const [networkAvailabilityESX, setNetworkAvailabilityESX] = useState<string | null>(null)
 
     const handleMaintenanceDataChange = (
         maintenance: boolean,
@@ -42,6 +46,8 @@ export default function StatistiquesMensuelles() {
                 resolutionRate,
                 telephonyAvailability,
                 maintenanceMinutes,
+                upMeanTimeMPLS: networkAvailability,
+                upMeanTimeESX: networkAvailabilityESX,
             }),
             }
         );
@@ -57,33 +63,45 @@ export default function StatistiquesMensuelles() {
         }
     };
 
+    const handleNetworkAvailabilityChange = (availability: string) => {
+        setNetworkAvailability(availability);
+    };
+
+    const handleNetworkAvailabilityESXChange = (availability: string) => {
+        setNetworkAvailabilityESX(availability);
+    };
+
     return (
         <>
-        <Header text={t("Titles.StatsRapport")} />
-        <div>
-            {/* Données Clarilog */}
-            <h2>Donnée Clarilog</h2>
-            <MonthPickerStats ref={monthPickerRef} />
-        </div>
-        <div>
-            <h2>Taux de disponibilité du réseau</h2>
-            {/* Composant drag n drop */}
-        </div>
-        <div>
-            <h2>Taux de disponibilité de la téléphonie</h2>
-            {/* Composant téléphonie */}
-            <Telephonie onMaintenanceDataChange={handleMaintenanceDataChange}/>
-        </div>
-        <div>
-            <h2>Taux de disponibilité du système</h2>
-            {/* Composant drag n drop */}
-        </div>
-        <Link to={`/statistiques_annuelles?year=${currentYear}`}>
-            <button>Aller au rapport annuel</button>
-        </Link>
-        <button onClick={handleExportToExcel}>
-            Confirmer les données et télécharger le rapport
-        </button>
+            <Header text={t("Titles.StatsRapport")} />
+            <div>
+                <div>
+                    <p>Statistiques pour le rapport mensuel "Indicateur de la performance SIC"</p>
+                    <p>Toutes les données en rouge seront enregistrées dans le rapport à la fin de la manipulation</p>
+                    <Link to={`/statistiques_annuelles?year=${currentYear}`}>
+                        <button>Aller au rapport annuel</button> 
+                    </Link>
+                </div>
+                <div> 
+                    <h2>Donnée Clarilog</h2>
+                    <MonthPickerStats ref={monthPickerRef} />
+                </div>
+                <div>
+                    <h2>Taux de disponibilité du réseau</h2>
+                    <DisponibiliteMPLS onAvailabilityData={handleNetworkAvailabilityChange}/>
+                </div>
+                <div>
+                    <h2>Taux de disponibilité de la téléphonie</h2>
+                    <Telephonie onMaintenanceDataChange={handleMaintenanceDataChange}/>
+                </div>
+                <div>
+                    <h2>Taux de disponibilité du système</h2>
+                    <DisponibiliteESX onAvailabilityData={handleNetworkAvailabilityESXChange}/>
+                </div>
+                <button onClick={handleExportToExcel}>
+                    Confirmer les données et télécharger le rapport
+                </button>
+            </div>
         </>
     );
 }
