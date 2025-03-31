@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { TicketModule } from './ticket/ticket.module';
 import { ExcelModule } from './excel/excel.module';
 import { CsvModule } from './csv/csv.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { UtilsModule } from './utils/utils.module';
 
 
 @Module({
@@ -24,6 +28,10 @@ import { CsvModule } from './csv/csv.module';
     TicketModule,
     ExcelModule,
     CsvModule,
+    ScheduleModule.forRoot(),
+    UtilsModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
