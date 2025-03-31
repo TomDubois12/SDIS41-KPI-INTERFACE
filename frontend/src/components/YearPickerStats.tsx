@@ -82,11 +82,11 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(
         };
 
         const currentYear = new Date().getFullYear();
-        const years = Array.from({ length: 15 }, (_, i) => currentYear - 7 + i);
+        const years = Array.from({ length: 15 }, (_, i) => currentYear - 14 + i);
 
         return (
             <div className={styles.container}>
-                <p>Veuillez choisir l'année pour la récupération des données <span>Clarilog</span> :</p>
+                <p>{t("Rapport.SelectionnerAnnee")} :</p>
                 <select value={selectedYear} onChange={handleYearChange} className={styles.yearSelect}>
                     {years.map((year) => (
                         <option key={year} value={year}>
@@ -105,7 +105,7 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(
                                 <span className={styles.result}> {countTicketCreated}</span>
                             </p>
                             {resolutionRate !== null && (
-                                <p className={styles.ticket}>Taux de résolution des tickets incidents dans l'année :
+                                <p className={styles.ticket}>{t("Rapport.TauxResolution")} :
                                     <span className={styles.result}> {resolutionRate}%</span>
                                 </p>
                             )}

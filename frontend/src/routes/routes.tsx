@@ -9,6 +9,8 @@ import ClarilogMensuel from "../pages/ClarilogMensuel.tsx";
 import ClarilogAnnuel from "../pages/ClarilogAnnuel.tsx";
 import ClarilogTicketDetail from "../pages/ClarilogTicketDetail.tsx";
 import Credits from "../pages/Credits.tsx";
+import HowToGetCSV from "../pages/HowToGetCSV.tsx";
+import CSVDetails from "../pages/CSVDetails.tsx";
 
 export default function AppRoutes() {
     return (
@@ -23,6 +25,8 @@ export default function AppRoutes() {
             <Route path="/clarilog_annuel" element={<ClarilogAnnuel />} />
             <Route path="/clarilog_detail" element={<ClarilogTicketDetail />} />
             <Route path="/credits" element={<Credits />} />
+            <Route path="/howtogetcsv" element={<HowToGetCSV />} />
+            <Route path="/csvdetails" element={<CSVDetails />} />
         </Routes>
     );
 }

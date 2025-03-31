@@ -1,15 +1,23 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
+import { Link } from "react-router-dom";
+
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/DisponibiliteMPLSESX.module.scss';
+import Button from "./Button";
 
 interface DisponibiliteMPLSProps {
     onAvailabilityData: (availability: string) => void;
 }
 
 export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteMPLSProps) {
+    const { t } = useTranslation();
     const [file, setFile] = useState<File | null>(null);
     const [availability, setAvailability] = useState<string | null>(null);
     const [validationMessage, setValidationMessage] = useState<string | null>(null);
+    const [isValidationClicked, setIsValidationClicked] = useState(false);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
@@ -33,10 +41,11 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             const response = await axios.post("http://localhost:3001/csv/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            const upMeanTimeMPLS = response.data?.upMeanTime || 'N/A'; // Extract upMeanTime
+            const upMeanTimeMPLS = response.data?.upMeanTime || 'N/A';
             setAvailability(upMeanTimeMPLS);
             onAvailabilityData(upMeanTimeMPLS);
             setValidationMessage("Données validées avec succès.");
+            setIsValidationClicked(true); // Mise à jour de l'état après le clic
         } catch (error) {
             console.error("Upload Error:", error);
             setValidationMessage("Erreur lors de la validation des données.");
@@ -46,33 +55,34 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
     return (
-        <div>
-            <p>
-                Veuillez sélectionner le CSV correspondant aux rapports de disponibilités
-                des MPLS ci-dessous <button>?</button>
+        <div className={styles.container}>
+            <p>{t("Rapport.SelectionnerCSVMPLS")}
+                <Link to={"/howtogetcsv"}>
+                    <button>?</button>
+                </Link>
             </p>
-
-            <div
+            <div className={styles.dragdrop}
                 {...getRootProps()}
-                style={{
-                    border: "2px dashed gray",
-                    padding: "20px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                }}
             >
                 <input {...getInputProps()} />
                 {isDragActive ? (
-                    <p>Déposez le fichier ici...</p>
+                    <p>{t("Rapport.DragActive")}</p>
                 ) : (
-                    <p>Faites glisser et déposez un fichier CSV ici, ou cliquez pour sélectionner un fichier</p>
+                    <p>{t("Rapport.InfoDragDrop")}</p>
                 )}
             </div>
 
             {file && (
                 <div>
-                    <p>Fichier sélectionné : {file.name}</p>
-                    <button onClick={handleValidate}>Valider les données</button>
+                    <p>{t("Rapport.FichierSelectionne")} : {file.name}</p>
+                    {!isValidationClicked && (
+                        <Button 
+                            backgroundColor={"#2B3244"}
+                            text={t("Rapport.ValideDonnee")} 
+                            textColor={"white"} 
+                            onClick={handleValidate}
+                        /> 
+                    )}
                 </div>
             )}
 
@@ -82,7 +92,14 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
 
             {availability && (
                 <div>
-                    <p>Taux de disponibilité du réseau : {availability} <button>Détail</button></p>
+                    <p>{t("Rapport.DispoReseau")} : <span className={styles.red}>{availability}</span></p>
+                    <Link to={"/csvdetails"}>
+                        <Button 
+                            backgroundColor={"#2B3244"}
+                            text={t("Global.Details")} 
+                            textColor={"white"} 
+                        />
+                    </Link> 
                 </div>
             )}
         </div>

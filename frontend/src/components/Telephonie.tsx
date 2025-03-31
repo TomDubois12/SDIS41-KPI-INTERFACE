@@ -1,10 +1,15 @@
 import { useState } from "react";
 
+import { useTranslation } from "../hooks/useTranslation";
+
+import styles from '../styles/components/Telephonie.module.scss';
+
 interface TelephonieProps {
     onMaintenanceDataChange: (maintenance: boolean, minutes: string) => void;
 }
 
 export default function Telephonie({ onMaintenanceDataChange }: TelephonieProps) {
+    const { t } = useTranslation();
     const [maintenance, setMaintenance] = useState(false);
     const [minutes, setMinutes] = useState("");
 
@@ -23,7 +28,7 @@ export default function Telephonie({ onMaintenanceDataChange }: TelephonieProps)
     };
 
     return (
-        <div>
+        <div className={styles.container}>
             <div>
                 <input
                     type="checkbox"
@@ -31,25 +36,20 @@ export default function Telephonie({ onMaintenanceDataChange }: TelephonieProps)
                     checked={maintenance}
                     onChange={handleMaintenanceChange}
                 />
-                <label htmlFor="maintenance">Une maintenance a-t-elle eu lieu ?</label>
+                <label htmlFor="maintenance">{t("Rapport.Maintenance")}</label>
             </div>
-
             {maintenance && (
-                <div>
-                    <span>Temps de la maintenance ?</span>
+                <div className={styles.tpsMaintenance}>
+                    <span>{t("Rapport.TempsMaintenance")}</span>
                     <input
                         type="text"
                         value={minutes}
                         onChange={handleMinutesChange}
                     />
                     <span>minutes</span>
-                    <button>?</button>
                 </div>
             )}
-
-            <p>
-                Taux de disponibilité du réseau : {maintenance ? "99.9%" : "100%"}
-            </p>
+            <p>{t("Rapport.TauxDispoTelephonie")} : <span className={styles.result}>{maintenance ? "99.9%" : "100%"}</span> </p>
         </div>
     );
 }

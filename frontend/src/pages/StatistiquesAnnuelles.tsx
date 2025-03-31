@@ -2,14 +2,17 @@ import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import { saveAs } from 'file-saver';
 
-
 import { useTranslation } from "../hooks/useTranslation";
+
+import styles from "../styles/pages/StatistiqueRapport.module.scss"
 
 import Header from "../components/Header";
 import YearPickerStats, { YearPickerStatsHandle } from "../components/YearPickerStats";
 import Telephonie from "../components/Telephonie";
 import DisponibiliteMPLS from "../components/DisponibiliteMPLS";
 import DisponibiliteESX from "../components/DisponibiliteESX";
+import Button from "../components/Button";
+import Title from "../components/Title";
 
 export default function StatistiquesAnnuelles() {
     const { t } = useTranslation();
@@ -76,32 +79,51 @@ export default function StatistiquesAnnuelles() {
     return (
         <>
             <Header text={t("Titles.StatsRapport")} />
-            <div>
-                <div>
-                    <p>Statistiques pour le rapport annuel "Indicateur de la performance SIC"</p>
-                    <p>Toutes les données en rouge seront enregistrées dans le rapport à la fin de la manipulation</p>
-                    <Link to={`/statistiques_mensuelles?month=${currentMonth}&year=${currentYear}`}>
-                        <button>Aller au rapport mensuel</button>
-                    </Link>
+            <div className={styles.container}>
+                <div className={styles.containerP}>
+                    <p>{t("Rapport.titleStatAnnuel")}</p>
+                    <p>{t("Rapport.DonneeRouge")}</p>
                 </div>
+                <Link to={`/statistiques_mensuelles?month=${currentMonth}&year=${currentYear}`}>
+                    <Button 
+                        backgroundColor={"#2B3244"}
+                        text={t("Rapport.GoToMonth")} 
+                        textColor={"white"} 
+                    /> 
+                </Link>
                 <div>
-                    <h2>Donnée Clarilog</h2>
+                    <div className={styles.gestionTitle}>
+                        <Title text={t("Rapport.DonneeClarilog")} />
+                    </div>
                     <YearPickerStats ref={yearPickerRef}/>
                 </div>
                 <div>
-                    <h2>Taux de disponibilité du réseau</h2>
+                    <div className={styles.gestionTitle}>
+                        <Title text={t("Rapport.DispoReseau")} />
+                    </div>
                     <DisponibiliteMPLS onAvailabilityData={handleNetworkAvailabilityChange}/>
                 </div>
                 <div>
-                    <h2>Taux de disponibilité de la téléphonie</h2>
+                    <div className={styles.gestionTitle}>
+                        <Title text={t("Rapport.DispoTelephonie")} />
+                    </div>
                     <Telephonie onMaintenanceDataChange={handleMaintenanceDataChange}/>
                     
                 </div>
                 <div>
-                    <h2>Taux de disponibilité du système</h2>
+                    <div className={styles.gestionTitle}>
+                        <Title text={t("Rapport.DispoSysteme")} />
+                    </div>
                     <DisponibiliteESX onAvailabilityData={handleNetworkAvailabilityESXChange}/> 
                 </div>
-                <button onClick={handleExportToExcel}>Confirmer les données et télécharger le rapport</button>
+                <div className={styles.lastButton}>
+                    <Button 
+                        backgroundColor={"#2B3244"}
+                        text={t("Rapport.Telecharger")} 
+                        textColor={"white"} 
+                        onClick={handleExportToExcel}
+                    /> 
+                </div>
             </div>
         </>
     );

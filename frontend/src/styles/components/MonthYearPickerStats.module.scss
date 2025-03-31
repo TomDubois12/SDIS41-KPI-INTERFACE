@@ -1,0 +1,31 @@
+.container {    
+
+    p {
+        font-size: 20px;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+
+    .monthSelect, .yearSelect {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-size: 10px;
+        
+        &:focus {
+            outline: none;
+            border-color: #66afe9;
+            box-shadow: 0 0 5px #2B3244;
+        }
+    }
+
+    .result {
+        color: #C54844;
+    }
+}

@@ -17,9 +17,7 @@ export interface MonthPickerStatsHandle {
     };
 }
 
-const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(
-    ({ initialMonth, initialYear }, ref) => {
-
+const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(({ initialMonth, initialYear }, ref) => {
         const { t } = useTranslation();
         const [selectedMonth, setSelectedMonth] = useState<number>(initialMonth || new Date().getMonth() + 1);
         const [selectedYear, setSelectedYear] = useState<number>(initialYear || new Date().getFullYear());
@@ -95,11 +93,11 @@ const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(
         ];
 
         const currentYear = new Date().getFullYear();
-        const years = Array.from({ length: 15 }, (_, i) => currentYear - 7 + i);
+        const years = Array.from({ length: 15 }, (_, i) => currentYear - 14 + i);
 
         return (
             <div className={styles.container}>
-                <p>Veuillez choisir le mois et l'année pour la récupération des données <span>Clarilog</span> :</p>
+                <p>{t("Rapport.SelectionnerMoisAnnee")} :</p>
                 <select value={selectedMonth} onChange={handleMonthChange} className={styles.monthSelect}>
                     {monthNames.map((month, index) => (
                         <option key={index + 1} value={index + 1}>
@@ -125,7 +123,7 @@ const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(
                                 <span className={styles.result}> {countTicketCreated}</span>
                             </p>
                             {resolutionRate !== null && (
-                                <p className={styles.ticket}>Taux de résolution des tickets incidents :
+                                <p className={styles.ticket}>{t("Rapport.TauxResolution")} :
                                     <span className={styles.result}> {resolutionRate}%</span>
                                 </p>
                             )}

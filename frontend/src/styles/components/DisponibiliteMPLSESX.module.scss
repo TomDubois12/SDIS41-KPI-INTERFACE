@@ -1,0 +1,43 @@
+.container {
+
+    p {
+        font-size: 20px;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+        
+        button {
+            margin-left: 1.5vw;
+            margin-top: 0vh;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #343a40;
+            color: white;
+            font-size: 18px;
+            border: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+    }    
+
+    .dragdrop {
+        border: 2px groove gray;
+        padding: 2em;
+        text-align: center;
+        cursor: pointer;
+        width: 50%;
+
+        @media (max-width: 950px) {
+            width: 80%;
+        }
+    }
+
+    .red {
+        color: #C54844;
+    }
+
+}
