@@ -2,9 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
 import { useTranslation } from "../hooks/useTranslation";
-
 import styles from '../styles/components/DisponibiliteMPLSESX.module.scss';
 import Button from "./Button";
 
@@ -18,6 +16,8 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
     const [availability, setAvailability] = useState<string | null>(null);
     const [validationMessage, setValidationMessage] = useState<string | null>(null);
     const [isValidationClicked, setIsValidationClicked] = useState(false);
+    const [detailedData, setDetailedData] = useState<any[] | null>(null);
+    const [showDetails, setShowDetails] = useState(false);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
@@ -41,15 +41,21 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             const response = await axios.post("http://localhost:3001/csv/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            const upMeanTimeMPLS = response.data?.upMeanTime || 'N/A';
+            const data = response.data;
+            setDetailedData(data.data);
+            const upMeanTimeMPLS = data?.upMeanTime || 'N/A';
             setAvailability(upMeanTimeMPLS);
             onAvailabilityData(upMeanTimeMPLS);
+            setIsValidationClicked(true);
             setValidationMessage("Données validées avec succès.");
-            setIsValidationClicked(true); // Mise à jour de l'état après le clic
         } catch (error) {
             console.error("Upload Error:", error);
             setValidationMessage("Erreur lors de la validation des données.");
         }
+    };
+
+    const toggleDetails = () => {
+        setShowDetails(!showDetails);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
@@ -76,12 +82,12 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
                 <div>
                     <p>{t("Rapport.FichierSelectionne")} : {file.name}</p>
                     {!isValidationClicked && (
-                        <Button 
+                        <Button
                             backgroundColor={"#2B3244"}
-                            text={t("Rapport.ValideDonnee")} 
-                            textColor={"white"} 
+                            text={t("Rapport.ValideDonnee")}
+                            textColor={"white"}
                             onClick={handleValidate}
-                        /> 
+                        />
                     )}
                 </div>
             )}
@@ -93,13 +99,37 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             {availability && (
                 <div>
                     <p>{t("Rapport.DispoReseau")} : <span className={styles.red}>{availability}</span></p>
-                    <Link to={"/csvdetails"}>
-                        <Button 
+                    <div className={styles.detailsbutton}>
+                        <Button
                             backgroundColor={"#2B3244"}
-                            text={t("Global.Details")} 
-                            textColor={"white"} 
+                            text={t("Global.Details")}
+                            textColor={"white"}
+                            onClick={toggleDetails}
                         />
-                    </Link> 
+                    </div>
+                    {showDetails && detailedData && (
+                        <div className={styles.tablecontainer}>
+                            <h2>Détails</h2>
+                            <table className={styles.tickettable}>
+                                <thead>
+                                    <tr>
+                                        {Object.keys(detailedData[0]).map(key => (
+                                            <th key={key}>{key}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {detailedData.map((row, index) => (
+                                        <tr key={index}>
+                                            {Object.values(row).map((value, index) => (
+                                                <td key={index}>{value}</td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

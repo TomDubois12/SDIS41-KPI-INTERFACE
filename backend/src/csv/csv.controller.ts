@@ -15,8 +15,8 @@ export class CsvController {
         const outputFile = './src/csv/output_csv.json';
         await this.csvService.convertCsvToJson(filePath, outputFile);
         if (fs.existsSync(outputFile)) {
-            const data = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
-            return { upMeanTime: data.upMeanTime }; // Return only upMeanTime
+        const data = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+        return data; // Return the entire parsed data
         }
         return null;
     }
@@ -25,7 +25,7 @@ export class CsvController {
     getData(): any {
         const outputFile = './output.json';
         if (fs.existsSync(outputFile)) {
-            return JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+        return JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
         }
         return [];
     }
