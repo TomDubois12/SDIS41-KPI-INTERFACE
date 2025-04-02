@@ -25,7 +25,7 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             setFile(file);
         } else {
             alert("Veuillez sélectionner un fichier CSV valide.");
-        }
+        } 
     }, []);
 
     const handleValidate = async () => {
