@@ -52,8 +52,9 @@ export class ExcelService {
             worksheet.getCell('B9').value = data.upMeanTimeMPLS;
             worksheet.getCell('B10').value = data.telephonyAvailability;
             worksheet.getCell('B11').value = data.upMeanTimeESX;
-            worksheet.getCell('D10').value = data.maintenanceMinutes + " minutes";
-
+            if (data.maintenanceMinutes) {
+                worksheet.getCell('D10').value = data.maintenanceMinutes + " minutes";
+            }
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             res.setHeader('Content-Disposition', 'attachment; filename=Indicateur_de_la_performance_SIC.xlsx');
 
