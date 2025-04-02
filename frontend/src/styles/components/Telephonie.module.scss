@@ -1,0 +1,42 @@
+.container {
+    label, p, span {
+        font-size: 20px;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+
+    .result {
+        color: #C54844;
+    }
+
+    .tpsMaintenance {
+        @media (max-width: 950px) {
+            margin-top: 2.5vh;
+        }
+        span, input, button {
+            margin-left: 1vw;
+        }
+
+        input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            color: #C54844;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+            
+            &:focus {
+                outline: none;
+                border-color: #66afe9;
+                box-shadow: 0 0 5px #2B3244;
+            }
+        }
+    }
+
+}

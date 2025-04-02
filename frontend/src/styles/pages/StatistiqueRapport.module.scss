@@ -1,0 +1,34 @@
+.container {   
+    margin-left: 0.5vw;
+    @media (max-width: 950px) {
+        margin-left: 0vw;
+    }
+
+    .containerP {
+        text-align: center;
+        p {
+            font-size: 22px;
+            color: #2B3244;
+            font-weight: 900;
+            -webkit-text-stroke: 0.25px #C2BEB5;
+        }
+    }
+
+    button {
+        margin-top: 3vh;
+        padding: 1.5vh 3vw;
+    }
+}
+
+.gestionTitle {
+    width: 50%;
+    margin-top: 5vh;
+    margin-bottom: 2vh;
+    @media (max-width: 950px) {
+        width: 100%;
+    }
+}
+
+.lastButton {
+    margin-top: 5vh;
+}

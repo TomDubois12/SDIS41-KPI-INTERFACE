@@ -96,6 +96,36 @@
         "ContactTxt": "For any request for improvement, correction, or evolution of this application, please contact its creator:",
         "Contact1": "Email - tom.dubois12@gmail.com",
         "FinalTxt": "A big thank you to SDIS 41 for the warm welcome and the resources made available during this project."
+    },
+    "Rapport": {
+        "titleStatMensuel": "You are currently on the statistics page related to the monthly report ‟SIC Performance Indicator”",
+        "titleStatAnnuel" : "You are currently on the statistics page related to the annual report ‟SIC Performance Indicator”",
+        "DonneeRouge": "All data indicated in red will be recorded in the report at the end of the process",
+        "GoToMonth": "Go to the monthly report",
+        "GoToYear": "Go to the annual report",
+        "DonneeClarilog": "Clarilog Data",
+        "SelectionnerMoisAnnee": "Please select a month and a year to retrieve Clarilog data",
+        "SelectionnerAnnee": "Please select a year to retrieve Clarilog data",
+        "TauxResolution": "Incident ticket resolution rate",
+        "DispoReseau": "Network availability rate",
+        "SelectionnerCSVMPLS": "Please select the CSV corresponding to the MPLS availability reports below",
+        "DragActive": "Drop the file here...",
+        "InfoDragDrop": "Drag and drop a CSV file here, or click to select a file",
+        "FichierSelectionne": "File selected",
+        "ValideDonnee": "Validate data",
+        "DispoTelephonie": "Telephony availability rate",
+        "Maintenance": "Has maintenance taken place?",
+        "TempsMaintenance": "Maintenance time?",
+        "TauxDispoTelephonie": "Network availability rate",
+        "DispoSysteme": "System availability rate",
+        "SelectionnerCSVESX": "Please select the CSV corresponding to the ESX availability reports below",
+        "Telecharger": "Confirm data and download the report", 
+        "HowToGetCSV": "How to retrieve the different CSV files?",
+        "Etape1": "1. On Centreon, go to the ‟Report” tab, ‟Availability”, then ‟Host Groups”",
+        "Etape2": "2. Select the desired host group",
+        "Etape3": "3. Select the desired date range and click ‟Apply period”",
+        "Etape4": "4. Download the report in CSV format by clicking on the CSV icon",
+        "GoBack": "Back to the previous page",
+        "TooltipTelephonie": "The time indicated will be inserted in the comment section"
     }
-
 }
