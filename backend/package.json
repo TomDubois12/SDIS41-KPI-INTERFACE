@@ -32,6 +32,8 @@
     "i18next": "^24.2.2",
     "i18next-fs-backend": "^2.6.0",
     "i18next-http-middleware": "^3.7.1",
+    "imap": "^0.8.19",
+    "mailparser": "^3.7.2",
     "mssql": "^11.0.1",
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.2",
