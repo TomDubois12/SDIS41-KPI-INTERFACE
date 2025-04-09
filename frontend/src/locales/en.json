@@ -36,7 +36,8 @@
         "TiketsTypesYear": "Type of tickets created during the year",
         "Chargement": "Loading chart...",
         "Erreur": "Error loading chart",
-        "PasDeDonnees": "No data available regarding this chart"
+        "PasDeDonneesBarChart": "No data available yet regarding ticket distribution",
+        "PasDeDonneesPieChart": "No data available yet regarding the distribution of ticket types"
     },
     "NbTicketMois": {
         "NbTicketsCreesMois": "Total number of tickets created this month",
@@ -127,5 +128,14 @@
         "Etape4": "4. Download the report in CSV format by clicking on the CSV icon",
         "GoBack": "Back to the previous page",
         "TooltipTelephonie": "The time indicated will be inserted in the comment section"
+    },
+    "EmailOnduleur": {
+        "Chargement": "Loading emails...",
+        "Erreur": "An error occurred while retrieving emails. Please refresh the page.",
+        "Title": "List of inverter emails from the last 7 days",
+        "Type": "Inverter type",
+        "Message": "Message",
+        "Evenement": "Event",
+        "Horodatage": "Timestamp"
     }
 }

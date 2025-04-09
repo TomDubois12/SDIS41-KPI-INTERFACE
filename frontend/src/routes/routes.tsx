@@ -5,6 +5,7 @@ import Clarilog from "../pages/Clarilog.tsx"
 import StatistiquesMensuelles from "../pages/StatistiquesMensuelles.tsx"
 import StatistiquesAnnuelles from "../pages/StatistiquesAnnuelles.tsx"
 import Alertes from "../pages/Alertes.tsx"
+import AlertesOnduleurs from "../pages/AlertesOnduleurs.tsx";
 import ClarilogMensuel from "../pages/ClarilogMensuel.tsx";
 import ClarilogAnnuel from "../pages/ClarilogAnnuel.tsx";
 import ClarilogTicketDetail from "../pages/ClarilogTicketDetail.tsx";
@@ -20,6 +21,7 @@ export default function AppRoutes() {
             <Route path="/statistiques_mensuelles" element={<StatistiquesMensuelles />} />
             <Route path="/statistiques_annuelles" element={<StatistiquesAnnuelles />} />
             <Route path="/alertes" element={<Alertes />} />
+            <Route path="/alertes_onduleurs" element={<AlertesOnduleurs />} />
             <Route path="clarilog_mensuel" element={<ClarilogMensuel />} />
             <Route path="/clarilog_annuel" element={<ClarilogAnnuel />} />
             <Route path="/clarilog_detail" element={<ClarilogTicketDetail />} />

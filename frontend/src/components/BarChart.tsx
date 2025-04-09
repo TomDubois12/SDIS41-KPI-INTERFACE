@@ -103,7 +103,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
 
     if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
     if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
-    if (chartData.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonnees")}.</p>;
+    if (chartData.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonneesBarChart")}.</p>;
 
     return (
         <div>
