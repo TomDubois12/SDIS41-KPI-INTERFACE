@@ -5,6 +5,7 @@ import { useTranslation } from "../hooks/useTranslation";
 import Title from './Title';
 
 import styles from '../styles/components/EmailOnduleur.module.scss'
+import Button from './Button';
 
 interface Email {
     id: number;
@@ -47,6 +48,10 @@ function EmailOnduleur() {
         return <p>{t("EmailOnduleur.Erreur")}</p>;
     }
 
+    function goBack() {
+        window.history.back();
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.gestionTitle}>
@@ -81,6 +86,12 @@ function EmailOnduleur() {
                     </tbody>
                 </table>
             </div>
+            <Button 
+                backgroundColor={"#2B3244"}
+                text={t("Rapport.GoBack")} 
+                textColor={"white"} 
+                onClick={goBack}
+            />
         </div>
     );    
 }
