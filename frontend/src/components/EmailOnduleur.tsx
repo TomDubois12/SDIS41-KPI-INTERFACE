@@ -36,7 +36,7 @@ function EmailOnduleur() {
         fetchEmails();
         const intervalId = setInterval(() => {
             fetchEmails();
-        }, 80000);
+        }, 50000);
         return () => clearInterval(intervalId);
     }, []);
 

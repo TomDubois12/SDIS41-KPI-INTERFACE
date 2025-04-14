@@ -117,13 +117,17 @@ export class EmailINPTService {
         try {
             await this.connectImap();
             await this.openInbox();
-
+    
             const now = new Date();
             const sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-            this.emails = [];
-            await this.fetchEmails(sevenDaysAgo, now);
-
+    
+            // Utiliser un tableau temporaire au lieu de vider emails
+            const tempEmails = [];
+            await this.fetchEmails(sevenDaysAgo, now, tempEmails);
+            
+            // Mettre à jour emails seulement après avoir tout récupéré
+            this.emails = tempEmails;
+    
             this.lastSuccessfulFetch = new Date();
         } catch (error) {
             if (error.code === 'EPIPE') {
@@ -147,7 +151,7 @@ export class EmailINPTService {
         }
     }
 
-    private async fetchEmails(startDate: Date, now: Date) {
+    private async fetchEmails(startDate: Date, now: Date, emailsArray: any[]) {
         return new Promise<void>((resolve, reject) => {
             const searchCriteria = [['SINCE', startDate]];
             const fetchOptions = {
@@ -184,7 +188,7 @@ export class EmailINPTService {
                                 const nomSiteMatch = parsed.subject.match(/site de\s*([\w\s]+)/);
                                 const dateHeureMatch = parsed.text?.match(/(\d{2}\/\d{2}\/\d{4}\s+de\s+\d{2}:\d{2}\s+à\s+\d{2}:\d{2})/);
 
-                                this.emails.push({
+                                emailsArray.push({
                                     id: seqno,
                                     from: parsed.from?.text,
                                     subject: parsed.subject,
