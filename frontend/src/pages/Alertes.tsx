@@ -16,21 +16,15 @@ export default function Alertes() {
             <div className={styles.divCard}>    
                 <Card 
                     img={Feu} //changer les images
-                    text={"Alertes Onduleurs"}
+                    text={t("EmailOnduleur.AlerteTitle")} 
                     buttonText={t("Global.Entrer")}
                     path="/alertes_onduleurs"
                 />
                 <Card 
                     img={Feu} //changer les images
-                    text={"Alertes Onduleurs"}
+                    text={t("EmailINPT.AlerteTitle")}
                     buttonText={t("Global.Entrer")}
-                    path="/alertes_onduleurs"
-                />
-                <Card 
-                    img={Feu} //changer les images
-                    text={"Alertes Onduleurs"}
-                    buttonText={t("Global.Entrer")}
-                    path="/alertes_onduleurs"
+                    path="/alertes_inpt"
                 />
             </div>
         </>

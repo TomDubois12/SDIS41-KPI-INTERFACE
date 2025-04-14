@@ -4,16 +4,11 @@ import * as Imap from 'imap';
 import { simpleParser } from 'mailparser';
 
 @Injectable()
-export class EmailOnduleurService {
+export class EmailINPTService {
     private imap: Imap;
-    private readonly logger = new Logger(EmailOnduleurService.name);
+    private readonly logger = new Logger(EmailINPTService.name);
     private emails: any[] = [];
-    private readonly adresseEmailSources = [
-        'nicolas.bellier@sdis41.fr',
-        'onduleur.alerte@sdis41.fr',
-        'onduleur.administratif@sdis41.fr',
-    ];
-    private readonly sujetEmailSource = 'UPS event notification';
+    private readonly sujetEmailSource = 'Operation programmee Tetrapol'; //mail commençant par
     private imapConnected = false;
 
     constructor() {
@@ -23,7 +18,7 @@ export class EmailOnduleurService {
     private initializeImap() {
         this.imap = new Imap({
             user: 'sic@sdis41.fr',
-            password: 'puhz tmew shzv ldeo',  
+            password: 'puhz tmew shzv ldeo',
             host: 'imap.gmail.com',
             port: 993,
             tls: true,
@@ -124,7 +119,7 @@ export class EmailOnduleurService {
             await this.openInbox();
 
             const now = new Date();
-            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
             this.emails = [];
             await this.fetchEmails(sevenDaysAgo, now);
@@ -136,7 +131,7 @@ export class EmailOnduleurService {
                 this.imapConnected = false;
                 try {
                     this.imap.end();
-                } catch (e) {}
+                } catch (e) { }
                 this.initializeImap();
             } else {
                 this.logger.error('Erreur lors de la récupération des emails:', error);
@@ -183,28 +178,21 @@ export class EmailOnduleurService {
                                 return;
                             }
 
-                            if (
-                                parsed.subject === this.sujetEmailSource &&
-                                parsed.from &&
-                                parsed.from.value &&
-                                parsed.from.value.length > 0 &&
-                                this.adresseEmailSources.includes(parsed.from.value[0].address)
-                            ) {
-                                const content = parsed.text;
-                                const type = content.includes('administratif') ? 'Administratif' : 'Alerte';
-                                const messageMatch = content.match(/Message\s*:\s*(.+?)\n\n/s);
-                                const eventMatch = content.match(/Event List\s*:\s*(.+?)\n/s);
-                                const timestampMatch = content.match(/Timestamp\s*:\s*(.+?)$/m);
+                            if (parsed.subject?.startsWith(this.sujetEmailSource)) {
+                                // Extraction des informations avec des expressions régulières
+                                const numeroOperationMatch = parsed.subject.match(/n°\s*(\d+)/);
+                                const nomSiteMatch = parsed.subject.match(/site de\s*([\w\s]+)/);
+                                const dateHeureMatch = parsed.text?.match(/(\d{2}\/\d{2}\/\d{4}\s+de\s+\d{2}:\d{2}\s+à\s+\d{2}:\d{2})/);
 
                                 this.emails.push({
                                     id: seqno,
                                     from: parsed.from?.text,
                                     subject: parsed.subject,
                                     date: parsed.date,
-                                    type,
-                                    message: messageMatch?.[1]?.trim() ?? '',
-                                    event: eventMatch?.[1]?.trim() ?? '',
-                                    timestamp: timestampMatch?.[1]?.trim() ?? '',
+                                    numeroOperation: numeroOperationMatch ? numeroOperationMatch[1] : null,
+                                    nomSite: nomSiteMatch ? nomSiteMatch[1].trim() : null,
+                                    dateHeure: dateHeureMatch ? dateHeureMatch[1] : null,
+                                    text: parsed.text,
                                 });
                                 this.logger.log(`Email #${seqno} récupéré: ${parsed.subject}`);
                             }

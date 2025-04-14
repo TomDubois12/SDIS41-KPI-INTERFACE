@@ -7,7 +7,8 @@ import { ExcelModule } from './excel/excel.module';
 import { CsvModule } from './csv/csv.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './utils/utils.module';
-import { EmailModule } from './email_onduleur/email_onduleur.module';
+import { EmailOnduleurModule } from './email_onduleur/email_onduleur.module';
+import { EmailINPTModule } from './email_inpt/email_inpt.module';
 
 
 @Module({
@@ -31,7 +32,8 @@ import { EmailModule } from './email_onduleur/email_onduleur.module';
     CsvModule,
     ScheduleModule.forRoot(),
     UtilsModule,
-    EmailModule,
+    EmailOnduleurModule,
+    EmailINPTModule,
   ],
   controllers: [AppController],
   providers: [AppService],

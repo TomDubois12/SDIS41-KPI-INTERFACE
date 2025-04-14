@@ -130,12 +130,21 @@
         "TooltipTelephonie": "The time indicated will be inserted in the comment section"
     },
     "EmailOnduleur": {
+        "AlerteTitle": "Inverter Alerts",
         "Chargement": "Loading emails...",
         "Erreur": "An error occurred while retrieving emails. Please refresh the page.",
-        "Title": "List of inverter emails from the last 7 days",
+        "Title": "List of inverter alerts from the last 7 days",
         "Type": "Inverter type",
         "Message": "Message",
         "Evenement": "Event",
         "Horodatage": "Timestamp"
+    },
+    "EmailINPT": {
+        "AlerteTitle": "INPT Alerts",
+        "Title": "List of INPT alerts from the last 7 days",
+        "NumeroOperation": "Operation number",
+        "NomSite": "Site impacted",
+        "DateHeure": "Date & Time",
+        "Expediteur": "Sender"
     }
 }

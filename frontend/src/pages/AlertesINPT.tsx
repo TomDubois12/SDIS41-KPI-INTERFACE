@@ -1,7 +1,7 @@
 import { useTranslation } from "../hooks/useTranslation";
 
 import Header from "../components/Header";
-import EmailOnduleur from "../components/EmailOnduleur";
+import EmailIMPT from "../components/EmailINPT";
 
 export default function AlertesOnduleurs() {
 
@@ -10,7 +10,7 @@ export default function AlertesOnduleurs() {
     return (
         <>
             <Header text={t("Titles.Alertes")} />
-            <EmailOnduleur />
+            <EmailIMPT />
         </>
     );
 }

@@ -130,12 +130,21 @@
         "TooltipTelephonie": "Le temps indiqué sera insérer dans la partie commentaire"
     },
     "EmailOnduleur": {
+        "AlerteTitle": "Alertes Onduleurs",
         "Chargement": "Chargement des mails en cours...",
         "Erreur": "Une erreur s'est produite lors de la récupération des mails. Actualiser la page.",
-        "Title": "Liste des mails onduleurs des 7 derniers jours",
+        "Title": "Liste des alertes onduleurs des 7 derniers jours",
         "Type": "Type d'onduleur",
         "Message": "Message",
         "Evenement": "Événement",
         "Horodatage": "Horodatage"
+    },
+    "EmailINPT": {
+        "AlerteTitle": "Alertes INPT",
+        "Title": "Liste des alertes INPT des 7 derniers jours",
+        "NumeroOperation": "Numéro de l'opération",
+        "NomSite": "Site impacté",
+        "DateHeure": "Date & Heure",
+        "Expediteur": "Expéditeur"
     }
 }

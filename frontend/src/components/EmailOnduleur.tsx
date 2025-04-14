@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useTranslation } from "../hooks/useTranslation";
 import Title from './Title';
 
-import styles from '../styles/components/EmailOnduleur.module.scss'
+import styles from '../styles/components/Email.module.scss'
 import Button from './Button';
 
 interface Email {
@@ -24,7 +24,7 @@ function EmailOnduleur() {
     useEffect(() => {
         async function fetchEmails() {
             try {
-                const response = await axios.get<Email[]>('http://localhost:3001/emails');
+                const response = await axios.get<Email[]>('http://localhost:3001/emails_onduleurs');
                 setEmails(response.data);
                 setLoading(false);
             } catch (err: any) {
