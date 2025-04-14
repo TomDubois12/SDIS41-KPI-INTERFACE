@@ -44,9 +44,10 @@ const CalendarComponent = () => {
         }
     };
 
-    function goBack() {
-        window.history.back();
-    }
+    const handleYearPageClick = () => {
+        const year = new Date().getFullYear();
+        navigate(`/clarilog_annuel?year=${year}`); // Redirection avec l'année
+    };
 
     const tileClassName = ({ date, view }) => {
         if (view === 'year' && date.getFullYear() === date.getFullYear()) {
@@ -102,7 +103,7 @@ const CalendarComponent = () => {
                 backgroundColor={"#2B3244"} 
                 text={t("Calendar.GoToYear")}
                 textColor={"white"}
-                onClick={goBack}                       
+                onClick={handleYearPageClick}                       
             />
         </div>
     );
