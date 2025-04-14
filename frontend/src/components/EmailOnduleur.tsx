@@ -7,7 +7,7 @@ import Title from './Title';
 import styles from '../styles/components/Email.module.scss'
 import Button from './Button';
 
-interface Email {
+interface EmailOnduleur {
     id: number;
     type: string;
     message: string;
@@ -17,14 +17,14 @@ interface Email {
 
 function EmailOnduleur() {
     const { t } = useTranslation();
-    const [emails, setEmails] = useState<Email[]>([]);
+    const [emails, setEmails] = useState<EmailOnduleur[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         async function fetchEmails() {
             try {
-                const response = await axios.get<Email[]>('http://localhost:3001/emails_onduleurs');
+                const response = await axios.get<EmailOnduleur[]>('http://localhost:3001/emails_onduleurs');
                 setEmails(response.data);
                 setLoading(false);
             } catch (err: any) {
@@ -36,7 +36,7 @@ function EmailOnduleur() {
         fetchEmails();
         const intervalId = setInterval(() => {
             fetchEmails();
-        }, 60000);
+        }, 80000);
         return () => clearInterval(intervalId);
     }, []);
 
