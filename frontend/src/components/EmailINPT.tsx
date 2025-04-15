@@ -39,7 +39,7 @@ function EmailINPT() {
         fetchEmails();
         const intervalId = setInterval(() => {
             fetchEmails();
-        }, 5000);
+        }, 50000);
         return () => clearInterval(intervalId);
     }, []);
 

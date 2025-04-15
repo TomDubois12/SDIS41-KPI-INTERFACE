@@ -126,8 +126,12 @@ export class EmailOnduleurService {
             const now = new Date();
             const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-            this.emails = [];
-            await this.fetchEmails(sevenDaysAgo, now);
+            // Utiliser un tableau temporaire au lieu de vider emails
+            const tempEmails = [];
+            await this.fetchEmails(sevenDaysAgo, now, tempEmails);
+            
+            // Mettre à jour emails seulement après avoir tout récupéré
+            this.emails = tempEmails;
 
             this.lastSuccessfulFetch = new Date();
         } catch (error) {
@@ -152,7 +156,7 @@ export class EmailOnduleurService {
         }
     }
 
-    private async fetchEmails(startDate: Date, now: Date) {
+    private async fetchEmails(startDate: Date, now: Date, emailsArray: any[]) {
         return new Promise<void>((resolve, reject) => {
             const searchCriteria = [['SINCE', startDate]];
             const fetchOptions = {
@@ -196,7 +200,8 @@ export class EmailOnduleurService {
                                 const eventMatch = content.match(/Event List\s*:\s*(.+?)\n/s);
                                 const timestampMatch = content.match(/Timestamp\s*:\s*(.+?)$/m);
 
-                                this.emails.push({
+                                // Utiliser emailsArray au lieu de this.emails
+                                emailsArray.push({
                                     id: seqno,
                                     from: parsed.from?.text,
                                     subject: parsed.subject,
@@ -227,6 +232,10 @@ export class EmailOnduleurService {
 
     getEmails(): any[] {
         return this.emails;
+    }
+
+    getEmailById(id: number): any {
+        return this.emails.find(email => email.id === id);
     }
 
     getLastSuccessfulFetch(): Date | null {
