@@ -124,11 +124,11 @@ export class EmailOnduleurService {
             await this.openInbox();
 
             const now = new Date();
-            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
             // Utiliser un tableau temporaire au lieu de vider emails
             const tempEmails = [];
-            await this.fetchEmails(sevenDaysAgo, now, tempEmails);
+            await this.fetchEmails(thirtyDaysAgo, now, tempEmails);
             
             // Mettre à jour emails seulement après avoir tout récupéré
             this.emails = tempEmails;

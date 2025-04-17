@@ -134,7 +134,7 @@
         "AlerteTitle": "Alertes Onduleurs",
         "Chargement": "Chargement des mails en cours...",
         "Erreur": "Une erreur s'est produite lors de la récupération des mails. Actualiser la page.",
-        "Title": "Liste des alertes onduleurs des 7 derniers jours",
+        "Title": "Liste des alertes onduleurs des 30 derniers jours",
         "Type": "Type d'onduleur",
         "Message": "Message",
         "Evenement": "Événement",
@@ -143,7 +143,7 @@
     },
     "EmailINPT": {
         "AlerteTitle": "Alertes INPT",
-        "Title": "Liste des alertes INPT des 7 derniers jours",
+        "Title": "Liste des alertes INPT des 30 derniers jours",
         "NumeroOperation": "Numéro de l'opération",
         "NomSite": "Site impacté",
         "DateHeure": "Date & Heure",

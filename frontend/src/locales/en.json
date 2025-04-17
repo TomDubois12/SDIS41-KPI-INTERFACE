@@ -134,7 +134,7 @@
         "AlerteTitle": "Inverter Alerts",
         "Chargement": "Loading emails...",
         "Erreur": "An error occurred while retrieving emails. Please refresh the page.",
-        "Title": "List of inverter alerts from the last 7 days",
+        "Title": "List of inverter alerts from the last 30 days",
         "Type": "Inverter type",
         "Message": "Message",
         "Evenement": "Event",
@@ -143,7 +143,7 @@
     },
     "EmailINPT": {
         "AlerteTitle": "INPT Alerts",
-        "Title": "List of INPT alerts from the last 7 days",
+        "Title": "List of INPT alerts from the last 30 days",
         "NumeroOperation": "Operation number",
         "NomSite": "Site impacted",
         "DateHeure": "Date & Time",

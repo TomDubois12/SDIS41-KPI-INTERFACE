@@ -123,16 +123,19 @@ export class EmailINPTService {
             await this.openInbox();
 
             const now = new Date();
-            const sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); //30 jours
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); //30 jours
 
             // Utiliser un tableau temporaire au lieu de vider emails
-            const tempEmails = [];
-            await this.fetchEmails(sevenDaysAgo, now, tempEmails);
+            const tempEmails: any[] = []; // Explicitly type tempEmails as any[]
+            await this.fetchEmails(thirtyDaysAgo, now, tempEmails);
 
             // Traiter les incidents de début et de fin
             this.processEmailRelationships(tempEmails);
 
-            // Mettre à jour emails seulement après avoir tout récupéré
+            // Trier les emails par id décroissant
+            tempEmails.sort((a: any, b: any) => b.id - a.id); // Explicitly type a and b as any
+
+            // Mettre à jour emails seulement après avoir tout récupéré et trié
             this.emails = tempEmails;
 
             this.lastSuccessfulFetch = new Date();
@@ -161,7 +164,7 @@ export class EmailINPTService {
     private processEmailRelationships(emails: any[]) {
         // Créer un dictionnaire pour accéder rapidement aux emails par numéro d'opération
         const emailsByNumeroOperation = new Map();
-        
+
         // Premier passage pour identifier les opérations programmées et initialiser leur statut
         emails.forEach(email => {
             if (email.typeEmail === 'operation' && email.numeroOperation) {
@@ -169,12 +172,12 @@ export class EmailINPTService {
                 emailsByNumeroOperation.set(email.numeroOperation, email);
             }
         });
-        
+
         // Second passage pour mettre à jour les statuts
         emails.forEach(email => {
             if ((email.typeEmail === 'incident_debut' || email.typeEmail === 'incident_fin') && email.numeroOperation) {
                 const relatedEmail = emailsByNumeroOperation.get(email.numeroOperation);
-                
+
                 if (relatedEmail) {
                     // Mettre à jour le statut unique
                     if (email.typeEmail === 'incident_fin') {
@@ -222,9 +225,9 @@ export class EmailINPTService {
                             let typeEmail = "";
                             if (parsed.subject?.includes("Operation programmee Tetrapol")) {
                                 typeEmail = 'operation';
-                            } else if (parsed.subject?.includes("Debut d'incident sur le reseau INPT")) {
+                            } else if (parsed.subject?.includes("Debut d\'incident sur le reseau INPT")) {
                                 typeEmail = 'incident_debut';
-                            } else if (parsed.subject?.includes("Fin d'incident sur le reseau INPT")) {
+                            } else if (parsed.subject?.includes("Fin d\'incident sur le reseau INPT")) {
                                 typeEmail = 'incident_fin';
                             }
 
@@ -255,27 +258,27 @@ export class EmailINPTService {
                                     // Pour les débuts d'incidents
                                     const numeroOperationMatch = parsed.text?.match(/incident référencé n°\s*(\d+)/);
                                     emailData.numeroOperation = numeroOperationMatch ? numeroOperationMatch[1] : null;
-                                    
+
                                     // Extraire la date et l'heure de l'incident
                                     const dateHeureMatch = parsed.text?.match(/survenu le (\d{2}\/\d{2}\/\d{4}) à (\d{2}:\d{2})/);
                                     if (dateHeureMatch) {
                                         emailData.dateHeure = `${dateHeureMatch[1]} à ${dateHeureMatch[2]}`;
                                     }
-                                    
+
                                     // Extraire les sites impactés
                                     const sitesMatch = parsed.text?.match(/impacte le ou les relais de ([^\.]+)/);
                                     emailData.nomSite = sitesMatch ? sitesMatch[1].trim() : null;
                                 } else if (typeEmail === 'incident_fin') {
                                     // Pour les fins d'incidents
-                                    const numeroOperationMatch = parsed.text?.match(/fin de l'incident n°\s*(\d+)/);
+                                    const numeroOperationMatch = parsed.text?.match(/fin de l\'incident n°\s*(\d+)/);
                                     emailData.numeroOperation = numeroOperationMatch ? numeroOperationMatch[1] : null;
-                                    
+
                                     // Extraire la date et l'heure de résolution
                                     const dateHeureMatch = parsed.text?.match(/apparu le (\d{2}\/\d{2}\/\d{4}) à (\d{2}:\d{2})/);
                                     if (dateHeureMatch) {
                                         emailData.dateHeure = `${dateHeureMatch[1]} à ${dateHeureMatch[2]}`;
                                     }
-                                    
+
                                     // Extraire le site concerné
                                     const siteMatch = parsed.text?.match(/impactant le site ou artère ([^\.]+)/);
                                     emailData.nomSite = siteMatch ? siteMatch[1].trim() : null;

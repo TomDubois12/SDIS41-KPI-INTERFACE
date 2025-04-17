@@ -12,7 +12,7 @@ export default function Alertes() {
     
     return (
         <>
-            <Header text={t("Titles.Alertes")} />
+            <Header text={t("Titles.Alertes")} />  
             <div className={styles.divCard}>    
                 <Card 
                     img={Feu} //changer les images
