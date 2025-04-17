@@ -2,7 +2,8 @@
     "Global": {
         "Entrer": "Enter",
         "Chargement": "Loading...",
-        "Details": "Details"
+        "Details": "Details",
+        "Reessayer": "Retry"
     },
     "Parametre": {
         "SwitchLanguage": "Switch to french",
@@ -137,7 +138,8 @@
         "Type": "Inverter type",
         "Message": "Message",
         "Evenement": "Event",
-        "Horodatage": "Timestamp"
+        "Horodatage": "Timestamp",
+        "AucuneDonnee": "Aucune donnée pour le moment"
     },
     "EmailINPT": {
         "AlerteTitle": "INPT Alerts",
@@ -145,6 +147,8 @@
         "NumeroOperation": "Operation number",
         "NomSite": "Site impacted",
         "DateHeure": "Date & Time",
-        "Expediteur": "Sender"
+        "Expediteur": "Sender",
+        "Statut": "Status",
+        "AucuneDonnee": "No data yet"
     }
 }

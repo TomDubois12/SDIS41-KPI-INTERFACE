@@ -44,12 +44,22 @@ function EmailOnduleur() {
         return <p>{t("EmailOnduleur.Chargement")}</p>;
     }
 
-    if (error) {
-        return <p>{t("EmailOnduleur.Erreur")}</p>;
-    }
-
     function goBack() {
         window.history.back();
+    }
+
+    if (error) {
+        return (
+            <div className={styles.errorContainer}>
+                <p>{t("EmailOnduleur.Erreur")} {error.message}</p>
+                <Button
+                    backgroundColor={"#2B3244"}
+                    text={t("Global.Reessayer")}
+                    textColor={"white"}
+                    onClick={() => window.location.reload()}
+                />
+            </div>
+        );
     }
 
     return (
@@ -86,6 +96,13 @@ function EmailOnduleur() {
                     </tbody>
                 </table>
             </div>
+
+            {emails.length === 0 && (
+                <div className={styles.noDataMessage}>
+                    {t("EmailOnduleur.AucuneDonnee")}
+                </div>
+            )}
+
             <Button 
                 backgroundColor={"#2B3244"}
                 text={t("Rapport.GoBack")} 

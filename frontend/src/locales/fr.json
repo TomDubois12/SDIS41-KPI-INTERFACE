@@ -2,7 +2,8 @@
     "Global": {
         "Entrer": "Entrer",
         "Chargement": "Chargement...",
-        "Details": "Détails"
+        "Details": "Détails",
+        "Reessayer": "Réessayer"
     },
     "Parametre": {    
         "SwitchLanguage": "Passer en anglais",
@@ -137,7 +138,8 @@
         "Type": "Type d'onduleur",
         "Message": "Message",
         "Evenement": "Événement",
-        "Horodatage": "Horodatage"
+        "Horodatage": "Horodatage",
+        "AucuneDonnee": "Aucune donnée pour le moment"
     },
     "EmailINPT": {
         "AlerteTitle": "Alertes INPT",
@@ -145,6 +147,8 @@
         "NumeroOperation": "Numéro de l'opération",
         "NomSite": "Site impacté",
         "DateHeure": "Date & Heure",
-        "Expediteur": "Expéditeur"
+        "Expediteur": "Expéditeur",
+        "Statut": "Statut",
+        "AucuneDonnee": "Aucune donnée pour le moment"
     }
 }
