@@ -99,7 +99,7 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
 
     if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
     if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
-    if (state.series.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonnees")}.</p>;
+    if (state.series.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonneesPieChart")}.</p>;
 
     return (
         <div id="chart">

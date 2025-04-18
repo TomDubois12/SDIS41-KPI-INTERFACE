@@ -2,7 +2,8 @@
     "Global": {
         "Entrer": "Entrer",
         "Chargement": "Chargement...",
-        "Details": "Détails"
+        "Details": "Détails",
+        "Reessayer": "Réessayer"
     },
     "Parametre": {    
         "SwitchLanguage": "Passer en anglais",
@@ -36,7 +37,8 @@
         "TiketsTypesYear": "Type des tickets crées dans l'année",
         "Chargement": "Chargement du graphique...",
         "Erreur": "Erreur lors du chargement du graphique",
-        "PasDeDonnees": "Aucune donnée disponible concernant ce graphique"
+        "PasDeDonneesBarChart": "Aucune donnée disponible pour l'instant, concernant la répartition des tickets",
+        "PasDeDonneesPieChart": "Aucune donnée disponible pour l'instant, concernant la répartition des types de tickets"
     },
     "NbTicketMois": {
         "NbTicketsCreesMois": "Nombre total de ticket créés ce mois-ci",
@@ -127,5 +129,26 @@
         "Etape4": "4. Télécharger le rapport au format CSV en cliquant sur l'icon CSV",
         "GoBack": "Retour à la page précédente",
         "TooltipTelephonie": "Le temps indiqué sera insérer dans la partie commentaire"
+    },
+    "EmailOnduleur": {
+        "AlerteTitle": "Alertes Onduleurs",
+        "Chargement": "Chargement des mails en cours...",
+        "Erreur": "Une erreur s'est produite lors de la récupération des mails. Actualiser la page.",
+        "Title": "Liste des alertes onduleurs des 30 derniers jours",
+        "Type": "Type d'onduleur",
+        "Message": "Message",
+        "Evenement": "Événement",
+        "Horodatage": "Horodatage",
+        "AucuneDonnee": "Aucune donnée pour le moment"
+    },
+    "EmailINPT": {
+        "AlerteTitle": "Alertes INPT",
+        "Title": "Liste des alertes INPT des 30 derniers jours",
+        "NumeroOperation": "Numéro de l'opération",
+        "NomSite": "Site impacté",
+        "DateHeure": "Date & Heure",
+        "Expediteur": "Expéditeur",
+        "Statut": "Statut",
+        "AucuneDonnee": "Aucune donnée pour le moment"
     }
 }

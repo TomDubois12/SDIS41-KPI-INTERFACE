@@ -2,7 +2,8 @@
     "Global": {
         "Entrer": "Enter",
         "Chargement": "Loading...",
-        "Details": "Details"
+        "Details": "Details",
+        "Reessayer": "Retry"
     },
     "Parametre": {
         "SwitchLanguage": "Switch to french",
@@ -36,7 +37,8 @@
         "TiketsTypesYear": "Type of tickets created during the year",
         "Chargement": "Loading chart...",
         "Erreur": "Error loading chart",
-        "PasDeDonnees": "No data available regarding this chart"
+        "PasDeDonneesBarChart": "No data available yet regarding ticket distribution",
+        "PasDeDonneesPieChart": "No data available yet regarding the distribution of ticket types"
     },
     "NbTicketMois": {
         "NbTicketsCreesMois": "Total number of tickets created this month",
@@ -127,5 +129,26 @@
         "Etape4": "4. Download the report in CSV format by clicking on the CSV icon",
         "GoBack": "Back to the previous page",
         "TooltipTelephonie": "The time indicated will be inserted in the comment section"
+    },
+    "EmailOnduleur": {
+        "AlerteTitle": "Inverter Alerts",
+        "Chargement": "Loading emails...",
+        "Erreur": "An error occurred while retrieving emails. Please refresh the page.",
+        "Title": "List of inverter alerts from the last 30 days",
+        "Type": "Inverter type",
+        "Message": "Message",
+        "Evenement": "Event",
+        "Horodatage": "Timestamp",
+        "AucuneDonnee": "Aucune donnée pour le moment"
+    },
+    "EmailINPT": {
+        "AlerteTitle": "INPT Alerts",
+        "Title": "List of INPT alerts from the last 30 days",
+        "NumeroOperation": "Operation number",
+        "NomSite": "Site impacted",
+        "DateHeure": "Date & Time",
+        "Expediteur": "Sender",
+        "Statut": "Status",
+        "AucuneDonnee": "No data yet"
     }
 }
