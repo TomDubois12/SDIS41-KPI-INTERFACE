@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './utils/utils.module';
 import { EmailOnduleurModule } from './email_onduleur/email_onduleur.module';
 import { EmailINPTModule } from './email_inpt/email_inpt.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 
 @Module({
@@ -34,6 +35,7 @@ import { EmailINPTModule } from './email_inpt/email_inpt.module';
     UtilsModule,
     EmailOnduleurModule,
     EmailINPTModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
