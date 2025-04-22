@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('subscriptions')
 export class Subscription {
@@ -14,7 +14,7 @@ export class Subscription {
     @Column()
     auth: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'int', nullable: true, name: 'user_id' })  // <-- Vérifiez ceci
     userId: number | null;
 
     @CreateDateColumn()

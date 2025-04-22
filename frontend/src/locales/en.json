@@ -9,7 +9,17 @@
         "SwitchLanguage": "Switch to french",
         "SwitchToDT": "Switch to dark theme",
         "Credits": "Credits",
-        "BackToHome": "Back to home page"
+        "BackToHome": "Back to home page",
+        "Notifications": {
+            "Desactiver": "Disable notifications",
+            "DesactivationEnCours": "Disabling notifications in progress",
+            "ErreurDesactivation": "Error while disabling notifications",
+            "Activer": "Enable notifications",
+            "ActivationEnCours": "Enabling notifications in progress",
+            "ErreurActivation": "Error while enabling notifications",
+            "PermissionRefusee": "Permission denied, please try again",
+            "Erreur": "An error occurred, please try again"
+        }
     },
     "Titles": {
         "KPI": "SDIS41 - KPI Interface",

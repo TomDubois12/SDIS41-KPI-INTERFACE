@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, Get } from '@nestjs/common';
 import { NotificationService } from './notifications.service';
 import { SubscribeDto } from './dto/subscribe.dto';
 
@@ -21,5 +21,10 @@ export class NotificationsController {
         console.error('Erreur lors de l\'enregistrement de l\'abonnement :', error);
         return { success: false, error: error.message };
         }
+    }
+
+    @Get('vapid-public-key')
+    getVapidPublicKey(): string {
+        return this.notificationService.getPublicKey();
     }
 }

@@ -1,15 +1,27 @@
-import { Repository } from 'typeorm';
-import { Subscription } from '../entities/subscription.entity';
+// Dans src/notifications/repositories/subscription.repository.ts
+
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
+import { Subscription } from '../entities/subscription.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
-export class SubscriptionRepository extends Repository<Subscription> {
+export class SubscriptionRepository {
+    private repository: Repository<Subscription>;
+
     constructor(
-        @InjectRepository(Subscription)
-        repository: Repository<Subscription>,
+        @InjectDataSource('push_notifications_connection')
+        private dataSource: DataSource,
     ) {
-        super(repository.target, repository.manager, repository.queryRunner);
+        this.repository = this.dataSource.getRepository(Subscription);
+    }
+
+    async find(): Promise<Subscription[]> {
+        return this.repository.find();
+    }
+
+    async findOneByEndpoint(endpoint: string): Promise<Subscription | null> {
+        return this.repository.findOne({ where: { endpoint } });
     }
 
     async saveSubscription(endpoint: string, p256dh: string, auth: string, userId: number | null): Promise<Subscription> {
@@ -17,18 +29,12 @@ export class SubscriptionRepository extends Repository<Subscription> {
         subscription.endpoint = endpoint;
         subscription.p256dh = p256dh;
         subscription.auth = auth;
-        subscription.userId = userId; // Laissez ceci tel quel, car l'entité est corrigée
-
-        return await this.save(subscription);
+        subscription.userId = userId;
+        return this.repository.save(subscription);
     }
 
-    async findOneByEndpoint(endpoint: string): Promise<Subscription | undefined> {
-        const subscription = await this.findOne({ where: { endpoint } });
-        if (!subscription) {
-            return undefined;
-        }
-        return subscription as Subscription; // Type assertion ici
+    // Ajoutez cette méthode pour supprimer un abonnement
+    async delete(id: number): Promise<void> {
+        await this.repository.delete(id);
     }
-
-    // Vous pouvez ajouter d'autres méthodes pour récupérer, supprimer des abonnements, etc.
 }

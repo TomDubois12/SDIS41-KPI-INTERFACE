@@ -1,13 +1,22 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { SubscriptionRepository } from './repositories/subscription.repository';
+import { ConfigModule } from '@nestjs/config';
+import { TicketModule } from 'src/ticket/ticket.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Subscription])], // Importez le module TypeOrm pour l'entité Subscription
-    providers: [NotificationService, SubscriptionRepository], // Ajoutez SubscriptionRepository aux providers
+    imports: [
+        TypeOrmModule.forFeature([Subscription], 'push_notifications_connection'),
+        ConfigModule,
+        forwardRef(() => TicketModule),    
+    ],
+    providers: [
+        NotificationService,
+        SubscriptionRepository,
+    ],
     controllers: [NotificationsController],
     exports: [NotificationService],
 })

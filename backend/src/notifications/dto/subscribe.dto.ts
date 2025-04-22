@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { SubscribeKeysDto } from './subscribe-keys.dto';
 
 export class SubscribeDto {
@@ -8,5 +9,7 @@ export class SubscribeDto {
 
     @IsObject()
     @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => SubscribeKeysDto)
     keys: SubscribeKeysDto;
 }

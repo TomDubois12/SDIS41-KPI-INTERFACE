@@ -1,14 +1,18 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { NotificationService } from '../notifications/notifications.service';
+import { getDataSourceToken } from '@nestjs/typeorm';
 
 @Injectable()
 export class TicketService {
     private readonly logger = new Logger(TicketService.name);
+    private readonly dataSource: DataSource; // Déclarez dataSource
+
     constructor(
-        private dataSource: DataSource,
-        private readonly notificationService: NotificationService,
-    ) {}
+        @Inject(getDataSourceToken('parc_db_connection')) // Injectez la DataSource correcte
+        dataSource: DataSource,
+    ) {
+        this.dataSource = dataSource; // Assignez la DataSource injectée
+    }
 
     // le nombre de tickets qui ont été créés à la date spécifiée
     async getNbTicketsCreated(date: string): Promise<any> {
@@ -96,41 +100,20 @@ export class TicketService {
     async getTickets(date: string): Promise<any[]> {
         try {
             const tickets = await this.dataSource.query(
-                `SELECT 
-                    t.TicketId, 
-                    t.Title, 
-                    CASE 
-                        WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail' 
-                        ELSE u.[user_park_helpdesk_login] 
+                `SELECT
+                    t.TicketId,
+                    t.Title,
+                    CASE
+                        WHEN t.CallerId = -2 THEN 'Envoyé depuis un mail'
+                        ELSE u.[user_park_helpdesk_login]
                     END AS CallerName,
                     CONVERT(VARCHAR, t.SentOn, 108) AS HeureDeCréation,
-                    t.ResolutionDate
+                    t.ResolutionDate,
+                    CAST(t.SentOn AS DATE) AS SentOnDateRaw -- Garder la date brute
                 FROM [parc_db].[dbo].[SD_Tickets] t
                 LEFT JOIN [user_park] u ON t.CallerId = u.id_user_park
                 WHERE CAST(t.SentOn AS DATE) = '${date}';`,
             );
-
-            if (tickets && tickets.length > 0) {
-                // Logique pour envoyer les notifications
-                for (const ticket of tickets) {
-                    try { // Ajout d'un bloc try-catch interne
-                        const payload = JSON.stringify({
-                            title: 'Nouveau Ticket Disponible',
-                            body: `Nouveau ticket : ${ticket.Title} (Créé le ${date})`,
-                        });
-                        const subscriptions = await this.notificationService.getAllSubscriptions();
-                        for (const subscription of subscriptions) {
-                            const success = await this.notificationService.sendPushNotification(subscription, payload);
-                            if (!success) {
-                                this.logger.error(`Échec de l'envoi de la notification à ${subscription.endpoint}`);
-                            }
-                        }
-                    } catch (notificationError) { // Capture des erreurs d'envoi de notification
-                        this.logger.error('Erreur lors de l\'envoi des notifications:', notificationError.stack);
-                    }
-                }
-            }
-
             return tickets;
         } catch (error) {
             this.logger.error('Error fetching tickets:', error.stack);
@@ -240,6 +223,13 @@ export class TicketService {
             FROM [parc_db].[dbo].[SD_Tickets] t
             LEFT JOIN [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
             WHERE CAST(t.SentOn AS DATE) = '${date}'
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            )
             GROUP BY tc.TicketClassLabel;`
         );
     }
@@ -251,6 +241,13 @@ export class TicketService {
             FROM [parc_db].[dbo].[SD_Tickets] t
             LEFT JOIN [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
             WHERE MONTH(t.SentOn) = ${month} AND YEAR(t.SentOn) = ${year}
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            )
             GROUP BY tc.TicketClassLabel;`
         );
     }
@@ -262,6 +259,13 @@ export class TicketService {
             FROM [parc_db].[dbo].[SD_Tickets] t
             LEFT JOIN [parc_db].[dbo].[SD_TicketClasses] tc ON t.Category = tc.TicketClassId
             WHERE YEAR(t.SentOn) = ${year}
+            AND t.DeletedOn IS NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM [parc_db].[dbo].[SD_TicketHistory] h
+                WHERE h.TicketId = t.TicketId
+                AND h.TicketStatus IN (3, 6, 11)
+            )
             GROUP BY tc.TicketClassLabel;`
         );
     }
