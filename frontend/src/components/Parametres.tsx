@@ -1,4 +1,4 @@
-// src/components/Parametres.tsx (VERSION FINALE COMPLÈTE - Vérifiée)
+// src/components/Parametres.tsx (Dernière Version Complète Fournie)
 
 import { Link } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
@@ -69,7 +69,7 @@ const Parametres = () => {
         } catch (err: any) {
             console.error("Erreur fetchPreferences:", err);
             setNotificationError(err.message || t("Parametre.Notifications.ErreurRecupPrefs"));
-            setNotifyTicketPref(true); setNotifyEmailPref(true);
+            setNotifyTicketPref(true); setNotifyEmailPref(true); // Revenir aux défauts si erreur
         } finally {
             setIsPrefsLoading(false);
         }
@@ -125,7 +125,7 @@ const Parametres = () => {
                 }
             })
             .then(() => {
-                 // S'exécute après la mise à jour UI et après fetchPreferences (si appelé)
+                 // S'exécute après la mise à jour de l'UI et après fetchPreferences (si appelé)
                  console.log('[Effect Étape 6] Chaîne de promesses useEffect terminée avec succès.');
             })
             .catch(err => {
@@ -184,11 +184,11 @@ const Parametres = () => {
          setNotifyTicketPref(isChecked);
          updateBackendPreferences({ ticket: isChecked, email: notifyEmailPref });
      };
-     const handleEmailPrefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-         const isChecked = event.target.checked;
-         setNotifyEmailPref(isChecked);
-         updateBackendPreferences({ ticket: notifyTicketPref, email: isChecked });
-     };
+    const handleEmailPrefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = event.target.checked;
+        setNotifyEmailPref(isChecked);
+        updateBackendPreferences({ ticket: notifyTicketPref, email: isChecked });
+    };
 
     // --- Fonction pour s'abonner (globalement) ---
     const subscribeUser = useCallback(async () => {
@@ -229,7 +229,7 @@ const Parametres = () => {
             });
 
             if (!subscribeResponse.ok) {
-                await subscription.unsubscribe();
+                await subscription.unsubscribe(); // Annuler localement si erreur backend
                 let errorMsg = `Erreur serveur (${subscribeResponse.status})`;
                 try { const errorData = await subscribeResponse.json(); errorMsg = errorData?.message || errorMsg; } catch(e){}
                 throw new Error(`${t("Parametre.Notifications.ErreurSauvegardeAbonnement")} ${errorMsg}`);
@@ -262,34 +262,45 @@ const Parametres = () => {
         setIsMainLoading(true);
         setNotificationError(null);
         setMainNotificationButtonText(t("Parametre.Notifications.DesactivationEnCours"));
+        let endpointToDelete: string | null = null; // Pour l'appel API backend
+
         try {
              const registration = await navigator.serviceWorker.ready;
              const subscription = await registration.pushManager.getSubscription();
+
              if (subscription) {
-                 const endpointToDelete = subscription.endpoint; // Garder pour appel API
-                 const unsubscribed = await subscription.unsubscribe();
+                 endpointToDelete = subscription.endpoint; // Récupérer l'endpoint AVANT de désinscrire
+                 const unsubscribed = await subscription.unsubscribe(); // Désinscrire le navigateur
+
                  if (unsubscribed) {
                      console.log('User is unsubscribed locally.');
+                     // Mettre à jour l'UI immédiatement
                      setIsSubscribed(false);
                      setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
                      setCurrentEndpoint(null);
                      setNotifyTicketPref(true); // Reset état local
                      setNotifyEmailPref(true);
 
-                     // Optionnel mais recommandé: Notifier le backend
-                     try {
-                          const deleteResponse = await fetch('http://localhost:3001/notifications/unsubscribe', { // Endpoint à créer
-                              method: 'POST',
-                              body: JSON.stringify({ endpoint: endpointToDelete }),
-                              headers: { 'Content-Type': 'application/json' },
-                          });
-                          if(deleteResponse.ok) { console.log("Subscription removed from backend."); }
-                          else { console.warn("Failed to remove subscription from backend.", await deleteResponse.text()); }
-                     } catch (backendDeleteError) { console.error("Error notifying backend of unsubscription:", backendDeleteError); }
+                     if (endpointToDelete) {
+                          console.log(`Notification du backend pour désinscrire: ${endpointToDelete.substring(0,40)}...`);
+                          try {
+                               const deleteResponse = await fetch('http://localhost:3001/notifications/unsubscribe', { // Endpoint à créer
+                                   method: 'POST', // Ou DELETE
+                                   body: JSON.stringify({ endpoint: endpointToDelete }),
+                                   headers: { 'Content-Type': 'application/json' },
+                               });
+                               if(deleteResponse.ok) { console.log("Subscription removed from backend."); }
+                               else { console.warn("Failed to remove subscription from backend.", await deleteResponse.text()); }
+                          } catch (backendDeleteError) { console.error("Error notifying backend of unsubscription:", backendDeleteError); }
+                     }
 
-                 } else { throw new Error(t("Parametre.Notifications.ErreurDesinscriptionLocale")); }
+                 } else {
+                     // L'appel navigateur a échoué
+                     throw new Error(t("Parametre.Notifications.ErreurDesinscriptionLocale"));
+                 }
              } else {
-                  console.log("Aucun abonnement à désinscrire.");
+                  // Pas d'abonnement trouvé localement, synchroniser l'UI
+                  console.log("Aucun abonnement local trouvé à désinscrire.");
                   setIsSubscribed(false);
                   setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
                   setCurrentEndpoint(null);
@@ -302,7 +313,7 @@ const Parametres = () => {
         } finally {
             setIsMainLoading(false);
         }
-    }, [t]);
+    }, [t]); // Dépendances useCallback
 
     // --- Gestionnaire clic bouton principal ---
     const handleNotificationButtonClick = () => {
@@ -322,9 +333,7 @@ const Parametres = () => {
                     </button>
 
                     {/* Section Notifications */}
-                    <hr className={styles.divider} />
                     <div className={styles.notificationSection}>
-                        <h4>{t("Parametre.Notifications.Titre")}</h4>
                         {supportsNotifications ? (
                              <>
                                  <button onClick={handleNotificationButtonClick} disabled={isMainLoading}>
@@ -332,6 +341,7 @@ const Parametres = () => {
                                  </button>
                                  {isSubscribed && (
                                      <div className={styles.preferences}>
+                                         {/* Indicateur de chargement pendant fetch/update des prefs */}
                                          {isPrefsLoading && <span className={styles.loadingPrefs}>({t("Global.Enregistrement")}...)</span>}
                                          <label className={isPrefsLoading || isMainLoading ? styles.disabledLabel : ''}>
                                              <input type="checkbox" checked={notifyTicketPref} onChange={handleTicketPrefChange} disabled={isPrefsLoading || isMainLoading} />
@@ -347,8 +357,6 @@ const Parametres = () => {
                          ) : ( <p>{t("Parametre.Notifications.NonSupportees")}</p> )}
                          {notificationError && <p className={styles.errorMessage}>{notificationError}</p>}
                     </div>
-                    <hr className={styles.divider} />
-
                     {/* Liens */}
                     <Link to="/credits"><button>{t("Parametre.Credits")}</button></Link>
                     <Link to="/"><button>{t("Parametre.BackToHome")}</button></Link>

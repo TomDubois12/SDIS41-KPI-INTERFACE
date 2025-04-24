@@ -3,22 +3,37 @@
         "Entrer": "Enter",
         "Chargement": "Loading...",
         "Details": "Details",
-        "Reessayer": "Retry"
+        "Reessayer": "Retry",
+        "Enregistrement": "Saving..."
     },
     "Parametre": {
-        "SwitchLanguage": "Switch to french",
+        "SwitchLanguage": "Switch to French",
         "SwitchToDT": "Switch to dark theme",
         "Credits": "Credits",
-        "BackToHome": "Back to home page",
+        "BackToHome": "Back to Homepage",
         "Notifications": {
-            "Desactiver": "Disable notifications",
-            "DesactivationEnCours": "Disabling notifications in progress",
-            "ErreurDesactivation": "Error while disabling notifications",
-            "Activer": "Enable notifications",
-            "ActivationEnCours": "Enabling notifications in progress",
-            "ErreurActivation": "Error while enabling notifications",
-            "PermissionRefusee": "Permission denied, please try again",
-            "Erreur": "An error occurred, please try again"
+        "Titre": "Notifications",
+        "PrefTickets": "Ticket notifications",
+        "PrefEmails": "Email notifications",
+        "Desactiver": "Disable notifications",
+        "DesactivationEnCours": "Disabling notifications...",
+        "ErreurDesactivation": "Error disabling notifications",
+        "Activer": "Enable notifications",
+        "ActivationEnCours": "Enabling notifications...",
+        "ErreurActivation": "Error enabling notifications",
+        "PermissionRefusee": "Permission denied. Please allow notifications in your browser settings.",
+        "Erreur": "An error occurred, please try again.",
+        "ErreurSauvegardePrefs": "Error saving preferences.",
+        "ErreurRecupPrefs": "Error fetching preferences.",
+        "ErreurFormatPrefs": "Error in preferences format.",
+        "NonSupportees": "Notifications not supported.",
+        "ErreurInit": "Notification system initialization error.",
+        "ErreurSW": "Error registering Service Worker.",
+        "ErreurSauvegardeAbonnement": "Error saving subscription.",
+        "ErreurRecupAbonnement": "Error fetching subscription.",
+        "ErreurInattendue": "An unexpected error occurred, please try again.",
+        "ErreurManqueEndpoint": "Error: Missing endpoint.",
+        "ErreurDesinscriptionLocale": "Error unsubscribing, please try again."
         }
     },
     "Titles": {

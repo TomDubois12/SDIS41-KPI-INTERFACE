@@ -145,7 +145,7 @@ export class EmailINPTService {
         // Construction complète du payload
         const notificationPayload = JSON.stringify({
             title: `Alerte Email INPT (${typeEmail})`,
-            body: `Sujet: ${emailData.subject?.substring(0, 60) ?? 'N/A'}...\nSite: ${emailData.nomSite ?? 'N/A'}`,
+            body: `Sujet: ${emailData.subject?.substring(0, 120) ?? 'N/A'}...`,
             data: { emailType: 'INPT', id: messageId }
         });
         // Bloc d'envoi complet

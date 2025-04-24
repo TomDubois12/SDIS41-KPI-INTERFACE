@@ -14,7 +14,7 @@ export class EmailOnduleurService {
     private readonly MAX_HISTORY_SIZE = 100; // Ajustable
     // Critères de filtrage
     private readonly adresseEmailSources = [
-         'nicolas.bellier@sdis41.fr',
+         'nicolas.bellier@sdis41.fr', // A RETIRER A TERME
          'onduleur.alerte@sdis41.fr',
          'onduleur.administratif@sdis41.fr',
      ];

@@ -3,7 +3,8 @@
         "Entrer": "Entrer",
         "Chargement": "Chargement...",
         "Details": "Détails",
-        "Reessayer": "Réessayer"
+        "Reessayer": "Réessayer",
+        "Enregistrement": "Enregistrement..."
     },
     "Parametre": {    
         "SwitchLanguage": "Passer en anglais",
@@ -11,14 +12,28 @@
         "Credits": "Crédits",
         "BackToHome": "Retour à la page d'accueil",
         "Notifications": {
+            "Titre": "Notifications",
+            "PrefTickets": "Notifications tickets",
+            "PrefEmails": "Notifications emails",
             "Desactiver": "Desactiver les notifications",
             "DesactivationEnCours": "Désactivation des notifications en cours",
             "ErreurDesactivation": "Erreur lors de la désactivation",
-            "Activer": "Activater les notifications",
+            "Activer": "Activer les notifications",
             "ActivationEnCours": "Activation des notifications en cours",
             "ErreurActivation": "Erreur lors de l'activation",
-            "PermissionRefusee": "Permission refusé, veuillez réessayer",
-            "Erreur": "Une erreur est survenue, veuillez réessayer"
+            "PermissionRefusee": "Permission refusé, veuillez autoriser les notifications depuis google",
+            "Erreur": "Une erreur est survenue, veuillez réessayer",
+            "ErreurSauvegardePrefs": "Erreur lors de la sauvegarde des préférences",
+            "ErreurRecupPrefs": "Erreur lors de la récupération des préférences",
+            "ErreurFormatPrefs": "Erreur dans le format des préférences",
+            "NonSupportees": "Notifications non-supportées",
+            "ErreurInit": "Erreur d'initialisation du système de notification",
+            "ErreurSW": "Erreur survenue lors de l'enregistrement du Service Worker",
+            "ErreurSauvegardeAbonnement": "Erreur lors de la sauvegarde des abonnements",
+            "ErreurRecupAbonnement": "Erreur lors de la récupération des abonnements",
+            "ErreurInattendue": "Erreur inattendue est survenue, veuillez réessayer",
+            "ErreurManqueEndpoint": "Erreur : Endpoint manquant",
+            "ErreurDesinscriptionLocale": "Erreur lors de la désinscription, veuillez réessayer"
         }
     },
     "Titles": {

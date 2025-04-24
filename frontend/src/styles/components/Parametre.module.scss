@@ -7,6 +7,26 @@
   border: none;
   font-size: 32px;
   cursor: pointer;
+  text-align: center;
+  align-items: center;
+}
+
+.notificationSection {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.preferences {
+  display: flex;
+  flex-direction: column;
+  color: white; 
+  font-size: 15px;
+  font-weight: 900;
+
+  input {
+    margin-top: 2vh;
+  }
 }
 
 .menu {
@@ -35,6 +55,7 @@
   cursor: pointer;
   padding: 1vh;
   transition: background 0.2s ease-in-out;
+  font-weight: 0;
 }
 
 .menu button:hover {
