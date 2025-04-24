@@ -251,7 +251,7 @@ export class NotificationService implements OnModuleInit {
                          const title = newTicket.Title || 'Sans titre';
                          const payload = JSON.stringify({
                              title: 'Nouveau ticket !',
-                             body: `Ticket ${newTicket.TicketId} ${title.substring(0, 100)} par ${formattedCallerName}.`,
+                             body: `Ticket ${newTicket.TicketId} \nSujet : ${title.substring(0, 100)} \npar ${formattedCallerName}.`,
                              data: { url: `/clarilog_detail?id=${newTicket.TicketId}` }
                          });
 

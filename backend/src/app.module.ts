@@ -12,43 +12,50 @@ import { EmailINPTModule } from './email_inpt/email_inpt.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { Subscription } from './notifications/entities/subscription.entity';
 import { DataSource } from 'typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ImapPollingModule } from './imap-polling/imap-polling.module'; // <-- Nouveau Module
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { ImapPollingModule } from './imap-polling/imap-polling.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forRoot({
-            type: 'mssql',
-            name: 'parc_db_connection',
-            host: 'SRV71\\CLARILOG',
-            port: 1433,
-            username: 'sa',
-            password: '6H_c>HtzVr1(6W-|',
-            database: 'parc_db',
-            options: {
-                encrypt: false,
-                enableArithAbort: true,
-            },
-            entities: [],
-            synchronize: false,
-        }),
-        TypeOrmModule.forRoot({ // Connexion pour push_notifications (MySQL)
-            type: 'mysql', // <-- Change to 'mysql'
-            name: 'push_notifications_connection',
-            host: 'ST428', // <-- Change to your MySQL host
-            port: 3306,      // <-- MySQL default port
-            username: 'root',      // <-- Change to your MySQL username
-            password: 'BqBoUixq8bCzTfgvrX1e5ZWRE', // <-- Your MySQL password
-            database: 'push_notifications',
-            entities: [Subscription], // Spécifiez l'entité Subscription ici
-            synchronize: false,
-        }),
         ConfigModule.forRoot({
-            isGlobal: true, // Makes the ConfigService available everywhere
-            envFilePath: '.env', // Explicitly specify the path to your .env file (optional if it's in the root)
+            isGlobal: true,
+            envFilePath: '.env',
+        }),
+        TypeOrmModule.forRootAsync({
+            name: 'parc_db_connection',
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                type: 'mssql',
+                host: configService.get<string>('CLARILOG_DATABASE_HOST') as string,
+                port: configService.get<number>('CLARILOG_DATABASE_PORT') as number,
+                username: configService.get<string>('CLARILOG_DATABASE_USERNAME') as string,
+                password: configService.get<string>('CLARILOG_DATABASE_PASSWORD') as string,
+                database: configService.get<string>('CLARILOG_DATABASE_DATABASE') as string,
+                options: {
+                    encrypt: false,
+                    enableArithAbort: true,
+                },
+                entities: [],
+                synchronize: false,
+            }),
+            inject: [ConfigService],
+        }),
+
+        TypeOrmModule.forRootAsync({
+            name: 'push_notifications_connection',
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                type: 'mysql',
+                host: configService.get<string>('NOTIFICATIONS_DATABASE_HOST') as string,
+                port: configService.get<number>('NOTIFICATIONS_DATABASE_PORT') as number,
+                username: configService.get<string>('NOTIFICATIONS_DATABASE_USERNAME') as string,
+                password: configService.get<string>('NOTIFICATIONS_DATABASE_PASSWORD') as string,
+                database: configService.get<string>('NOTIFICATIONS_DATABASE_DATABASE') as string,
+                entities: [Subscription],
+                synchronize: false,
+            }),
+            inject: [ConfigService],
         }),
         ScheduleModule.forRoot(),
         EventEmitterModule.forRoot(),
@@ -61,7 +68,6 @@ dotenv.config();
         ImapPollingModule,
         EmailOnduleurModule,
         EmailINPTModule,
-        ImapPollingModule, 
     ],
     controllers: [AppController],
     providers: [
@@ -69,7 +75,7 @@ dotenv.config();
         {
             provide: 'parc_db_connection',
             useFactory: (dataSource: DataSource) => dataSource,
-            inject: [getDataSourceToken('parc_db_connection')] // <-- Corrected inject
+            inject: [getDataSourceToken('parc_db_connection')]
         }
     ],
     exports: ['parc_db_connection']

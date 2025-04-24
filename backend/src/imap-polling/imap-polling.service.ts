@@ -59,11 +59,13 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
              this.imap = null;
              this.imapConnected = false;
         }
-        // !! IDENTIFIANTS EN DUR (comme demandé pour l'instant) !!
         this.imap = new Imap({
-            user: 'sic@sdis41.fr', password: 'puhz tmew shzv ldeo',
-            host: 'imap.gmail.com', port: 993, tls: true,
-            tlsOptions: { rejectUnauthorized: false }, // Risqué
+            user: this.configService.get<string>('SIC_MAILBOX_USERNAME') as string, 
+            password: this.configService.get<string>('SIC_MAILBOX_PASSWORD') as string,
+            host: this.configService.get<string>('SIC_MAILBOX_HOST') as string, 
+            port: this.configService.get<string>('SIC_MAILBOX_PORT') as string, 
+            tls: true,
+            tlsOptions: { rejectUnauthorized: false }, // Risqué, à revoir
             connTimeout: 15000, authTimeout: 10000,
         }) as Imap.ImapConnection;
         this.imap.setMaxListeners(20);
