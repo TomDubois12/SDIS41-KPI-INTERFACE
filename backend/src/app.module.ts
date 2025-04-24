@@ -12,8 +12,10 @@ import { EmailINPTModule } from './email_inpt/email_inpt.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { Subscription } from './notifications/entities/subscription.entity';
 import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ImapPollingModule } from './imap-polling/imap-polling.module'; // <-- Nouveau Module
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
@@ -48,14 +50,18 @@ dotenv.config();
             isGlobal: true, // Makes the ConfigService available everywhere
             envFilePath: '.env', // Explicitly specify the path to your .env file (optional if it's in the root)
         }),
+        ScheduleModule.forRoot(),
+        EventEmitterModule.forRoot(),
+
         TicketModule,
         NotificationsModule,
         ExcelModule,
         CsvModule,
-        ScheduleModule.forRoot(),
         UtilsModule,
+        ImapPollingModule,
         EmailOnduleurModule,
         EmailINPTModule,
+        ImapPollingModule, 
     ],
     controllers: [AppController],
     providers: [

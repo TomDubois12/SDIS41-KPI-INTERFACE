@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Inject, forwardRef, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import * as webpush from 'web-push';
@@ -7,12 +7,24 @@ import { SubscriptionRepository } from './repositories/subscription.repository';
 import { Subscription } from './entities/subscription.entity';
 import { TicketService } from '../ticket/ticket.service'; // Ajustez le chemin si nécessaire
 
+// Interface pour clarifier les préférences passées au repo (usage interne)
+interface SubscriptionPreferences {
+    notifyOnTicket?: boolean;
+    notifyOnEmail?: boolean;
+}
+
+// Interface exportée pour le type de retour des préférences
+export interface CurrentPreferences {
+    notifyOnTicket: boolean;
+    notifyOnEmail: boolean;
+}
+
 @Injectable()
 export class NotificationService implements OnModuleInit {
     private readonly logger = new Logger(NotificationService.name);
     private vapidPublicKey: string;
     private vapidPrivateKey: string;
-    private previousTickets: any[] = []; // Stockage en mémoire
+    private previousTickets: any[] = [];
 
     constructor(
         private readonly subscriptionRepository: SubscriptionRepository,
@@ -20,18 +32,16 @@ export class NotificationService implements OnModuleInit {
         @Inject(forwardRef(() => TicketService))
         private readonly ticketService: TicketService,
     ) {
-        // Récupérer les clés VAPID
+        // --- Configuration VAPID ---
         this.vapidPublicKey = this.configService.get<string>('VAPID_PUBLIC_KEY') as string;
         this.vapidPrivateKey = this.configService.get<string>('VAPID_PRIVATE_KEY') as string;
-
         if (!this.vapidPublicKey || !this.vapidPrivateKey) {
-            this.logger.error('Clés VAPID non trouvées...');
-            // Gérer l'erreur comme avant
+            this.logger.error('Clés VAPID non trouvées dans les variables d\'environnement !');
         } else {
             this.logger.log('Clés VAPID chargées.');
             try {
                 webpush.setVapidDetails(
-                    this.configService.get<string>('VAPID_MAILTO', 'mailto:tom.dubois@sdis41.fr'), // Email par défaut si non configuré
+                    this.configService.get<string>('VAPID_MAILTO', 'mailto:votre-email@example.com'),
                     this.vapidPublicKey,
                     this.vapidPrivateKey,
                 );
@@ -43,117 +53,182 @@ export class NotificationService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        this.logger.log('NotificationService Module Initialized. Starting monitoring...');
+        this.logger.log('NotificationService Module Initialized. Démarrage surveillance tickets...');
         await this.startMonitoring();
     }
 
-    // --- Méthode privée pour formater le nom ---
+    // Méthode privée pour formater le nom d'opérateur/demandeur
     private formatOperatorName(operatorName: string | null | undefined): string {
-        if (!operatorName) {
-            // Gérer le cas 'Envoyé depuis un mail' ou autre nom non standard
-             if (operatorName === 'Envoyé depuis un mail') return operatorName;
-            return 'Inconnu'; // Retourner 'Inconnu' ou une chaîne vide si null/undefined/vide
-        }
-
-        // Logique copiée depuis le frontend
-        const parts = operatorName.split('\\');
-        // Si le format est DOMAIN\user.name ou user.name
-         let namePart = parts[parts.length - 1]; // Prendre la dernière partie (ou la seule si pas de \)
-
-        // Remplacer . et - par des espaces
-        if (namePart.includes('.') || namePart.includes('-')) {
-             namePart = namePart.replace(/[.-]/g, ' ');
-        }
-
-        // Mettre en majuscule la première lettre de chaque mot
-        const capitalize = (str: string): string => {
-             // Gérer les cas comme 'd'' ou 'l'' pour ne pas les mettre en majuscule (optionnel)
-             return str.replace(/\b(?!(?:d'|l'))\w/g, (char) => char.toUpperCase());
-             // Version simple : return str.replace(/\b\w/g, (char) => char.toUpperCase());
-        };
-
-        return capitalize(namePart.trim()); // trim() pour enlever les espaces superflus
+       if (!operatorName) {
+           if (operatorName === 'Envoyé depuis un mail') return operatorName; // Cas spécifique
+           return 'Inconnu';
+       }
+       const parts = operatorName.split('\\');
+       let namePart = parts[parts.length - 1];
+       if (namePart.includes('.') || namePart.includes('-')) {
+           namePart = namePart.replace(/[.-]/g, ' ');
+       }
+       const capitalize = (str: string): string => str.replace(/\b(?!(?:d'|l'))\w/g, (char) => char.toUpperCase());
+       return capitalize(namePart.trim());
     }
-    // --- Fin méthode formatOperatorName ---
 
-
+    /** Enregistre un nouvel abonnement ou retourne l'existant. Utilise les préférences par défaut. */
     async subscribeUser(endpoint: string, p256dh: string, auth: string, userId: number | null): Promise<Subscription> {
-        const existingSubscription = await this.subscriptionRepository.findOneByEndpoint(endpoint);
-        if (existingSubscription) {
-            this.logger.log(`Abonnement existant trouvé : ${existingSubscription.id}`);
-            return existingSubscription;
+        const shortEndpoint = endpoint.substring(0, 40) + '...';
+        // Utiliser let car on peut réassigner après la sauvegarde de mise à jour
+        let subscription = await this.subscriptionRepository.findOneByEndpoint(endpoint);
+
+        if (subscription) {
+            // Abonnement trouvé
+            this.logger.log(`[subscribeUser] Abonnement existant trouvé pour ${shortEndpoint} ID: ${subscription.id}. Vérification MàJ.`);
+            let needsSave = false;
+            if (subscription.p256dh !== p256dh) {
+                subscription.p256dh = p256dh;
+                needsSave = true;
+                this.logger.log(`[subscribeUser] Clé p256dh différente détectée pour ${shortEndpoint}`);
+            }
+            if (subscription.auth !== auth) {
+                subscription.auth = auth;
+                needsSave = true;
+                this.logger.log(`[subscribeUser] Clé auth différente détectée pour ${shortEndpoint}`);
+            }
+            if (userId !== null && subscription.userId !== userId) {
+                 subscription.userId = userId;
+                 needsSave = true;
+                 this.logger.log(`[subscribeUser] UserId différent détecté pour ${shortEndpoint}`);
+            }
+
+            if (needsSave) {
+                 // --- LOG AJOUTÉ AVANT SAUVEGARDE (UPDATE) ---
+                 this.logger.log(`[subscribeUser] Tentative de sauvegarde (update) pour l'abonnement ID: ${subscription.id}. Données: ${JSON.stringify(subscription)}`);
+                 try {
+                     // Utiliser la méthode save publique du repository qui appelle repository.save de TypeORM
+                     const savedSubscription = await this.subscriptionRepository.save(subscription);
+                     // --- LOG AJOUTÉ APRÈS SAUVEGARDE (UPDATE) ---
+                     this.logger.log(`[subscribeUser] Abonnement ID: ${subscription.id} mis à jour et sauvegardé avec succès.`);
+                     return savedSubscription; // Retourner l'entité sauvegardée/mise à jour
+                 } catch (error) {
+                      // --- LOG DÉTAILLÉ DE L'ERREUR DE SAUVEGARDE ---
+                      this.logger.error(`[subscribeUser] ERREUR lors de la sauvegarde (update) de l'abonnement ID: ${subscription.id}`, error instanceof Error ? error.stack : error);
+                      // Renvoyer l'erreur pour qu'elle soit traitée par NestJS (probablement en 500)
+                      throw error;
+                 }
+            } else {
+                this.logger.log(`[subscribeUser] Aucune mise à jour nécessaire pour l'abonnement ID: ${subscription.id}.`);
+                return subscription; // Retourner l'abonnement existant non modifié
+            }
+        } else {
+            // Créer un nouvel abonnement
+            this.logger.log(`[subscribeUser] Aucun abonnement existant trouvé pour ${shortEndpoint}. Création...`);
+            try {
+                 // Utiliser saveSubscription du repo pour la création
+                 const newSubscription = await this.subscriptionRepository.saveSubscription(endpoint, p256dh, auth, userId);
+                 this.logger.log(`[subscribeUser] Nouvel abonnement créé : ${newSubscription.id}`);
+                 return newSubscription;
+            } catch (error) {
+                 // --- LOG DÉTAILLÉ DE L'ERREUR DE CRÉATION ---
+                 this.logger.error(`[subscribeUser] ERREUR lors de la création du nouvel abonnement pour ${shortEndpoint}`, error instanceof Error ? error.stack : error);
+                 throw error; // Renvoyer l'erreur
+            }
         }
-        const newSubscription = await this.subscriptionRepository.saveSubscription(endpoint, p256dh, auth, userId);
-        this.logger.log(`Nouvel abonnement créé : ${newSubscription.id}`);
-        return newSubscription;
     }
 
+    /** Met à jour les préférences pour un abonnement donné via son endpoint. */
+    async updatePreferences(endpoint: string, preferences: SubscriptionPreferences): Promise<boolean> {
+         const shortEndpoint = endpoint.substring(0,40) + '...';
+         this.logger.log(`Mise à jour préférences demandée pour endpoint: ${shortEndpoint} avec ${JSON.stringify(preferences)}`);
+         // La méthode du repo retourne true si l'abonnement est trouvé (MàJ effectuée ou non nécessaire)
+         const updated = await this.subscriptionRepository.updatePreferencesByEndpoint(endpoint, preferences);
+         if (!updated) {
+              this.logger.warn(`Aucun abonnement trouvé pour l'endpoint ${shortEndpoint} lors MàJ préférences.`);
+         } else {
+              this.logger.log(`Préférences MàJ (ou identiques) pour endpoint: ${shortEndpoint}`);
+         }
+         return updated;
+    }
+
+    /** Récupère TOUS les abonnements actifs (pour admin, cleanup, etc.) */
     async getAllSubscriptions(): Promise<Subscription[]> {
-        const subscriptions = await this.subscriptionRepository.find();
-        // this.logger.log(`[getAllSubscriptions] Found ${subscriptions.length} subscriptions.`); // Log de debug retiré/commenté
-        return subscriptions;
+        return this.subscriptionRepository.find();
     }
 
+    /** Récupère les abonnements souhaitant les notifications TICKET */
+    async getTicketSubscribers(): Promise<Subscription[]> {
+        this.logger.debug('Récupération des abonnés aux tickets...');
+        return this.subscriptionRepository.findTicketSubscribers();
+    }
+
+    /** Récupère les abonnements souhaitant les notifications EMAIL */
+    async getEmailSubscribers(): Promise<Subscription[]> {
+        this.logger.debug('Récupération des abonnés aux emails...');
+        return this.subscriptionRepository.findEmailSubscribers();
+    }
+
+    /** Récupère les préférences actuelles pour un abonnement spécifique. */
+    async getPreferencesByEndpoint(endpoint: string): Promise<CurrentPreferences | null> {
+        const shortEndpoint = endpoint.substring(0, 40) + '...';
+        this.logger.debug(`Recherche des préférences pour endpoint: ${shortEndpoint}`);
+        const subscription = await this.subscriptionRepository.findOneByEndpoint(endpoint);
+
+        if (!subscription) {
+            this.logger.warn(`Aucun abonnement trouvé pour l'endpoint lors de getPreferencesByEndpoint: ${shortEndpoint}`);
+            return null;
+        }
+        // Retourne l'objet correspondant à l'interface CurrentPreferences
+        return {
+            notifyOnTicket: subscription.notifyOnTicket,
+            notifyOnEmail: subscription.notifyOnEmail,
+        };
+    }
+
+    /** Envoi la notification push et gère les erreurs (suppression si expiré). */
     async sendPushNotification(subscription: Subscription, payload: string): Promise<boolean> {
         const shortEndpoint = subscription.endpoint.substring(0, 40) + '...';
         try {
             const pushSubscription: webpush.PushSubscription = {
-                endpoint: subscription.endpoint,
-                keys: { p256dh: subscription.p256dh, auth: subscription.auth },
+                 endpoint: subscription.endpoint,
+                 keys: { p256dh: subscription.p256dh, auth: subscription.auth },
             };
-            // this.logger.log(`[sendPushNotification] Attempting to send notification to ${shortEndpoint}`); // Log de debug retiré/commenté
             await webpush.sendNotification(pushSubscription, payload);
-            this.logger.log(`[sendPushNotification] Notification envoyée avec succès à ${shortEndpoint}`);
+            this.logger.log(`[sendPushNotification] Succès vers ${shortEndpoint}`);
             return true;
         } catch (error: any) {
-            this.logger.error(`[sendPushNotification] Erreur lors de l'envoi à ${shortEndpoint}`, error.message);
-            if (error.statusCode === 404 || error.statusCode === 410) {
-                this.logger.warn(`[sendPushNotification] Abonnement expiré/invalide détecté pour ${shortEndpoint}. Suppression...`);
-                try {
-                    await this.subscriptionRepository.delete(subscription.id);
-                    this.logger.log(`[sendPushNotification] Abonnement ${subscription.id} (Endpoint: ${shortEndpoint}) supprimé.`);
-                } catch (deleteError: any) {
-                    this.logger.error(`[sendPushNotification] Erreur suppression abonnement ${subscription.id}: ${deleteError.message}`);
-                }
-            } else {
-                 this.logger.error(`[sendPushNotification] Détails erreur pour ${shortEndpoint}: Status=${error.statusCode}, Body=${error.body}`);
-            }
+             this.logger.error(`[sendPushNotification] Échec vers ${shortEndpoint}`, error.message);
+             if (error.statusCode === 404 || error.statusCode === 410) {
+                 this.logger.warn(`[sendPushNotification] Suppression abonnement expiré ${subscription.id} (Endpoint: ${shortEndpoint})`);
+                 try {
+                      await this.subscriptionRepository.delete(subscription.id);
+                      this.logger.log(`[sendPushNotification] Abonnement ${subscription.id} supprimé.`);
+                 } catch (deleteError: any) {
+                      this.logger.error(`[sendPushNotification] Erreur suppression abonnement ${subscription.id}: ${deleteError.message}`);
+                 }
+             } else {
+                  this.logger.error(`[sendPushNotification] Détails erreur non gérée pour ${shortEndpoint}: Status=${error.statusCode}, Body=${error.body}`);
+             }
             return false;
         }
     }
 
+    /** Retourne la clé publique VAPID. */
     getPublicKey(): string {
         return this.vapidPublicKey;
     }
 
-    async cleanupExpiredSubscriptions(): Promise<number> {
-        // Logique inchangée... (peut être retirée si non utilisée)
-        this.logger.log('[cleanupExpiredSubscriptions] Starting cleanup task...');
-        const subscriptions = await this.getAllSubscriptions();
-        let removedCount = 0;
-        for (const subscription of subscriptions) {
-             try { /* ... */ } catch (error: any) { /* ... */ }
-        }
-        this.logger.log(`[cleanupExpiredSubscriptions] Cleanup finished: ${removedCount} subscriptions removed.`);
-        return removedCount;
-    }
-
+    // --- Surveillance Tickets ---
+    /** Récupère les tickets du jour via TicketService */
     async getCurrentTickets(): Promise<any[]> {
         try {
             const todayDate = new Date().toISOString().slice(0, 10);
-            // this.logger.log(`[getCurrentTickets] Fetching tickets for date: ${todayDate}`); // Log de debug retiré/commenté
             const tickets = await this.ticketService.getTickets(todayDate);
-            // this.logger.log(`[getCurrentTickets] Fetched ${tickets?.length ?? 0} tickets.`); // Log de debug retiré/commenté
             return Array.isArray(tickets) ? tickets : [];
         } catch (error) {
-            this.logger.error('[getCurrentTickets] Error fetching tickets:', error);
+            this.logger.error('[getCurrentTickets] Erreur fetching tickets via TicketService:', error);
             return [];
         }
     }
 
+    /** Vérifie s'il y a de nouveaux tickets et notifie les abonnés concernés. */
     async checkForNewTicket() {
-        // Retirer les logs de debug détaillés maintenant que le problème de doublon est résolu
-        // this.logger.log('--- [checkForNewTicket] START ---');
         const currentTickets = await this.getCurrentTickets();
         const previousTicketIds = this.previousTickets.map(t => t?.TicketId);
 
@@ -165,53 +240,76 @@ export class NotificationService implements OnModuleInit {
             if (newTickets.length > 0) {
                 this.logger.log(`[checkForNewTicket] ${newTickets.length} new ticket(s) IDENTIFIED: IDs=[${newTickets.map(t => t.TicketId).join(', ')}]`);
 
-                for (const newTicket of newTickets) {
-                    this.logger.log(`[checkForNewTicket] Processing new ticket ID=${newTicket.TicketId}`);
+                // Récupérer UNIQUEMENT les abonnés aux tickets
+                const subscriptions = await this.getTicketSubscribers();
+                this.logger.log(`[checkForNewTicket] Found ${subscriptions.length} subscribers for ticket notifications.`);
 
-                    // --- Appel de la fonction de formatage ---
-                    const formattedCallerName = this.formatOperatorName(newTicket.CallerName);
-                    // --- Fin Appel ---
+                if (subscriptions.length > 0) {
+                     for (const newTicket of newTickets) {
+                         this.logger.log(`[checkForNewTicket] Processing new ticket ID=${newTicket.TicketId}`);
+                         const formattedCallerName = this.formatOperatorName(newTicket.CallerName);
+                         const title = newTicket.Title || 'Sans titre';
+                         const payload = JSON.stringify({
+                             title: 'Nouveau ticket !',
+                             body: `Ticket ${newTicket.TicketId} ${title.substring(0, 100)} par ${formattedCallerName}.`,
+                             data: { url: `/clarilog_detail?id=${newTicket.TicketId}` }
+                         });
 
-                    const title = newTicket.Title || 'Sans titre'; // Fallback pour le titre
-
-                    const payload = JSON.stringify({
-                        title: 'Nouveau ticket !',
-                        // --- Utilisation du nom formaté dans le corps ---
-                        body: `Ticket ${newTicket.TicketId} ${title.substring(0, 100)} par ${formattedCallerName}.`,
-                        // Optionnel: ajouter une action ou une URL
-                        data: { url: `/clarilog_detail?id=${newTicket.TicketId}` } // Pour ouvrir le ticket au clic
-                    });
-
-                    const subscriptions = await this.getAllSubscriptions();
-                    this.logger.log(`[checkForNewTicket] Found ${subscriptions.length} subscriptions to notify for Ticket ID=${newTicket.TicketId}.`);
-
-                    let successCount = 0;
-                    for (const sub of subscriptions) {
-                        // this.logger.log(`[checkForNewTicket] SENDING notification for Ticket ID=${newTicket.TicketId} ...`); // Log moins verbeux
-                        const success = await this.sendPushNotification(sub, payload);
-                        if(success) successCount++;
-                    }
-                        this.logger.log(`[checkForNewTicket] Finished sending for Ticket ID=${newTicket.TicketId}. Success count: ${successCount}/${subscriptions.length}`);
+                         this.logger.log(`[checkForNewTicket] Sending ticket notification ID=${newTicket.TicketId} to ${subscriptions.length} subscribers.`);
+                         // Envoyer à tous les abonnés concernés (parallélisation possible)
+                         await Promise.allSettled(
+                              subscriptions.map(sub => this.sendPushNotification(sub, payload))
+                         );
+                         this.logger.log(`[checkForNewTicket] Finished sending attempt for Ticket ID=${newTicket.TicketId}.`);
+                     }
+                } else {
+                     this.logger.log(`[checkForNewTicket] No active subscribers found for ticket notifications.`);
                 }
             }
         }
-        // Toujours mettre à jour previousTickets
+        // Toujours mettre à jour la liste précédente
         this.previousTickets = [...currentTickets];
-         // this.logger.log('--- [checkForNewTicket] END ---');
     }
 
+    /** Tâche Cron pour vérifier les tickets */
     @Cron(CronExpression.EVERY_5_SECONDS)
     async monitoringTask() {
-         // Retirer les logs de début/fin de tâche si plus nécessaires
-         // this.logger.log('====== [monitoringTask] RUNNING ======');
         await this.checkForNewTicket();
-         // this.logger.log('====== [monitoringTask] FINISHED ======');
     }
 
+    /** Initialisation de la surveillance */
     async startMonitoring() {
         this.logger.log('[startMonitoring] Initializing previous tickets state...');
         this.previousTickets = await this.getCurrentTickets();
         this.logger.log(`[startMonitoring] Initialized previousTickets with ${this.previousTickets.length} tickets.`);
-        this.logger.log('[startMonitoring] Monitoring task is now scheduled to run.');
+        this.logger.log('[startMonitoring] Monitoring task scheduled.');
     }
-}
+
+    /** Nettoyage des abonnements expirés */
+    async cleanupExpiredSubscriptions(): Promise<number> {
+        this.logger.log('[cleanupExpiredSubscriptions] Starting cleanup task...');
+        const subscriptions = await this.getAllSubscriptions();
+        let removedCount = 0;
+        for (const subscription of subscriptions) {
+             try {
+                 const pushSubscription: webpush.PushSubscription = { endpoint: subscription.endpoint, keys: { p256dh: subscription.p256dh, auth: subscription.auth } };
+                 // Ping silencieux pour tester la validité
+                 await webpush.sendNotification(pushSubscription, JSON.stringify({ type: 'ping' }));
+             } catch (error: any) {
+                 if (error.statusCode === 404 || error.statusCode === 410) {
+                     this.logger.warn(`[cleanup] Found expired subscription: ${subscription.id}. Deleting.`);
+                     try {
+                          await this.subscriptionRepository.delete(subscription.id);
+                          removedCount++;
+                     }
+                     catch (deleteError: any) {
+                          this.logger.error(`[cleanup] Error deleting ${subscription.id}: ${deleteError.message}`);
+                     }
+                 }
+             }
+        }
+        this.logger.log(`[cleanupExpiredSubscriptions] Cleanup finished: ${removedCount} subscriptions removed.`);
+        return removedCount;
+    }
+
+} // Fin NotificationService

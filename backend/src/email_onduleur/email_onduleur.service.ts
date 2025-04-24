@@ -1,244 +1,120 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import * as Imap from 'imap';
-import { simpleParser } from 'mailparser';
+// src/email_onduleur/email_onduleur.service.ts
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { NotificationService } from '../notifications/notifications.service';
+// Importer l'événement générique et le payload
+import { ImapEmailPayload, EMAIL_RECEIVED_EVENT } from '../imap-polling/imap-polling.service';
 
 @Injectable()
 export class EmailOnduleurService {
-    private imap: Imap;
     private readonly logger = new Logger(EmailOnduleurService.name);
-    private emails: any[] = [];
+    private processedOnduleurEmails: any[] = []; // Historique mémoire
+    // Réintroduire le Set pour gérer les notifications uniques par session
+    private notifiedEmailIds: Set<string> = new Set();
+    private readonly MAX_HISTORY_SIZE = 100; // Ajustable
+    // Critères de filtrage
     private readonly adresseEmailSources = [
-        'nicolas.bellier@sdis41.fr',
-        'onduleur.alerte@sdis41.fr',
-        'onduleur.administratif@sdis41.fr',
-    ];
+         'nicolas.bellier@sdis41.fr',
+         'onduleur.alerte@sdis41.fr',
+         'onduleur.administratif@sdis41.fr',
+     ];
     private readonly sujetEmailSource = 'UPS event notification';
-    private imapConnected = false;
 
-    constructor() {
-        this.initializeImap();
+    constructor(
+        @Inject(forwardRef(() => NotificationService))
+        private readonly notificationService: NotificationService,
+    ) {
+         this.logger.log('EmailOnduleurService initialisé, écoute de ' + EMAIL_RECEIVED_EVENT);
     }
 
-    private initializeImap() {
-        this.imap = new Imap({
-            user: 'sic@sdis41.fr',
-            password: 'puhz tmew shzv ldeo',  
-            host: 'imap.gmail.com',
-            port: 993,
-            tls: true,
-            tlsOptions: { rejectUnauthorized: false },
-        });
+    // Écouter l'événement générique
+    @OnEvent(EMAIL_RECEIVED_EVENT, { async: true })
+    async handleEmailReceived(payload: ImapEmailPayload) {
+        const { seqno, parsed, messageId } = payload;
+        this.logger.debug(`[Onduleur] Événement ${EMAIL_RECEIVED_EVENT} reçu pour #${seqno} (ID: ${messageId})`);
 
-        this.imap.setMaxListeners(20);
-
-        this.imap.on('ready', () => {
-            this.imapConnected = true;
-            this.logger.log('Connexion IMAP établie');
-        });
-
-        this.imap.on('error', (err) => {
-            this.logger.error('Erreur IMAP:', err);
-            this.imapConnected = false;
-        });
-
-        this.imap.on('end', () => {
-            this.imapConnected = false;
-            this.logger.log('Connexion IMAP fermée');
-        });
-    }
-
-    private connectImap(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            if (this.imapConnected) {
-                resolve();
-                return;
-            }
-
-            if (this.imap && (this.imap.state === 'disconnected' || this.imap.state === 'error')) {
-                this.logger.log('Réinitialisation de la connexion IMAP');
-                this.initializeImap();
-            }
-
-            this.imap.once('ready', () => {
-                this.imapConnected = true;
-                resolve();
-            });
-
-            this.imap.once('error', (err) => {
-                this.imapConnected = false;
-                reject(err);
-            });
-
-            try {
-                this.imap.connect();
-            } catch (error) {
-                this.logger.error('Erreur lors de la connexion IMAP:', error);
-                reject(error);
-            }
-        });
-    }
-
-    private disconnectImap(): Promise<void> {
-        return new Promise((resolve) => {
-            if (this.imapConnected && this.imap && this.imap.state !== 'disconnected') {
-                try {
-                    this.imap.end();
-                } catch (error) {
-                    this.logger.error('Erreur lors de la déconnexion IMAP:', error);
-                }
-                this.imapConnected = false;
-            }
-            resolve();
-        });
-    }
-
-    private openInbox(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.imap.openBox('INBOX', true, (err, box) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                this.logger.log('Boîte de réception ouverte');
-                resolve();
-            });
-        });
-    }
-
-    private isFetchingEmails = false;
-    private lastSuccessfulFetch: Date | null = null;
-
-    @Cron(CronExpression.EVERY_MINUTE)
-    async fetchAndProcessEmails() {
-        if (this.isFetchingEmails) {
-            this.logger.warn('Récupération des emails déjà en cours, ignorée.');
-            return;
+        // 1. Filtrer : Est-ce un email Onduleur ?
+        const senderAddress = parsed.from?.value?.[0]?.address?.toLowerCase();
+        const subjectMatch = parsed.subject === this.sujetEmailSource;
+        if (!subjectMatch || !senderAddress || !this.adresseEmailSources.includes(senderAddress)) {
+            this.logger.debug(`[Onduleur] Email #${seqno} ignoré (critères sujet/expéditeur non remplis).`);
+            return; // Ignorer
         }
 
-        this.isFetchingEmails = true;
-        this.logger.debug('Début de fetchAndProcessEmails');
+        this.logger.log(`[Onduleur] Email correspondant trouvé #${seqno}. Traitement...`);
 
-        try {
-            await this.connectImap();
-            await this.openInbox();
+        // 2. Extraire les données spécifiques Onduleur (Corps Complet)
+        const content = parsed.text || '';
+        const type = content.includes('administratif') ? 'Administratif' : 'Alerte';
+        const messageMatch = content.match(/Message\s*:\s*(.+?)\n\n/s);
+        const eventMatch = content.match(/Event List\s*:\s*(.+?)\n/s);
+        const timestampMatch = content.match(/Timestamp\s*:\s*(.+?)$/m);
+        const emailData: any = {
+            id: messageId, // Utiliser messageId
+            originalSeqno: seqno,
+            from: parsed.from?.text,
+            subject: parsed.subject,
+            date: parsed.date,
+            type,
+            message: messageMatch?.[1]?.trim() ?? '',
+            event: eventMatch?.[1]?.trim() ?? '',
+            timestamp: timestampMatch?.[1]?.trim() ?? '',
+         };
 
-            const now = new Date();
-            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-            // Utiliser un tableau temporaire au lieu de vider emails
-            const tempEmails = [];
-            await this.fetchEmails(thirtyDaysAgo, now, tempEmails);
-            
-            // Mettre à jour emails seulement après avoir tout récupéré
-            this.emails = tempEmails;
-
-            this.lastSuccessfulFetch = new Date();
-        } catch (error) {
-            if (error.code === 'EPIPE') {
-                this.logger.error('Erreur de socket : La connexion IMAP a été fermée de manière inattendue.');
-                this.imapConnected = false;
-                try {
-                    this.imap.end();
-                } catch (e) {}
-                this.initializeImap();
-            } else {
-                this.logger.error('Erreur lors de la récupération des emails:', error);
+        // 3. Mettre à jour l'historique en mémoire (TOUJOURS)
+        const existingIndex = this.processedOnduleurEmails.findIndex(e => e.id === messageId);
+        if (existingIndex > -1) {
+            // Remplacer l'entrée existante
+            this.processedOnduleurEmails[existingIndex] = emailData;
+            this.logger.debug(`[Onduleur] Email ID: ${messageId} mis à jour dans l'historique.`);
+        } else {
+            // Ajouter au début si nouveau
+            this.processedOnduleurEmails.unshift(emailData);
+            this.logger.debug(`[Onduleur] Email ID: ${messageId} ajouté à l'historique.`);
+            // Limiter la taille
+            if (this.processedOnduleurEmails.length > this.MAX_HISTORY_SIZE) {
+                 this.processedOnduleurEmails.length = this.MAX_HISTORY_SIZE;
             }
-        } finally {
-            try {
-                await this.disconnectImap();
-            } catch (error) {
-                this.logger.error('Erreur lors de la déconnexion:', error);
-            }
-            this.isFetchingEmails = false;
-            this.logger.debug('Fin de fetchAndProcessEmails');
         }
-    }
+        this.logger.debug(`[Onduleur] Historique mis à jour pour ID: ${messageId}. Taille: ${this.processedOnduleurEmails.length}`);
 
-    private async fetchEmails(startDate: Date, now: Date, emailsArray: any[]) {
-        return new Promise<void>((resolve, reject) => {
-            const searchCriteria = [['SINCE', startDate]];
-            const fetchOptions = {
-                bodies: [''],
-                struct: true,
-            };
+        // 4. Vérifier si DÉJÀ NOTIFIÉ cette session
+        if (!messageId || typeof messageId !== 'string' || messageId.startsWith('seqno-')) {
+             this.logger.warn(`[Onduleur] Message-ID invalide pour #${seqno}. Notification ignorée.`);
+             return;
+        }
+        if (this.notifiedEmailIds.has(messageId)) {
+             this.logger.log(`[Onduleur] Email ID: ${messageId} déjà notifié cette session. Ignoré pour notif.`);
+             return; // Ne pas notifier à nouveau
+        }
 
-            this.imap.search(searchCriteria, (err, results) => {
-                if (err) {
-                    this.logger.error('Erreur lors de la recherche des emails:', err);
-                    reject(err);
-                    return;
-                }
-
-                if (!results || results.length === 0) {
-                    this.logger.log('Aucun email trouvé dans la plage de dates.');
-                    resolve();
-                    return;
-                }
-
-                const f = this.imap.fetch(results, fetchOptions);
-
-                f.on('message', (msg, seqno) => {
-                    msg.on('body', (stream, info) => {
-                        simpleParser(stream, (err, parsed) => {
-                            if (err) {
-                                this.logger.error('Erreur de parsing:', err);
-                                return;
-                            }
-
-                            if (
-                                parsed.subject === this.sujetEmailSource &&
-                                parsed.from &&
-                                parsed.from.value &&
-                                parsed.from.value.length > 0 &&
-                                this.adresseEmailSources.includes(parsed.from.value[0].address)
-                            ) {
-                                const content = parsed.text;
-                                const type = content.includes('administratif') ? 'Administratif' : 'Alerte';
-                                const messageMatch = content.match(/Message\s*:\s*(.+?)\n\n/s);
-                                const eventMatch = content.match(/Event List\s*:\s*(.+?)\n/s);
-                                const timestampMatch = content.match(/Timestamp\s*:\s*(.+?)$/m);
-
-                                // Utiliser emailsArray au lieu de this.emails
-                                emailsArray.push({
-                                    id: seqno,
-                                    from: parsed.from?.text,
-                                    subject: parsed.subject,
-                                    date: parsed.date,
-                                    type,
-                                    message: messageMatch?.[1]?.trim() ?? '',
-                                    event: eventMatch?.[1]?.trim() ?? '',
-                                    timestamp: timestampMatch?.[1]?.trim() ?? '',
-                                });
-                                this.logger.log(`Email #${seqno} récupéré: ${parsed.subject}`);
-                            }
-                        });
-                    });
-                });
-
-                f.once('error', (err) => {
-                    this.logger.error('Erreur lors du fetch:', err);
-                    reject(err);
-                });
-
-                f.once('end', () => {
-                    this.logger.log('Récupération des emails terminée.');
-                    resolve();
-                });
-            });
+        // 5. Notifier (car nouveau pour notification CETTE SESSION) et Mémoriser l'ID notifié
+        this.notifiedEmailIds.add(messageId); // Marquer comme notifié
+        this.logger.log(`[ONDULEUR NOTIFICATION] ID: ${messageId} marqué comme notifié pour cette session. Envoi...`);
+        const notificationPayload = JSON.stringify({
+            title: `Alerte Onduleur (${type})`,
+            body: `Événement: ${emailData.event || 'N/A'}\nMessage: ${emailData.message?.substring(0, 50) || 'N/A'}...`,
+            data: { emailType: 'Onduleur', id: messageId }
         });
-    }
+         try {
+             const subscriptions = await this.notificationService.getEmailSubscribers(); // Abonnés EMAIL
+             if (subscriptions && subscriptions.length > 0) {
+                 this.logger.log(`[Onduleur Notification] Envoi à ${subscriptions.length} abonnés.`);
+                 // Envoyer en parallèle
+                 Promise.allSettled( subscriptions.map(sub => this.notificationService.sendPushNotification(sub, notificationPayload)) )
+                     .then(results => {
+                         const fulfilled = results.filter(r => r.status === 'fulfilled' && r.value).length;
+                         this.logger.log(`[Onduleur Notification] Envoi terminé pour ID: ${messageId}. Succès: ${fulfilled}/${results.length}`);
+                     });
+             } else { this.logger.log(`[Onduleur Notification] Aucun abonné trouvé pour les emails.`); }
+         } catch (notificationError) { this.logger.error(`[Onduleur Notification] Erreur envoi pour ID: ${messageId}:`, notificationError); }
 
+    } // Fin handleEmailReceived
+
+    // Retourne l'historique mémoire actuel
     getEmails(): any[] {
-        return this.emails;
+        // Le tri est implicite par unshift
+        return this.processedOnduleurEmails;
     }
 
-    getEmailById(id: number): any {
-        return this.emails.find(email => email.id === id);
-    }
-
-    getLastSuccessfulFetch(): Date | null {
-        return this.lastSuccessfulFetch;
-    }
-}
+} // Fin classe EmailOnduleurService
