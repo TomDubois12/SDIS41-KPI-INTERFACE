@@ -312,4 +312,31 @@ export class NotificationService implements OnModuleInit {
         return removedCount;
     }
 
+    // --- NOUVELLE MÉTHODE POUR GÉRER LA DÉSINSCRIPTION ---
+    /**
+     * Gère une demande de désinscription provenant du frontend.
+     * Tente de supprimer l'abonnement correspondant de la base de données.
+     * @param endpoint L'endpoint unique de l'abonnement à supprimer.
+     * @returns boolean Indique si une suppression a été tentée (true si trouvé et supprimé, false si non trouvé).
+     */
+    async handleUnsubscribe(endpoint: string): Promise<boolean> {
+        const shortEndpoint = endpoint.substring(0, 40) + '...';
+        this.logger.log(`[handleUnsubscribe] Demande de suppression reçue pour ${shortEndpoint}`);
+        try {
+            // Utiliser la méthode deleteByEndpoint du repository
+            const deleted = await this.subscriptionRepository.deleteByEndpoint(endpoint);
+            if (deleted) {
+                this.logger.log(`[handleUnsubscribe] Abonnement pour ${shortEndpoint} supprimé de la base de données.`);
+            } else {
+                this.logger.warn(`[handleUnsubscribe] Aucun abonnement trouvé à supprimer pour ${shortEndpoint}.`);
+            }
+            return deleted; // Retourne true si suppression effectuée, false sinon
+        } catch (error) {
+            this.logger.error(`[handleUnsubscribe] Erreur lors de la suppression de l'abonnement pour ${shortEndpoint}`, error);
+            // Renvoyer false ou lancer une exception selon la gestion d'erreur souhaitée
+            return false;
+        }
+    }
+    // --- FIN NOUVELLE MÉTHODE ---
+
 } // Fin NotificationService

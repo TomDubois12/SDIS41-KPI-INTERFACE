@@ -4,6 +4,7 @@ import { NotificationService, CurrentPreferences } from './notifications.service
 import { SubscribeDto } from './dto/subscribe.dto';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { GetPreferencesDto } from './dto/get-preferences.dto'; // Importer le DTO pour GET
+import { UnsubscribeDto } from './dto/unsubscribe.dto';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -31,6 +32,35 @@ export class NotificationsController {
             return { success: false, error: 'An error occurred during subscription.' };
         }
     }
+
+    // --- NOUVEL ENDPOINT POUR GÉRER LA DÉSINSCRIPTION ---
+    /**
+     * Reçoit une demande de désinscription du frontend et supprime l'abonnement en BDD.
+     * Utilise POST car on envoie l'endpoint dans le corps.
+     */
+    @Post('unsubscribe')
+    @HttpCode(HttpStatus.OK) // Répondre 200 OK même si l'abonnement n'existait pas (idempotent)
+    @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    async unsubscribe(@Body() unsubscribeDto: UnsubscribeDto) {
+        const shortEndpoint = unsubscribeDto.endpoint.substring(0, 40) + '...';
+        this.logger.log(`Requête POST /unsubscribe reçue pour endpoint: ${shortEndpoint}`);
+        try {
+            const deleted = await this.notificationService.handleUnsubscribe(unsubscribeDto.endpoint);
+            // On ne lance pas d'erreur si deleted est false, car le but (ne plus être abonné) est atteint.
+            if (deleted) {
+                 this.logger.log(`Désinscription backend réussie pour ${shortEndpoint}.`);
+            } else {
+                 this.logger.log(`Désinscription backend : ${shortEndpoint} non trouvé ou déjà supprimé.`);
+            }
+            return { success: true, message: 'Unsubscription request processed.' };
+        } catch (error) {
+             this.logger.error(`Erreur dans POST /unsubscribe pour ${shortEndpoint}: ${error.message}`, error instanceof Error ? error.stack : undefined);
+             // Retourner une erreur générique au client
+             // On pourrait utiliser HttpException ici pour un code d'erreur spécifique si nécessaire
+             return { success: false, message: 'An error occurred while processing unsubscription.' };
+        }
+    }
+    // --- FIN NOUVEL ENDPOINT ---
 
     /**
      * Retourne la clé publique VAPID du serveur.
