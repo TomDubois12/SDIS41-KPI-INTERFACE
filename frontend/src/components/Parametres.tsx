@@ -1,4 +1,4 @@
-// src/components/Parametres.tsx (VERSION FINALE COMPLÈTE)
+// src/components/Parametres.tsx (VERSION FINALE COMPLÈTE - Vérifiée)
 
 import { Link } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
@@ -33,15 +33,13 @@ const Parametres = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { t, setLang, lang } = useTranslation();
 
-    // --- États pour la gestion globale des notifications ---
+    // --- États Notifications ---
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isMainLoading, setIsMainLoading] = useState(false);
     const [mainNotificationButtonText, setMainNotificationButtonText] = useState(t("Parametre.Notifications.Activer"));
     const [notificationError, setNotificationError] = useState<string | null>(null);
     const [supportsNotifications, setSupportsNotifications] = useState(true);
     const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
-
-    // --- États pour les préférences spécifiques ---
     const [notifyTicketPref, setNotifyTicketPref] = useState(true);
     const [notifyEmailPref, setNotifyEmailPref] = useState(true);
     const [isPrefsLoading, setIsPrefsLoading] = useState(false);
@@ -51,12 +49,11 @@ const Parametres = () => {
         setIsPrefsLoading(true);
         setNotificationError(null);
         console.log(`Récupération des préférences pour: ${endpoint.substring(0,40)}...`);
-
         try {
             const response = await fetch(`http://localhost:3001/notifications/preferences?endpoint=${encodeURIComponent(endpoint)}`);
             if (!response.ok) {
                  let errorMsg = `${t("Parametre.Notifications.ErreurRecupPrefs")} (${response.status})`;
-                 try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch(e) {}
+                 try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch(e){}
                  throw new Error(errorMsg);
             }
             const prefs = await response.json();
@@ -72,50 +69,80 @@ const Parametres = () => {
         } catch (err: any) {
             console.error("Erreur fetchPreferences:", err);
             setNotificationError(err.message || t("Parametre.Notifications.ErreurRecupPrefs"));
-            setNotifyTicketPref(true); setNotifyEmailPref(true); // Revenir aux défauts si erreur
+            setNotifyTicketPref(true); setNotifyEmailPref(true);
         } finally {
             setIsPrefsLoading(false);
         }
     }, [t]);
 
-    // --- Vérification initiale de l'abonnement et des préférences ---
-     useEffect(() => {
-         if (!('serviceWorker' in navigator && 'PushManager' in window)) {
-             setSupportsNotifications(false);
-             setMainNotificationButtonText(t("Parametre.Notifications.NonSupportees"));
-             return;
-         }
-         setSupportsNotifications(true);
+    // --- useEffect d'initialisation AVEC LOGS DÉTAILLÉS ---
+    useEffect(() => {
+        console.log("[Effect Étape 1] Début useEffect. Vérification support SW/Push...");
+        setNotificationError(null); // Reset error on load/re-run
 
-         navigator.serviceWorker.ready.then(registration => {
-             registration.pushManager.getSubscription().then(subscription => {
-                 if (subscription) {
-                     setIsSubscribed(true);
-                     setMainNotificationButtonText(t("Parametre.Notifications.Desactiver"));
-                     setCurrentEndpoint(subscription.endpoint);
-                     fetchPreferences(subscription.endpoint); // Charger les préférences
-                 } else {
-                     setIsSubscribed(false);
-                     setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
-                     setCurrentEndpoint(null);
-                     setNotifyTicketPref(true); setNotifyEmailPref(true); // Reset état local
-                 }
-             }).catch(err => {
-                 console.error("Error getting subscription:", err);
-                 setNotificationError(t("Parametre.Notifications.ErreurRecupAbonnement"));
-                 setIsSubscribed(false);
-                 setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
-                 setCurrentEndpoint(null);
-             });
-         }).catch(err => {
-             console.error("Service worker not ready:", err);
-             setNotificationError(t("Parametre.Notifications.ErreurSW"));
-             setSupportsNotifications(false);
-             setMainNotificationButtonText(t("Parametre.Notifications.ErreurSW"));
-             setCurrentEndpoint(null);
-         });
-     }, [t, fetchPreferences]); // Dépendances de l'effet initial
+        if (!('serviceWorker' in navigator && 'PushManager' in window)) {
+            console.warn("[Effect Étape 1] Non supporté.");
+            setSupportsNotifications(false);
+            setMainNotificationButtonText(t("Parametre.Notifications.NonSupportees"));
+            return; // Sortir si non supporté
+        }
+        console.log("[Effect Étape 1] Support OK.");
+        setSupportsNotifications(true); // S'assurer que c'est true si supporté
 
+        console.log("[Effect Étape 2] Tentative d'enregistrement SW '/sw.js'...");
+        navigator.serviceWorker.register('/sw.js') // Assure que sw.js est à la racine
+            .then(reg => { // reg est ServiceWorkerRegistration
+                console.log('[Effect Étape 2] Enregistrement SW Réussi. Registration:', reg);
+                console.log('[Effect Étape 3] Attente SW Ready (activation)...');
+                // Retourner la promesse .ready pour la chaîne suivante
+                return navigator.serviceWorker.ready;
+            })
+            .then(registration => { // registration est le ServiceWorkerRegistration activé
+                console.log('[Effect Étape 3] SW Ready (activé et contrôle la page). Registration:', registration);
+                console.log('[Effect Étape 4] Vérification abonnement Push existant...');
+                return registration.pushManager.getSubscription(); // Retourner la promesse
+            })
+            .then(subscription => { // subscription est le PushSubscription ou null
+                console.log('[Effect Étape 4] Résultat getSubscription:', subscription);
+                // Mise à jour UI et fetch prefs si nécessaire
+                if (subscription) {
+                    console.log('[Effect Étape 5a] Abonnement trouvé. Mise à jour UI (subscribed=true) et stockage endpoint...');
+                    setIsSubscribed(true);
+                    setMainNotificationButtonText(t("Parametre.Notifications.Desactiver"));
+                    const endpoint = subscription.endpoint;
+                    setCurrentEndpoint(endpoint);
+                    console.log('[Effect Étape 5a] Lancement fetchPreferences...');
+                    // Lancer fetchPreferences (retourne une promesse)
+                    return fetchPreferences(endpoint);
+                } else {
+                    console.log('[Effect Étape 5b] Aucun abonnement trouvé. Mise à jour UI (subscribed=false)...');
+                    setIsSubscribed(false);
+                    setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
+                    setCurrentEndpoint(null);
+                    setNotifyTicketPref(true); // Reset état local
+                    setNotifyEmailPref(true);
+                    return Promise.resolve(); // Continuer la chaîne
+                }
+            })
+            .then(() => {
+                 // S'exécute après la mise à jour UI et après fetchPreferences (si appelé)
+                 console.log('[Effect Étape 6] Chaîne de promesses useEffect terminée avec succès.');
+            })
+            .catch(err => {
+                // Gère les erreurs de register, ready, getSubscription, ou fetchPreferences
+                console.error('[Effect Catch Final] Erreur dans la chaîne useEffect:', err);
+                let errorMsg = t("Parametre.Notifications.ErreurInit");
+                if (err.message?.toLowerCase().includes('register')) errorMsg = t("Parametre.Notifications.ErreurSW");
+                else if (err.message?.toLowerCase().includes('subscription')) errorMsg = t("Parametre.Notifications.ErreurRecupAbonnement");
+                else if (err.message?.toLowerCase().includes('permission')) errorMsg = t("Parametre.Notifications.PermissionRefusee");
+                else if (err.message) errorMsg = `${t("Parametre.Notifications.ErreurInattendue")} : ${err.message}`;
+                setNotificationError(errorMsg);
+                setIsSubscribed(false);
+                setMainNotificationButtonText(t("Parametre.Notifications.Erreur"));
+                setCurrentEndpoint(null);
+                // Ne pas mettre supportsNotifications à false ici, sauf si l'erreur est liée au support
+            });
+    }, [t, fetchPreferences]); // Dépendances useEffect
 
     // --- Fonction pour mettre à jour les préférences côté Backend ---
     const updateBackendPreferences = useCallback(async (prefsToUpdate: { ticket: boolean, email: boolean }) => {
@@ -146,7 +173,6 @@ const Parametres = () => {
         } catch (err: any) {
              console.error("Erreur updateBackendPreferences:", err);
              setNotificationError(err.message || t("Parametre.Notifications.ErreurSauvegardePrefs"));
-             // Optionnel: Annuler changement local ? Pour l'instant, on affiche juste l'erreur.
         } finally {
              setIsPrefsLoading(false);
         }
@@ -164,7 +190,7 @@ const Parametres = () => {
          updateBackendPreferences({ ticket: notifyTicketPref, email: isChecked });
      };
 
-    // --- Fonction pour s'abonner (globablement) ---
+    // --- Fonction pour s'abonner (globalement) ---
     const subscribeUser = useCallback(async () => {
         setIsMainLoading(true);
         setNotificationError(null);
@@ -173,7 +199,7 @@ const Parametres = () => {
             const registration = await navigator.serviceWorker.ready;
             const response = await fetch('http://localhost:3001/notifications/vapid-public-key');
             if (!response.ok) throw new Error('Impossible de récupérer la clé VAPID.');
-            const keyData = await response.json();
+            const keyData = await response.json(); // Récupérer comme JSON
             const vapidPublicKey = keyData?.publicKey;
             if (!vapidPublicKey) throw new Error('Clé VAPID reçue invalide.');
 
@@ -181,10 +207,10 @@ const Parametres = () => {
             const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
             console.log('User is subscribed (raw):', subscription);
 
-            // Construire manuellement le payload pour correspondre au DTO backend
+            // Construire manuellement le payload pour correspondre au DTO
             const p256dhKey = subscription.getKey('p256dh');
             const authKey = subscription.getKey('auth');
-            if (!p256dhKey || !authKey) throw new Error("Impossible de récupérer les clés de l'abonnement.");
+            if (!p256dhKey || !authKey) throw new Error("Impossible de récupérer les clés p256dh/auth.");
 
             const payloadToSend = {
                 endpoint: subscription.endpoint,
@@ -195,7 +221,7 @@ const Parametres = () => {
             };
             console.log('Payload envoyé (manuel):', JSON.stringify(payloadToSend));
 
-            // Envoyer le payload manuel
+            // Envoyer le payload manuel au backend
             const subscribeResponse = await fetch('http://localhost:3001/notifications/subscribe', {
                 method: 'POST',
                 body: JSON.stringify(payloadToSend),
@@ -203,7 +229,7 @@ const Parametres = () => {
             });
 
             if (!subscribeResponse.ok) {
-                await subscription.unsubscribe(); // Annuler localement si erreur backend
+                await subscription.unsubscribe();
                 let errorMsg = `Erreur serveur (${subscribeResponse.status})`;
                 try { const errorData = await subscribeResponse.json(); errorMsg = errorData?.message || errorMsg; } catch(e){}
                 throw new Error(`${t("Parametre.Notifications.ErreurSauvegardeAbonnement")} ${errorMsg}`);
@@ -214,14 +240,14 @@ const Parametres = () => {
             setIsSubscribed(true);
             setMainNotificationButtonText(t("Parametre.Notifications.Desactiver"));
             setCurrentEndpoint(subscription.endpoint);
-            setNotifyTicketPref(true); // Mettre à jour état local avec défauts
+            setNotifyTicketPref(true); // Reset prefs locales aux défauts après nouvel abonnement
             setNotifyEmailPref(true);
 
         } catch (err: any) {
              console.error('Failed to subscribe the user: ', err);
              let message = t('Parametre.Notifications.ErreurActivation');
              if (err.name === 'NotAllowedError') message = t('Parametre.Notifications.PermissionRefusee');
-             else if (err.message) message = err.message; // Utiliser le message d'erreur reçu
+             else if (err.message) message = err.message; // Afficher l'erreur spécifique
              setNotificationError(message);
              setIsSubscribed(false);
              setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
@@ -229,7 +255,7 @@ const Parametres = () => {
         } finally {
             setIsMainLoading(false);
         }
-    }, [t]); // Retiré fetchPreferences des dépendances car non appelé ici
+    }, [t]); // Retiré fetchPreferences et updateBackendPreferences des dépendances
 
     // --- Fonction pour se désabonner (globalement) ---
     const unsubscribeUser = useCallback(async () => {
@@ -240,14 +266,15 @@ const Parametres = () => {
              const registration = await navigator.serviceWorker.ready;
              const subscription = await registration.pushManager.getSubscription();
              if (subscription) {
-                 const endpointToDelete = subscription.endpoint;
+                 const endpointToDelete = subscription.endpoint; // Garder pour appel API
                  const unsubscribed = await subscription.unsubscribe();
                  if (unsubscribed) {
                      console.log('User is unsubscribed locally.');
                      setIsSubscribed(false);
                      setMainNotificationButtonText(t("Parametre.Notifications.Activer"));
                      setCurrentEndpoint(null);
-                     setNotifyTicketPref(true); setNotifyEmailPref(true); // Reset état local
+                     setNotifyTicketPref(true); // Reset état local
+                     setNotifyEmailPref(true);
 
                      // Optionnel mais recommandé: Notifier le backend
                      try {
@@ -270,8 +297,7 @@ const Parametres = () => {
         } catch (err: any) {
              console.error('Failed to unsubscribe the user: ', err);
              setNotificationError(err.message || t('Parametre.Notifications.ErreurDesactivation'));
-             // Si erreur pendant désabonnement, l'état peut être incohérent.
-             // Laisser le bouton sur "Désactiver" pour permettre de réessayer ?
+             // Laisser le bouton sur "Désactiver" si erreur locale ?
              setMainNotificationButtonText(t("Parametre.Notifications.Desactiver"));
         } finally {
             setIsMainLoading(false);
@@ -308,29 +334,17 @@ const Parametres = () => {
                                      <div className={styles.preferences}>
                                          {isPrefsLoading && <span className={styles.loadingPrefs}>({t("Global.Enregistrement")}...)</span>}
                                          <label className={isPrefsLoading || isMainLoading ? styles.disabledLabel : ''}>
-                                             <input
-                                                 type="checkbox"
-                                                 checked={notifyTicketPref}
-                                                 onChange={handleTicketPrefChange}
-                                                 disabled={isPrefsLoading || isMainLoading} // Désactiver aussi pendant chargement principal
-                                             />
+                                             <input type="checkbox" checked={notifyTicketPref} onChange={handleTicketPrefChange} disabled={isPrefsLoading || isMainLoading} />
                                              {t("Parametre.Notifications.PrefTickets")}
                                          </label>
                                          <label className={isPrefsLoading || isMainLoading ? styles.disabledLabel : ''}>
-                                             <input
-                                                 type="checkbox"
-                                                 checked={notifyEmailPref}
-                                                 onChange={handleEmailPrefChange}
-                                                 disabled={isPrefsLoading || isMainLoading}
-                                             />
+                                             <input type="checkbox" checked={notifyEmailPref} onChange={handleEmailPrefChange} disabled={isPrefsLoading || isMainLoading} />
                                              {t("Parametre.Notifications.PrefEmails")}
                                          </label>
                                      </div>
                                  )}
                              </>
-                         ) : (
-                             <p>{t("Parametre.Notifications.NonSupportees")}</p>
-                         )}
+                         ) : ( <p>{t("Parametre.Notifications.NonSupportees")}</p> )}
                          {notificationError && <p className={styles.errorMessage}>{notificationError}</p>}
                     </div>
                     <hr className={styles.divider} />
