@@ -1,4 +1,3 @@
-// ticket.controller.tsx
 import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 
@@ -12,11 +11,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsCreated(date);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('count-created-by-month-year')
     async getNbTicketsByMonthYear(
@@ -27,11 +25,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsByMonthYear(month, year);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('count-created-by-year')
     async getNbTicketsByYear(
@@ -41,11 +38,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsByYear(year);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('count-resolved')
     async getNbTicketsResolved(@Query('date') date: string) {
@@ -53,11 +49,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsResolved(date);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
-        } 
+        }
     }
-
 
     @Get('count-resolved-by-month-year')
     async getNbTicketsResolvedByMonthYear(
@@ -68,11 +63,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsResolvedByMonthYear(month, year);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('count-resolved-by-year')
     async getNbTicketsResolvedByYear(
@@ -82,11 +76,10 @@ export class TicketController {
             const result = await this.ticketService.getNbTicketsResolvedByYear(year);
             return { count: result[0][''] };
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets')
     async getTickets(@Query('date') date: string) {
@@ -94,25 +87,23 @@ export class TicketController {
             const result = await this.ticketService.getTickets(date);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
 
-
     @Get('ticket/:id')
     async getTicketById(@Param('id') id: number) {
         try {
-        const ticket = await this.ticketService.getTicketById(id);
-        return ticket;
+            const ticket = await this.ticketService.getTicketById(id);
+            return ticket;
         } catch (error) {
-        if (error instanceof NotFoundException) {
-            throw error;
-        }
-        throw new NotFoundException(`Ticket with ID ${id} not found`);
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new NotFoundException(`Ticket with ID ${id} not found`);
         }
     }
-
 
     @Get('tickets-by-operator')
     async getTicketsByOperator(@Query('date') date: string) {
@@ -120,11 +111,10 @@ export class TicketController {
             const result = await this.ticketService.getTicketsByOperator(date);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets-by-operator-by-month-year')
     async getTicketsByOperatorByMonthYear(
@@ -135,11 +125,10 @@ export class TicketController {
             const result = await this.ticketService.getTicketsByOperatorByMonthYear(month, year);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets-by-operator-by-year')
     async getTicketsByOperatorByYear(
@@ -149,11 +138,10 @@ export class TicketController {
             const result = await this.ticketService.getTicketsByOperatorByYear(year);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets-types')
     async getTicketsTypes(@Query('date') date: string) {
@@ -161,11 +149,10 @@ export class TicketController {
             const result = await this.ticketService.getTicketsTypes(date);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets-types-by-month-year')
     async getTicketsTypesByMonthYear(
@@ -176,11 +163,10 @@ export class TicketController {
             const result = await this.ticketService.getTicketsTypesByMonthYear(month, year);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
 
     @Get('tickets-types-by-year')
     async getTicketsTypesByYear(
@@ -190,10 +176,8 @@ export class TicketController {
             const result = await this.ticketService.getTicketsTypesByYear(year);
             return result;
         } catch (err) {
-            console.error("Erreur dans la récupération : ", err);
+            console.error('Erreur dans la récupération : ', err);
             throw err;
         }
     }
-
-
 }

@@ -1,12 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-
-import { useTranslation } from "../hooks/useTranslation";
-
+import { useTranslation } from '../hooks/useTranslation';
 import styles from '../styles/components/TicketCount.module.scss';
-
-import Button from "../components/Button";
+import Button from '../components/Button';
 
 interface Ticket {
     TicketId: number;
@@ -17,10 +14,9 @@ interface Ticket {
 }
 
 const TicketCount: React.FC = () => {
-    
     const [NbTicketCreated, setNbTicketCreated] = useState<number | null>(null);
     const [NbTicketResolved, setNbTicketResolved] = useState<number | null>(null);
-    const [tickets, setTickets] = useState<Ticket[]>([]); // Correction ici
+    const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const location = useLocation();
@@ -29,30 +25,28 @@ const TicketCount: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const formattedDate = selectedDate
-        ? new Date(selectedDate).toLocaleDateString('fr-FR')
-        : 'Aucune';
+    const formattedDate = selectedDate ? new Date(selectedDate).toLocaleDateString('fr-FR') : 'Aucune';
 
     const formatOperatorName = (operatorName: string): string => {
         if (!operatorName) {
             return '';
         }
-    
+
         const parts = operatorName.split('\\');
-    
+
         if (parts.length === 2) {
             let namePart = parts[1];
             if (namePart.includes('.') || namePart.includes('-')) {
                 namePart = namePart.replace(/\./g, ' ').replace(/-/g, ' ');
             }
-    
+
             const capitalize = (str: string): string => {
                 return str.replace(/\b\w/g, (char) => char.toUpperCase());
             };
-    
+
             return capitalize(namePart);
         }
-    
+
         return operatorName;
     };
 
@@ -64,7 +58,7 @@ const TicketCount: React.FC = () => {
             const [NbTicketCreated, NbTicketResolved, ticketsResponse] = await Promise.allSettled([
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`), // Correction ici
+                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
             ]);
 
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
@@ -91,7 +85,7 @@ const TicketCount: React.FC = () => {
             const [NbTicketCreated, NbTicketResolved, ticketsResponse] = await Promise.allSettled([
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`), // Correction ici
+                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
             ]);
 
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
@@ -116,7 +110,7 @@ const TicketCount: React.FC = () => {
         return () => clearInterval(intervalId);
     }, [fetchInitialData, fetchLiveUpdates]);
 
-    if (loading) return <p>{t("Global.Chargement")}</p>;
+    if (loading) return <p>{t('Global.Chargement')}</p>;
     if (error) return <p>{error}</p>;
 
     const handleTicketClick = (ticketId: number) => {
@@ -140,17 +134,17 @@ const TicketCount: React.FC = () => {
     return (
         <div>
             <h2 className={styles.ticket}>Date : <span className={styles.result}>{formattedDate}</span></h2>
-            <h2 className={styles.ticket}>{t("TicketCount.NbTicketsCreesJour")} : <span className={styles.result}>{NbTicketCreated}</span></h2>
-            <h2 className={styles.ticket}>{t("TicketCount.NbTicketsResolusJour")} : <span className={styles.result}>{NbTicketResolved}</span></h2>
-            <h2 className={styles.ticket}>{t("TicketCount.TitleTableau")}</h2>
-            <div className={styles.tablecontainer}>   
+            <h2 className={styles.ticket}>{t('TicketCount.NbTicketsCreesJour')} : <span className={styles.result}>{NbTicketCreated}</span></h2>
+            <h2 className={styles.ticket}>{t('TicketCount.NbTicketsResolusJour')} : <span className={styles.result}>{NbTicketResolved}</span></h2>
+            <h2 className={styles.ticket}>{t('TicketCount.TitleTableau')}</h2>
+            <div className={styles.tablecontainer}>
                 <table className={styles.tickettable}>
                     <thead>
                         <tr>
-                            <th>{t("TicketCount.ID")}</th>
-                            <th>{t("TicketCount.TitreDemande")}</th>
-                            <th>{t("TicketCount.Demandeur")}</th>
-                            <th>{t("TicketCount.Heure")}</th>
+                            <th>{t('TicketCount.ID')}</th>
+                            <th>{t('TicketCount.TitreDemande')}</th>
+                            <th>{t('TicketCount.Demandeur')}</th>
+                            <th>{t('TicketCount.Heure')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,20 +154,20 @@ const TicketCount: React.FC = () => {
                                 onClick={() => handleTicketClick(TicketId)}
                                 style={getRowStyle(ResolutionDate)}
                             >
-                                <td>{TicketId || t("TicketCount.Erreur.ID")}</td>
-                                <td>{Title || t("TicketCount.Erreur.Titre")}</td>
-                                <td>{CallerName || t("TicketCount.Erreur.Demandeur")}</td>
-                                <td>{HeureDeCréation || t("TicketCount.Erreur.Heure")}</td>
+                                <td>{TicketId || t('TicketCount.Erreur.ID')}</td>
+                                <td>{Title || t('TicketCount.Erreur.Titre')}</td>
+                                <td>{CallerName || t('TicketCount.Erreur.Demandeur')}</td>
+                                <td>{HeureDeCréation || t('TicketCount.Erreur.Heure')}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-            </div> 
-            <Button 
-                backgroundColor={"#2B3244"} 
-                text={t("Calendar.GoToMonth")}
-                textColor={"white"}
-                onClick={goToCalendar}                       
+            </div>
+            <Button
+                backgroundColor={'#2B3244'}
+                text={t('Calendar.GoToMonth')}
+                textColor={'white'}
+                onClick={goToCalendar}
             />
         </div>
     );
