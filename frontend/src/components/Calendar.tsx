@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "../hooks/useTranslation";
 
 import '../styles/components/Calendar.css';
-//import "react-calendar/dist/Calendar.css";
 
 import Calendar from "react-calendar";
 import Button from "../components/Button";
@@ -13,7 +12,7 @@ import Button from "../components/Button";
 
 const CalendarComponent = () => {
     
-    const { t } = useTranslation();
+    const { t, lang } = useTranslation();
     const [date, setDate] = useState<Date | null>(new Date());
     const [calendarView, setCalendarView] = useState<'month' | 'year' | 'decade'>('month');
     const navigate = useNavigate();
@@ -98,6 +97,7 @@ const CalendarComponent = () => {
                 onClickYear={() => setCalendarView('year')}
                 onClickDecade={() => setCalendarView('decade')}
                 onClickView={handleHeaderClick}
+                locale={lang}
             />
             <Button 
                 backgroundColor={"#2B3244"} 
