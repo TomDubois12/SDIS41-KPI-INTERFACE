@@ -6,6 +6,20 @@
         "Reessayer": "Réessayer",
         "Enregistrement": "Enregistrement..."
     },
+    "Mois": {
+        "JAN": "Janvier",
+        "FEV": "Février",
+        "MAR": "Mars",
+        "AVR": "Avril",
+        "MAI": "Mai",
+        "JUIN": "Juin",
+        "JUI": "Juillet",
+        "AOU": "Août",
+        "SEP": "Septembre",
+        "OCT": "Octobre",
+        "NOV": "Novembre",
+        "DEC": "Décembre"
+    },
     "Parametre": {    
         "SwitchLanguage": "Passer en anglais",
         "SwitchToDT": "Passer en dark thème",

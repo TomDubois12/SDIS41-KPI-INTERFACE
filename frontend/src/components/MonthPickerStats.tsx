@@ -88,8 +88,8 @@ const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(({
         };
 
         const monthNames = [
-            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+            t('Mois.JAN'), t('Mois.FEV'), t('Mois.MAR'), t('Mois.AVR'), t('Mois.MAI'), t('Mois.JUIN'),
+            t('Mois.JUI'), t('Mois.AOU'), t('Mois.SEP'), t('Mois.OCT'), t('Mois.NOV'), t('Mois.DEC')
         ];
 
         const currentYear = new Date().getFullYear();
