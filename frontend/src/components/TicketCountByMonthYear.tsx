@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from '../styles/components/TicketCountByMonthYear.module.scss';
+import styles from '../styles/components/TicketCountByMonth.module.scss';
 
 interface TicketCountByMonthYearProps {
     month: number;

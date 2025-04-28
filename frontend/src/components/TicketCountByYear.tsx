@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from '../styles/components/TicketCountByMonthYear.module.scss';
+import styles from '../styles/components/TicketCountByYear.module.scss';
 
 interface TicketCountByYearProps {
     year: number;
@@ -49,15 +49,12 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
             } finally {
                 setLoading(false);
             }
-
         }
-
         fetchData();
     }, [year]);
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.ticket}>{t("Global.Details")} :</h2> 
             {loading ? (
                 <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
