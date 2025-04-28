@@ -5,17 +5,26 @@ interface ButtonProps {
     backgroundColor: string;
     text: string;
     textColor: string;
+    className?: string;
+    disabled?: boolean;
 }
 
-const Button = ({onClick, backgroundColor, text, textColor}: ButtonProps) => {
-  return (
+const Button = ({onClick, backgroundColor, text, textColor, className, disabled}: ButtonProps) => {
+
+  const combinedClassName = [
+      styles.button,
+      className
+  ].filter(Boolean).join(' ');
+
+  return ( 
     <button 
         onClick={onClick}
-        className={styles.button} 
+        className={combinedClassName} 
         style={{ 
             backgroundColor: backgroundColor, 
             color: textColor,
         }}
+        disabled={disabled}
         >
             {text}
     </button>
