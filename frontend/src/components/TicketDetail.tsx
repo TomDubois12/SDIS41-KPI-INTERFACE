@@ -94,7 +94,7 @@ const ClarilogTicketDetail: React.FC = () => {
     }, [ticketId]);
 
     const handleGoBack = () => {
-        navigate(-1);
+        window.history.back();
     };
 
     if (loading) return <p>{t("TicketDetail.ChargementDetail")}</p>;
@@ -120,7 +120,7 @@ const ClarilogTicketDetail: React.FC = () => {
                             ? styles.resolved 
                             : ticket.AssignedToId 
                             ? styles.defaultStatus 
-                            : styles.important
+                            : styles.important 
                     }
                 >
                     {ticket.AssignedToName 
@@ -137,7 +137,7 @@ const ClarilogTicketDetail: React.FC = () => {
                     }
                 </span>
             </p>
-            <p>{t("TicketDetail.Description")} : <span>{ticket.DescriptionText || t("TicketDetail.PasDeDescription")}</span></p>
+            <p className={styles.description}>{t("TicketDetail.Description")} : <span>{ticket.DescriptionText || t("TicketDetail.PasDeDescription")}</span></p>
             {ticket.ResolutionDate && (
                 <p>{t("TicketDetail.TempsReso")} : <span className={styles.resolved}>{ticket.resolutionTime.Minutes} {t("TicketDetail.TempsReso2")} {ticket.resolutionTime.Secondes} {t("TicketDetail.TempsReso3")}</span></p>
             )}
