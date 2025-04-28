@@ -107,8 +107,8 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
 
     return (
         <div>
-            <ReactApexChart options={chartOptions} series={[{ data: chartData.map(item => item.ticketCount) }]} type="bar" width="90%" height="auto" />
             <h2 className={styles.title}>{title}</h2>
+            <ReactApexChart options={chartOptions} series={[{ data: chartData.map(item => item.ticketCount) }]} type="bar" width="90%" height="auto" />
         </div>
     );
 };

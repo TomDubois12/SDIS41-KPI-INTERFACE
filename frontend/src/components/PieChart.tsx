@@ -103,8 +103,8 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
 
     return (
         <div id="chart">
-            <ReactApexChart options={state.options} series={state.series} type="pie" width="100%" height="auto" />
             <h2 className={styles.title}>{title}</h2>
+            <ReactApexChart options={state.options} series={state.series} type="pie" width="100%" height="auto" />
         </div>
     );
 };
