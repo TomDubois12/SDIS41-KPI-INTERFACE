@@ -130,7 +130,7 @@
             "TechUse": "Technologies utilisées",
             "Contact": "Contact"
         },
-        "CreditTxt": "Cette application a été réalisée par M. DUBOIS Tom dans le cadre d'un stage au SDIS 41, visant à valider son année de Bachelor Universitaire de Technologie en Informatique.",
+        "CreditTxt": "Cette application a été réalisée par M. Tom DUBOIS dans le cadre d'un stage au SDIS 41, visant à valider son année de Bachelor Universitaire de Technologie en Informatique réalisée à Orléans.",
         "ObjectifTxt": "Ce projet a été développé afin de proposer au service SIC une application capable de regrouper des indicateurs de performance concernant leur système de ticket Clarilog, un système d'auto complétion du rapport mensuel SIC, ainsi qu'un système d'alerte concernant les mails importants.",
         "TechUse1": "React/HTML/CSS/SCSS",
         "TechUse2": "NestJS/JS/TS",
