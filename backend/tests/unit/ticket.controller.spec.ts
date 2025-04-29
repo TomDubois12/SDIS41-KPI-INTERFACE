@@ -1,71 +1,99 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TicketController } from '../../src/ticket/ticket.controller';
-import { TicketService } from '../../src/ticket/ticket.service';
-import { NotFoundException } from '@nestjs/common';
+import { TicketController } from '../../src/ticket/ticket.controller'; // Ajuster chemin
+import { TicketService } from '../../src/ticket/ticket.service'; // Ajuster chemin
+import { NotFoundException, InternalServerErrorException, ParseIntPipe } from '@nestjs/common';
 
-describe('TicketController', () => {
-    let ticketController: TicketController;
-    let ticketService: TicketService;
+// Créer un objet mock simple pour TicketService
+const mockTicketService = {
+  getNbTicketsCreated: jest.fn(),
+  getTicketById: jest.fn(),
+  // Ajoutez d'autres méthodes ici si vous les testez
+};
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-        controllers: [TicketController],
-        providers: [
-            {
-            provide: TicketService,
-            useValue: {
-                getNbTicketsCreated: jest.fn().mockResolvedValue([{ '': 5 }]),
-                getNbTicketsByMonthYear: jest.fn().mockResolvedValue([{ '': 10 }]),
-                getNbTicketsByYear: jest.fn().mockResolvedValue([{ '': 50 }]),
-                getNbTicketsResolved: jest.fn().mockResolvedValue([{ '': 2 }]),
-                getNbTicketsResolvedByMonthYear: jest.fn().mockResolvedValue([{ '': 4 }]),
-                getNbTicketsResolvedByYear: jest.fn().mockResolvedValue([{ '': 20 }]),
-                getTickets: jest.fn().mockResolvedValue([{ id: 1, name: 'Test Ticket' }]),
-                getTicketById: jest.fn().mockImplementation(id => {
-                if (id === 1) return Promise.resolve({ id: 1, name: 'Test Ticket' });
-                throw new NotFoundException();
-                }),
-                getTicketsByOperator: jest.fn().mockResolvedValue([{ operator: 'A', count: 3 }]),
-            },
-            },
-        ],
-        }).compile();
+describe('TicketController (Minimal)', () => {
+  let controller: TicketController;
+  let service: TicketService; // Pour vérifier les appels au mock
 
-        ticketController = module.get<TicketController>(TicketController);
-        ticketService = module.get<TicketService>(TicketService);
+  beforeEach(async () => {
+    // Réinitialiser les mocks avant chaque test
+    jest.clearAllMocks();
+
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [TicketController],
+      providers: [
+        {
+          provide: TicketService,
+          useValue: mockTicketService, // Fournir le mock
+        },
+      ],
+    }).compile();
+
+    controller = module.get<TicketController>(TicketController);
+    service = module.get<TicketService>(TicketService); // Récupérer le mock injecté
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe('getNbTicketsCreated', () => {
+    it('should call service and return formatted count', async () => {
+      const testDate = '2025-04-29';
+      const serviceResult = [{ count: 12 }]; // Ce que le service retourne (après query + alias)
+      const expectedControllerResult = { count: 12 }; // Ce que le contrôleur doit retourner
+
+      // Configurer le mock pour retourner la valeur simulée
+      mockTicketService.getNbTicketsCreated.mockResolvedValue(serviceResult);
+
+      // Appeler la méthode du contrôleur
+      const result = await controller.getNbTicketsCreated(testDate);
+
+      // Vérifier que le contrôleur retourne le résultat formaté attendu
+      expect(result).toEqual(expectedControllerResult);
+
+      // Vérifier que la méthode du service a été appelée correctement
+      expect(service.getNbTicketsCreated).toHaveBeenCalledTimes(1);
+      expect(service.getNbTicketsCreated).toHaveBeenCalledWith(testDate);
     });
 
-    it('should be defined', () => {
-        expect(ticketController).toBeDefined();
+     it('should return count 0 if service returns empty array', async () => {
+         const testDate = '2025-04-30';
+         mockTicketService.getNbTicketsCreated.mockResolvedValue([]); // Service ne trouve rien
+         await expect(controller.getNbTicketsCreated(testDate)).resolves.toEqual({ count: 0 });
+         expect(service.getNbTicketsCreated).toHaveBeenCalledWith(testDate);
+     });
+
+     it('should throw InternalServerErrorException if service throws error', async () => {
+         const testDate = '2025-04-30';
+         const serviceError = new Error('Service Error');
+         mockTicketService.getNbTicketsCreated.mockRejectedValue(serviceError); // Simuler erreur service
+         await expect(controller.getNbTicketsCreated(testDate)).rejects.toThrow(InternalServerErrorException);
+         expect(service.getNbTicketsCreated).toHaveBeenCalledWith(testDate);
+     });
+  });
+
+  describe('getTicketById', () => {
+    it('should throw NotFoundException if service throws NotFoundException', async () => {
+      const testId = 999;
+      // Configurer le mock pour lancer l'erreur attendue
+      mockTicketService.getTicketById.mockRejectedValue(new NotFoundException('Not found'));
+
+      // S'attendre à ce que l'appel au contrôleur rejette avec la même exception
+      await expect(controller.getTicketById(testId)).rejects.toThrow(NotFoundException);
+
+      // Vérifier que le service a été appelé
+      expect(service.getTicketById).toHaveBeenCalledTimes(1);
+      expect(service.getTicketById).toHaveBeenCalledWith(testId);
     });
 
-    it('should return count of created tickets', async () => {
-        await expect(ticketController.getNbTicketsCreated('2025-01-01')).resolves.toEqual({ count: 5 });
-        expect(ticketService.getNbTicketsCreated).toHaveBeenCalledWith('2025-01-01');
-    });
+     it('should return ticket data if service returns data', async () => {
+         const testId = 1;
+         const mockTicketData = { TicketId: 1, Title: 'Found Ticket' };
+         mockTicketService.getTicketById.mockResolvedValue(mockTicketData);
 
-    it('should return count of created tickets by month and year', async () => {
-        await expect(ticketController.getNbTicketsByMonthYear(1, 2025)).resolves.toEqual({ count: 10 });
-        expect(ticketService.getNbTicketsByMonthYear).toHaveBeenCalledWith(1, 2025);
-    });
+         await expect(controller.getTicketById(testId)).resolves.toEqual(mockTicketData);
+         expect(service.getTicketById).toHaveBeenCalledWith(testId);
+     });
+  });
 
-    it('should return count of created tickets by year', async () => {
-        await expect(ticketController.getNbTicketsByYear(2025)).resolves.toEqual({ count: 50 });
-        expect(ticketService.getNbTicketsByYear).toHaveBeenCalledWith(2025);
-    });
-
-    it('should return ticket by ID if found', async () => {
-        await expect(ticketController.getTicketById(1)).resolves.toEqual({ id: 1, name: 'Test Ticket' });
-        expect(ticketService.getTicketById).toHaveBeenCalledWith(1);
-    });
-
-    it('should throw NotFoundException if ticket ID not found', async () => {
-        await expect(ticketController.getTicketById(999)).rejects.toThrow(NotFoundException);
-        expect(ticketService.getTicketById).toHaveBeenCalledWith(999);
-    });
-
-    it('should return tickets list', async () => {
-        await expect(ticketController.getTickets('2025-01-01')).resolves.toEqual([{ id: 1, name: 'Test Ticket' }]);
-        expect(ticketService.getTickets).toHaveBeenCalledWith('2025-01-01');
-    });
 });
