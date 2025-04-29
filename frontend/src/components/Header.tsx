@@ -23,7 +23,7 @@ const Header = ({text}: HeaderProps) => {
                                 window.location.href = '/hub';
                             }
                         }}>
-                            ⭠
+                            ⇦
                         </button>
                     </div>
                     <Link to="/hub">
