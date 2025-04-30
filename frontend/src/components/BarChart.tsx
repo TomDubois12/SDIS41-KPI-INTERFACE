@@ -63,7 +63,9 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
 
     useEffect(() => {
         const fetchData = async () => {
+            setError(null);
             try {
+                
                 const response = await axios.get<OperatorData[]>(apiUrl);
                 const formattedData = response.data.map((item: OperatorData) => ({
                     ...item,

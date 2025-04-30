@@ -42,6 +42,7 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
 
     useEffect(() => {
         const fetchData = async () => {
+            setError(null);
             try {
                 const response = await axios.get<ApiDataItem[]>(apiUrl);
                 
