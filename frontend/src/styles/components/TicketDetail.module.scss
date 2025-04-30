@@ -1,7 +1,7 @@
 .container {
     margin-top: 5vh;
     margin-left: 2%;
-    
+
     p {
         font-size: 24px;
         color: #2B3244;
@@ -11,12 +11,13 @@
 
     .description {
         flex-basis: 50%;
-        width: 50%;  
-        text-align: justify;  
+        width: 50%;
+        text-align: justify;
     }
 }
 
-.inProgress, .defaultStatus {
+.inProgress,
+.defaultStatus {
     color: orange;
     font-weight: bold;
 }

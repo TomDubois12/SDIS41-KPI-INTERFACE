@@ -1,9 +1,12 @@
+import axios from 'axios';
+
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useTranslation } from '../hooks/useTranslation';
-import styles from '../styles/components/TicketCount.module.scss';
+
 import Button from '../components/Button';
+
+import styles from '../styles/components/TicketCount.module.scss';
 
 interface Ticket {
     TicketId: number;
@@ -31,22 +34,17 @@ const TicketCount: React.FC = () => {
         if (!operatorName) {
             return '';
         }
-
         const parts = operatorName.split('\\');
-
         if (parts.length === 2) {
             let namePart = parts[1];
             if (namePart.includes('.') || namePart.includes('-')) {
                 namePart = namePart.replace(/\./g, ' ').replace(/-/g, ' ');
             }
-
             const capitalize = (str: string): string => {
                 return str.replace(/\b\w/g, (char) => char.toUpperCase());
             };
-
             return capitalize(namePart);
         }
-
         return operatorName;
     };
 
@@ -54,13 +52,11 @@ const TicketCount: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-
             const [NbTicketCreated, NbTicketResolved, ticketsResponse] = await Promise.allSettled([
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
                 axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
             ]);
-
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
             if (NbTicketResolved.status === 'fulfilled') setNbTicketResolved(NbTicketResolved.value.data.count || 0);
             if (ticketsResponse.status === 'fulfilled') {
@@ -71,7 +67,6 @@ const TicketCount: React.FC = () => {
                 }));
                 setTickets(formattedTickets);
             }
-
             setLoading(false);
         } catch (err) {
             setError('Erreur lors de la récupération des données');
@@ -87,7 +82,6 @@ const TicketCount: React.FC = () => {
                 axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
                 axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
             ]);
-
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || 0);
             if (NbTicketResolved.status === 'fulfilled') setNbTicketResolved(NbTicketResolved.value.data.count || 0);
             if (ticketsResponse.status === 'fulfilled') {
@@ -106,7 +100,6 @@ const TicketCount: React.FC = () => {
     useEffect(() => {
         fetchInitialData();
         const intervalId = setInterval(fetchLiveUpdates, 10000);
-
         return () => clearInterval(intervalId);
     }, [fetchInitialData, fetchLiveUpdates]);
 
@@ -172,5 +165,4 @@ const TicketCount: React.FC = () => {
         </div>
     );
 };
-
 export default TicketCount;

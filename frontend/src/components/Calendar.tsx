@@ -1,33 +1,30 @@
-import { useState } from "react";
 import { Tooltip } from "react-tooltip";
+
+import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-
 import { useTranslation } from "../hooks/useTranslation";
-
-import '../styles/components/Calendar.css';
 
 import Calendar from "react-calendar";
 import Button from "../components/Button";
 
+import '../styles/components/Calendar.css';
 
 const CalendarComponent = () => {
-    
     const { t, lang } = useTranslation();
     const [date, setDate] = useState<Date | null>(new Date());
     const [calendarView, setCalendarView] = useState<'month' | 'year' | 'decade'>('month');
     const navigate = useNavigate();
-    
+
     const handleDateChange = (newDate: Date | null) => {
         setDate(newDate);
         if (newDate) {
             const nextDay = new Date(newDate);
             nextDay.setDate(newDate.getDate() + 1);
-
-            const formattedDate = nextDay.toLocaleDateString('en-CA', { 
-                timeZone: 'UTC', 
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit' 
+            const formattedDate = nextDay.toLocaleDateString('en-CA', {
+                timeZone: 'UTC',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
             });
             navigate(`/clarilog?date=${formattedDate}`);
         }
@@ -45,7 +42,7 @@ const CalendarComponent = () => {
 
     const handleYearPageClick = () => {
         const year = new Date().getFullYear();
-        navigate(`/clarilog_annuel?year=${year}`); // Redirection avec l'année
+        navigate(`/clarilog_annuel?year=${year}`);
     };
 
     const tileClassName = ({ date, view }) => {
@@ -99,14 +96,13 @@ const CalendarComponent = () => {
                 onClickView={handleHeaderClick}
                 locale={lang}
             />
-            <Button 
-                backgroundColor={"#2B3244"} 
+            <Button
+                backgroundColor={"#2B3244"}
                 text={t("Calendar.GoToYear")}
                 textColor={"white"}
-                onClick={handleYearPageClick}                       
+                onClick={handleYearPageClick}
             />
         </div>
     );
 };
-
 export default CalendarComponent;

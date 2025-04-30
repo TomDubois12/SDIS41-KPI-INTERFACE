@@ -30,7 +30,7 @@
     text-align: center;
     background: none;
     border: none;
-    color: white; 
+    color: white;
     text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
     font-size: 24px;
     cursor: pointer;
@@ -47,14 +47,14 @@
     text-align: center;
     align-items: center;
     justify-content: center;
-  
+
     .preferences {
       display: flex;
       flex-direction: column;
-      color: white; 
+      color: white;
       font-size: 15px;
       text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
-    
+
       input {
         margin-top: 2vh;
       }

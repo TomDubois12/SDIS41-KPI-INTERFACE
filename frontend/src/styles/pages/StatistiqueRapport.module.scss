@@ -1,13 +1,14 @@
-.container {   
+.container {
     margin-left: 0.5vw;
     text-align: center;
-    
+
     @media (max-width: 950px) {
         margin-left: 0vw;
     }
 
     .containerP {
         text-align: center;
+
         p {
             font-size: 22px;
             color: #2B3244;
@@ -36,7 +37,7 @@
             padding-right: 3vw;
             font-size: 32px;
             text-align: center;
-    
+
             @media (max-width: 950px) {
                 font-size: 26px;
             }

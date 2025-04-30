@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/Telephonie.module.scss';

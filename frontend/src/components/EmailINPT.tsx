@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { useState, useEffect } from 'react';
 import { useTranslation } from "../hooks/useTranslation";
+
 import Title from './Title';
+import Button from './Button';
 
 import styles from '../styles/components/Email.module.scss'
-import Button from './Button';
 
 interface EmailINPT {
     id: number;
-    from?: string; 
+    from?: string;
     subject?: string;
     date?: string | Date;
     numeroOperation?: string | null;
@@ -26,6 +27,10 @@ function EmailINPT() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
+    function goBack() {
+        window.history.back();
+    }
+
     useEffect(() => {
         async function fetchEmails() {
             try {
@@ -39,7 +44,6 @@ function EmailINPT() {
                 setLoading(false);
             }
         }
-
         fetchEmails();
         const intervalId = setInterval(() => {
             fetchEmails();
@@ -70,16 +74,11 @@ function EmailINPT() {
         );
     }
 
-    function goBack() {
-        window.history.back();
-    }
-
     return (
         <div className={styles.container}>
             <div className={styles.gestionTitle}>
                 <Title text={t("EmailINPT.Title")} />
             </div>
-            
             <div className={styles.tablecontainer}>
                 <table className={styles.tickettable}>
                     <thead>
@@ -104,13 +103,11 @@ function EmailINPT() {
                     </tbody>
                 </table>
             </div>
-
             {emails.length === 0 && (
                 <div className={styles.noDataMessage}>
                     {t("EmailINPT.AucuneDonnee")}
                 </div>
             )}
-
             <Button
                 backgroundColor={"#2B3244"}
                 text={t("Rapport.GoBack")}
@@ -120,5 +117,4 @@ function EmailINPT() {
         </div>
     );
 }
-
 export default EmailINPT;

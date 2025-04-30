@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { useTranslation } from "../hooks/useTranslation";
-
-import styles from '../styles/pages/ClarilogAnnuel.module.scss';
 
 import TicketCountByYear from "../components/TicketCountByYear";
 import Header from "../components/Header";
@@ -12,8 +9,9 @@ import PieChart from "../components/PieChart";
 import YearPicker from "../components/YearPicker";
 import Button from "../components/Button";
 
+import styles from '../styles/pages/ClarilogAnnuel.module.scss';
+
 const ClarilogAnnuel: React.FC = () => {
-    
     const { t } = useTranslation();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -46,15 +44,15 @@ const ClarilogAnnuel: React.FC = () => {
     return (
         <>
             <Header
-                text={t("Titles.PerfClarilog")} 
+                text={t("Titles.PerfClarilog")}
             />
             <div className={styles.container}>
                 <div className={styles.divCalendar}>
-                    <YearPicker 
-                        initialYear={year} 
+                    <YearPicker
+                        initialYear={year}
                     />
-                    <TicketCountByYear 
-                        year={year} 
+                    <TicketCountByYear
+                        year={year}
                     />
                     <Button
                         backgroundColor={"#2B3244"}
@@ -64,18 +62,17 @@ const ClarilogAnnuel: React.FC = () => {
                     />
                 </div>
                 <div className={styles.divStats}>
-                    <BarChart 
-                        year={year} 
-                        title={t("Charts.TicketsAttributionYear")} 
-                        />
-                    <PieChart 
-                        year={year} 
-                        title={t("Charts.TiketsTypesYear")} 
-                        />
+                    <BarChart
+                        year={year}
+                        title={t("Charts.TicketsAttributionYear")}
+                    />
+                    <PieChart
+                        year={year}
+                        title={t("Charts.TiketsTypesYear")}
+                    />
                 </div>
             </div>
         </>
     );
 };
-
 export default ClarilogAnnuel;

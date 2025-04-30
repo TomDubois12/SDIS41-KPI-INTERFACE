@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 
-import styles from '../styles/components/Performance.module.scss'
+import { useState, useEffect } from 'react';
+import { useTranslation } from '../hooks/useTranslation';
 
+import styles from '../styles/components/Performance.module.scss'
 
 interface PerformanceProps {
     date: string;
@@ -15,10 +15,8 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
     const [performance, setPerformance] = useState<'✅' | '❌'>('❌');
     const averageTickets = 6;
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-    
 
     useEffect(() => {
-        // Récupérer le nombre de tickets résolus pour la date sélectionnée
         axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${date}`)
             .then(response => setResolvedTickets(response.data.count))
             .catch(error => console.error("Erreur lors de la récupération du nombre de tickets résolus :", error));
@@ -33,26 +31,25 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
     }, [resolvedTickets, averageTickets]);
 
     return (
-        <div 
+        <div
             onMouseEnter={() => setIsTooltipVisible(true)}
             onMouseLeave={() => setIsTooltipVisible(false)}
             style={{ position: 'relative' }}
         >
             <p className={styles.title}>Performance: {performance}</p>
             {isTooltipVisible && (
-                <div 
-                    style={{ 
-                        position: 'absolute', 
-                        background: 'white', 
-                        border: '1px solid #ccc', 
-                        padding: '10px', 
-                        zIndex: 1, 
+                <div
+                    style={{
+                        position: 'absolute',
+                        background: 'white',
+                        border: '1px solid #ccc',
+                        padding: '10px',
+                        zIndex: 1,
                         top: '100%',
-                        left: '0', 
-                        width: '200px' 
+                        left: '0',
+                        width: '200px'
                     }}
                 >
-                    {/* Contenu de l'info-bulle */}
                     {performance === '✅' ? (
                         <p>{t("Performance.Atteint")} {averageTickets} {t("Performance.Suite")}</p>
                     ) : (
@@ -63,5 +60,4 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
         </div>
     );
 };
-
 export default Performance;

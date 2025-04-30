@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/YearPicker.module.scss';
@@ -22,6 +21,7 @@ const YearPicker: React.FC<YearPickerProps> = ({ initialYear }) => {
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 15 }, (_, i) => currentYear - 14 + i);
+
     return (
         <div className={styles.container}>
             <h2 className={styles.title}>{t("Calendar.SelectDate")} :</h2>
@@ -35,5 +35,4 @@ const YearPicker: React.FC<YearPickerProps> = ({ initialYear }) => {
         </div>
     );
 };
-
 export default YearPicker;

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/TicketCountByYear.module.scss';
@@ -9,7 +8,6 @@ interface TicketCountByYearProps {
 }
 
 export default function TicketCountByYear({ year }: TicketCountByYearProps) {
-    
     const { t } = useTranslation();
     const [countTicketCreated, setCountTicketCreated] = useState<number | null>(null);
     const [countTicketResolved, setCountTicketResolved] = useState<number | null>(null);
@@ -34,7 +32,6 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
             } finally {
                 setLoading(false);
             }
-
             try {
                 const response = await fetch(
                     `http://localhost:3001/tickets/count-resolved-by-year?year=${year}`
@@ -60,16 +57,16 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
             ) : error ? (
                 <p className={styles.error}>{error}</p>
             ) : (
-                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsCreesAnnee")} : 
-                <span className={styles.result}> {countTicketCreated}</span> </p>
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsCreesAnnee")} :
+                    <span className={styles.result}> {countTicketCreated}</span> </p>
             )}
             {loading ? (
                 <p className={styles.chargement}>{t("Global.Chargement")}</p>
             ) : error ? (
                 <p className={styles.error}>{error}</p>
             ) : (
-                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsResolusAnnee")} : 
-                <span className={styles.result}> {countTicketResolved}</span> </p>
+                <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsResolusAnnee")} :
+                    <span className={styles.result}> {countTicketResolved}</span> </p>
             )}
         </div>
     );

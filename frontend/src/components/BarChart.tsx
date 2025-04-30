@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
+import ReactApexChart from "react-apexcharts";
 
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/BarChart.module.scss';
@@ -20,8 +20,8 @@ interface OperatorData {
 }
 
 const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title }) => {
-    
-    const [chartData, setChartData] = useState<OperatorData[]>([]); // Initialize as empty array
+
+    const [chartData, setChartData] = useState<OperatorData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const { t } = useTranslation();
@@ -30,13 +30,12 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
         "#1ABC9C", "#F39C12", "#E74C3C", "#3498DB", "#2ECC71", "#F1C40F",
         "#9B59B6", "#34495E", "#16A085", "#D35400"
     ]
-    
-    // Construire l'URL dynamiquement
+
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-by-operator?date=${date}`
         : month
             ? `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
-            : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`; // Ajout pour les données annuelles
+            : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`;
 
     const formatOperatorName = (operatorName: string): string => {
         if (!operatorName) {
@@ -65,7 +64,6 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
         const fetchData = async () => {
             setError(null);
             try {
-                
                 const response = await axios.get<OperatorData[]>(apiUrl);
                 const formattedData = response.data.map((item: OperatorData) => ({
                     ...item,
@@ -79,7 +77,6 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
                 setLoading(false);
             }
         };
-
         fetchData();
         const intervalId = setInterval(fetchData, 5000);
         return () => clearInterval(intervalId);
@@ -100,9 +97,6 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             fixed: { enabled: true, position: "topRight" },
         }
     };
-    
-    
-
     if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
     if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
     if (chartData.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonneesBarChart")}.</p>;
@@ -114,5 +108,4 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
         </div>
     );
 };
-
 export default BarChart;

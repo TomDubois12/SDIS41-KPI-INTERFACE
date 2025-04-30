@@ -1,5 +1,8 @@
 .container {
-    label, p, span {
+
+    label,
+    p,
+    span {
         font-size: 20px;
         color: #2B3244;
         font-weight: 900;
@@ -14,7 +17,10 @@
         @media (max-width: 950px) {
             margin-top: 2.5vh;
         }
-        span, input, button {
+
+        span,
+        input,
+        button {
             margin-left: 1vw;
         }
 
@@ -30,7 +36,7 @@
             font-weight: bold;
             text-align: center;
             font-size: 16px;
-            
+
             &:focus {
                 outline: none;
                 border-color: #66afe9;

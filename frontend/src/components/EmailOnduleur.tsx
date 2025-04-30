@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { useState, useEffect } from 'react';
 import { useTranslation } from "../hooks/useTranslation";
+
 import Title from './Title';
+import Button from './Button';
 
 import styles from '../styles/components/Email.module.scss'
-import Button from './Button';
 
 interface EmailOnduleur {
     id: number;
@@ -20,6 +21,10 @@ function EmailOnduleur() {
     const [emails, setEmails] = useState<EmailOnduleur[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+
+    function goBack() {
+        window.history.back();
+    }
 
     useEffect(() => {
         async function fetchEmails() {
@@ -42,10 +47,6 @@ function EmailOnduleur() {
 
     if (loading) {
         return <p>{t("EmailOnduleur.Chargement")}</p>;
-    }
-
-    function goBack() {
-        window.history.back();
     }
 
     if (error) {
@@ -96,21 +97,18 @@ function EmailOnduleur() {
                     </tbody>
                 </table>
             </div>
-
             {emails.length === 0 && (
                 <div className={styles.noDataMessage}>
                     {t("EmailOnduleur.AucuneDonnee")}
                 </div>
             )}
-
-            <Button 
+            <Button
                 backgroundColor={"#2B3244"}
-                text={t("Rapport.GoBack")} 
-                textColor={"white"} 
+                text={t("Rapport.GoBack")}
+                textColor={"white"}
                 onClick={goBack}
             />
         </div>
-    );    
+    );
 }
-
 export default EmailOnduleur;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
+import ReactApexChart from "react-apexcharts";
 
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/PieChart.module.scss';
@@ -26,14 +26,11 @@ interface ApiDataItem {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title }) => {
-    
     const [chartData, setChartData] = useState<DataItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const { t } = useTranslation();
-    
 
-    // Construire l'URL dynamiquement
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-types?date=${date}`
         : month
@@ -45,23 +42,17 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
             setError(null);
             try {
                 const response = await axios.get<ApiDataItem[]>(apiUrl);
-                
-                // Transformer les données
                 let transformedData = response.data.map(item => ({
                     TicketClassLabel: item.TicketClassLabel || "Pas de catégorie attribuée",
                     count: item.NombreTickets
                 }));
-                
-                // Calcul du total des tickets
                 const totalTickets = transformedData.reduce((sum, item) => sum + item.count, 0);
-                
-                // Ajout du pourcentage et tri par ordre décroissant
                 transformedData = transformedData
                     .map(item => ({
                         ...item,
                         percentage: (item.count / totalTickets) * 100
                     }))
-                    .sort((a, b) => b.percentage! - a.percentage!); // Tri du plus grand au plus petit
+                    .sort((a, b) => b.percentage! - a.percentage!);
 
                 setChartData(transformedData);
             } catch (error) {
@@ -71,7 +62,6 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
                 setLoading(false);
             }
         };
-
         fetchData();
         const intervalId = setInterval(fetchData, 5000);
         return () => clearInterval(intervalId);
@@ -109,5 +99,4 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
         </div>
     );
 };
-
 export default PieChart;

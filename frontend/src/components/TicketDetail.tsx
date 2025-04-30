@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
 
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from '../styles/components/TicketDetail.module.scss';
-
 import Button from "../components/Button";
+
+import styles from '../styles/components/TicketDetail.module.scss';
 
 interface TicketDetail {
     TicketId: number;
@@ -33,28 +33,22 @@ const ClarilogTicketDetail: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const ticketId = searchParams.get('id');
     const { t } = useTranslation();
-    const navigate = useNavigate();
 
     const formatOperatorName = (operatorName: string): string => {
         if (!operatorName) {
             return '';
         }
-
         const parts = operatorName.split('\\');
-
         if (parts.length === 2) {
             let namePart = parts[1];
             if (namePart.includes('.') || namePart.includes('-')) {
                 namePart = namePart.replace(/\./g, ' ').replace(/-/g, ' ');
             }
-
             const capitalize = (str: string): string => {
                 return str.replace(/\b\w/g, (char) => char.toUpperCase());
             };
-
             return capitalize(namePart);
         }
-
         return operatorName;
     };
 
@@ -65,7 +59,6 @@ const ClarilogTicketDetail: React.FC = () => {
                 setLoading(false);
                 return;
             }
-
             setLoading(true);
             try {
                 const response = await axios.get<TicketDetail>(`http://localhost:3001/tickets/ticket/${ticketId}`);
@@ -77,7 +70,7 @@ const ClarilogTicketDetail: React.FC = () => {
                     setTicket({
                         ...response.data,
                         CallerName: formatOperatorName(response.data.CallerName),
-                        AssignedToName: formattedAssignedToName, // Apply formatOperatorName here
+                        AssignedToName: formattedAssignedToName,
                     });
                 } else {
                     setError('Ticket non trouvé.');
@@ -89,7 +82,6 @@ const ClarilogTicketDetail: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchTicketDetails();
     }, [ticketId]);
 
@@ -100,6 +92,7 @@ const ClarilogTicketDetail: React.FC = () => {
     if (loading) return <p>{t("TicketDetail.ChargementDetail")}</p>;
     if (error) return <p>{error}</p>;
     if (!ticket) return <p>{t("TicketDetail.TicketNonTrouve")}</p>;
+
     return (
         <div className={styles.container}>
             <h2>{t("TicketDetail.DetailTitle")} n° <span className={styles.important}>{ticket.TicketId}</span> : </h2>
@@ -107,32 +100,32 @@ const ClarilogTicketDetail: React.FC = () => {
             <p>{t("TicketDetail.Demandeur")} : <span className={styles.important}>{ticket.CallerName || t("TicketCount.Erreur.Demandeur")}</span></p>
             <p>{t("TicketDetail.DateCreation")} : <span className={styles.important}>{new Date(ticket.SentOn).toLocaleDateString('fr-FR')}</span></p>
             <p>
-                {t("TicketDetail.Statut")} : <span className={ticket.TicketStatus === "En cours" 
-                ? styles.inProgress 
-                : ["Résolu", "Clôturé"].includes(ticket.TicketStatus) 
-                ? styles.resolved 
-                : styles.defaultStatus}> {ticket.TicketStatus}</span>
-            </p>            
+                {t("TicketDetail.Statut")} : <span className={ticket.TicketStatus === "En cours"
+                    ? styles.inProgress
+                    : ["Résolu", "Clôturé"].includes(ticket.TicketStatus)
+                        ? styles.resolved
+                        : styles.defaultStatus}> {ticket.TicketStatus}</span>
+            </p>
             <p>{t("TicketDetail.Categorie")} : <span className={styles.important}>{ticket.Category || t("TicketDetail.CategoriePasAttrib")}</span></p>
-            <p>{t("TicketDetail.AssigneA")} : <span 
-                    className={
-                        ticket.AssignedToName 
-                            ? styles.resolved 
-                            : ticket.AssignedToId 
-                            ? styles.defaultStatus 
-                            : styles.important 
-                    }
-                >
-                    {ticket.AssignedToName 
-                        ? ticket.AssignedToName 
-                        : ticket.AssignedToId || t("TicketDetail.NonAssigne")
-                    }
-                </span>
+            <p>{t("TicketDetail.AssigneA")} : <span
+                className={
+                    ticket.AssignedToName
+                        ? styles.resolved
+                        : ticket.AssignedToId
+                            ? styles.defaultStatus
+                            : styles.important
+                }
+            >
+                {ticket.AssignedToName
+                    ? ticket.AssignedToName
+                    : ticket.AssignedToId || t("TicketDetail.NonAssigne")
+                }
+            </span>
             </p>
             <p>
-                {t("TicketDetail.DateReso")} : <span className={ticket.ResolutionDate ? styles.resolved : styles.important}> 
-                    {ticket.ResolutionDate 
-                        ? new Date(ticket.ResolutionDate).toLocaleDateString('fr-FR') 
+                {t("TicketDetail.DateReso")} : <span className={ticket.ResolutionDate ? styles.resolved : styles.important}>
+                    {ticket.ResolutionDate
+                        ? new Date(ticket.ResolutionDate).toLocaleDateString('fr-FR')
                         : t("TicketDetail.NonReso")
                     }
                 </span>
@@ -150,5 +143,4 @@ const ClarilogTicketDetail: React.FC = () => {
         </div>
     );
 };
-
 export default ClarilogTicketDetail;

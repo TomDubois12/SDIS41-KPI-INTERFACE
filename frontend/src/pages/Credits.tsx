@@ -1,19 +1,18 @@
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from "../styles/pages/Credits.module.scss"
-
 import Header from "../components/Header";
 import Title from "../components/Title";
 import Button from "../components/Button";
 
-export default function Credits() {
+import styles from "../styles/pages/Credits.module.scss"
 
+export default function Credits() {
     const { t } = useTranslation();
-    
+
     function goBack() {
         window.history.back();
     }
-    
+
     return (
         <>
             <Header text={t("Parametre.Credits")} />
@@ -47,11 +46,11 @@ export default function Credits() {
                 <div className={styles.thx}>
                     <p>{t("Credits.FinalTxt")}</p>
                 </div>
-                <Button 
+                <Button
                     className={styles.buttonCredit}
                     backgroundColor={"#2B3244"}
-                    text={t("Rapport.GoBack")} 
-                    textColor={"white"} 
+                    text={t("Rapport.GoBack")}
+                    textColor={"white"}
                     onClick={goBack}
                 />
             </div>

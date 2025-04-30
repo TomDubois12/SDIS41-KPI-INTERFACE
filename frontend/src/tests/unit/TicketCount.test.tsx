@@ -1,13 +1,15 @@
+import axios, { AxiosStatic } from 'axios';
 import { render, screen, waitFor } from '@testing-library/react';
-import axios from 'axios';
-import TicketCount from '../../components/TicketCount';
 import { BrowserRouter } from 'react-router-dom';
+
 import { TranslationProvider } from "../../context/TranslationContext";
+
+import TicketCount from '../../components/TicketCount';
 
 jest.mock('axios');
 
 describe('TicketCount', () => {
-    let mockedAxios;
+    let mockedAxios: jest.Mocked<AxiosStatic>;
 
     beforeEach(() => {
         mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -42,19 +44,12 @@ describe('TicketCount', () => {
         });
 
         mockedAxios.get.mockImplementation(originalMock);
-
         renderWithRouter();
-
-        // Wait for initial data load
         await waitFor(() => {
             expect(screen.queryByText('Chargement...')).not.toBeInTheDocument();
         });
-
-        // Ensure initial data is displayed
         expect(screen.getByText('5')).toBeInTheDocument();
         expect(screen.getByText('3')).toBeInTheDocument();
-
-        // Modify mock response to simulate data update
         const updatedMock = jest.fn().mockImplementation((url) => {
             if (url.includes('/tickets/count-created')) {
                 return Promise.resolve({ data: { count: 7 } });
@@ -65,13 +60,8 @@ describe('TicketCount', () => {
             }
             return Promise.reject(new Error('Invalid URL'));
         });
-
         mockedAxios.get.mockImplementation(updatedMock);
-
-        // Advance timers to trigger interval
         jest.advanceTimersByTime(60000);
-
-        // Wait for updated data to load
         await waitFor(() => {
             expect(screen.getByText('7')).toBeInTheDocument();
             expect(screen.getByText('4')).toBeInTheDocument();

@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from '../styles/pages/Hub.module.scss';
 import Header from "../components/Header";
 import Card from "../components/Card";
+
+import styles from '../styles/pages/Hub.module.scss';
 import Extincteur from '../assets/images/Extincteur.png';
 import Dring from '../assets/images/Dring.png';
 import Feu from '../assets/images/Feu.png';
@@ -12,7 +12,7 @@ export default function Hub() {
 
     const { t } = useTranslation();
     const today = new Date();
-    const month = (today.getMonth() + 1).toString(); // Mois 1-indexé
+    const month = (today.getMonth() + 1).toString();
     const year = today.getFullYear().toString();
 
     return (

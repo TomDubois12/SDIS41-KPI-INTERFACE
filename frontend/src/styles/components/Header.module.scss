@@ -15,11 +15,11 @@
     .hiddenDivTitle {
         text-align: center;
     }
-    
+
     @media (min-width: 950px) {
         display: none;
     }
-    
+
     @media (max-width: 950px) {
         flex-direction: column;
         padding-top: 5vh;
@@ -40,7 +40,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
+
     @media (max-width: 950px) {
         display: none;
     }
@@ -54,7 +54,7 @@
         width: 55vw;
         height: clamp(6vh, 10vh, 12.5vh);
         text-align: center;
-        
+
         h1 {
             font-size: clamp(24px, 5vw, 48px);
         }

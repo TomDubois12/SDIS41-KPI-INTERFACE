@@ -1,8 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
-
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
-
-import styles from '../styles/pages/Clarilog.module.scss';
 
 import Header from "../components/Header";
 import TicketCount from "../components/TicketCount";
@@ -10,9 +7,9 @@ import Performance from "../components/Performance";
 import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 
+import styles from '../styles/pages/Clarilog.module.scss';
 
 export default function Clarilog() {
-    
     const { t } = useTranslation();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -26,16 +23,16 @@ export default function Clarilog() {
                     <TicketCount />
                 </div>
                 <div className={styles.divStats}>
-                    <Performance 
+                    <Performance
                         date={selectedDate}
                     />
-                    <BarChart 
-                        date={selectedDate} 
-                        title={t("Charts.TicketsAttributionDay")} 
-                    />
-                    <PieChart 
+                    <BarChart
                         date={selectedDate}
-                        title={t("Charts.TiketsTypesDay")} 
+                        title={t("Charts.TicketsAttributionDay")}
+                    />
+                    <PieChart
+                        date={selectedDate}
+                        title={t("Charts.TiketsTypesDay")}
                     />
                 </div>
             </div>

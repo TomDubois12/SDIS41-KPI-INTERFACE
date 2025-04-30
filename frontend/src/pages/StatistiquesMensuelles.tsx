@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
 import { saveAs } from "file-saver";
+
+import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
 import { useTranslation } from "../hooks/useTranslation";
-import styles from "../styles/pages/StatistiqueRapport.module.scss";
+
 import Header from "../components/Header";
 import MonthPickerStats, { MonthPickerStatsHandle } from "../components/MonthPickerStats";
 import Telephonie from "../components/Telephonie";
@@ -10,6 +11,8 @@ import DisponibiliteMPLS from "../components/DisponibiliteMPLS";
 import DisponibiliteESX from "../components/DisponibiliteESX";
 import Button from "../components/Button";
 import Title from "../components/Title";
+
+import styles from "../styles/pages/StatistiqueRapport.module.scss";
 
 export default function StatistiquesMensuelles() {
     const { t } = useTranslation();

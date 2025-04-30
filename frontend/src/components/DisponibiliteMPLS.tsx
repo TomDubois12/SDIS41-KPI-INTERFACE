@@ -1,10 +1,13 @@
-import React, { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import axios from "axios";
+
 import { Link } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { useTranslation } from "../hooks/useTranslation";
-import styles from '../styles/components/DisponibiliteMPLSESX.module.scss';
+
 import Button from "./Button";
+
+import styles from '../styles/components/DisponibiliteMPLSESX.module.scss';
 
 interface DisponibiliteMPLSProps {
     onAvailabilityData: (availability: string) => void;
@@ -25,7 +28,7 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             setFile(file);
         } else {
             alert("Veuillez sélectionner un fichier CSV valide.");
-        } 
+        }
     }, []);
 
     const handleValidate = async () => {
@@ -33,10 +36,8 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
             setValidationMessage("Veuillez sélectionner un fichier CSV.");
             return;
         }
-
         const formData = new FormData();
         formData.append("file", file);
-
         try {
             const response = await axios.post("http://localhost:3001/csv/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -77,7 +78,6 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
                     <p>{t("Rapport.InfoDragDrop")}</p>
                 )}
             </div>
-
             {file && (
                 <div>
                     <p>{t("Rapport.FichierSelectionne")} : {file.name}</p>
@@ -91,11 +91,9 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
                     )}
                 </div>
             )}
-
             {validationMessage && (
                 <p>{validationMessage}</p>
             )}
-
             {availability && (
                 <div>
                     <p>{t("Rapport.DispoReseau")} : <span className={styles.red}>{availability}</span></p>
