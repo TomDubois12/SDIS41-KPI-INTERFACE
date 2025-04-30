@@ -6,34 +6,59 @@ import { useTranslation } from "../hooks/useTranslation";
 import Title from './Title';
 import Button from './Button';
 
-import styles from '../styles/components/Email.module.scss'
+import styles from '../styles/components/Email.module.scss';
 
+/**
+ * Définit la structure d'un objet email Onduleur après traitement et extraction des données pertinentes.
+ * @property id Identifiant unique de l'email (probablement messageId).
+ * @property type Type d'email déterminé (ex: 'Administratif', 'Alerte').
+ * @property message Le message principal extrait de l'email.
+ * @property event L'événement spécifique rapporté par l'onduleur.
+ * @property timestamp L'horodatage de l'événement fourni dans l'email.
+ */
 interface EmailOnduleur {
-    id: number;
+    id: number | string;
     type: string;
     message: string;
     event: string;
     timestamp: string;
 }
 
+/**
+ * Composant React affichant une liste des emails provenant des onduleurs dans un tableau.
+ * Récupère les données depuis l'API `/emails_onduleurs` et rafraîchit la liste périodiquement.
+ * Gère les états de chargement et d'erreur. Applique un style différent aux lignes
+ * du tableau selon le type d'email ('Administratif' ou 'Alerte').
+ *
+ * @returns Le composant JSX affichant le titre, le tableau des emails ou les états alternatifs.
+ */
 function EmailOnduleur() {
     const { t } = useTranslation();
     const [emails, setEmails] = useState<EmailOnduleur[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
+    /**
+     * Fonction simple pour naviguer vers la page précédente dans l'historique du navigateur.
+     */
     function goBack() {
         window.history.back();
     }
 
     useEffect(() => {
+        /**
+         * Récupère les emails depuis l'API et met à jour l'état du composant.
+         * Gère le chargement et les erreurs.
+         */
         async function fetchEmails() {
             try {
                 const response = await axios.get<EmailOnduleur[]>('http://localhost:3001/emails_onduleurs');
                 setEmails(response.data);
-                setLoading(false);
+                setError(null);
             } catch (err: any) {
                 setError(err);
+                console.error("Erreur fetch emails Onduleur:", err);
+            } finally {
                 setLoading(false);
             }
         }

@@ -2,8 +2,14 @@ import { Link } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
-import styles from "../styles/components/Parametre.module.scss";
+import styles from '../styles/components/Parametre.module.scss';
 
+/**
+ * Convertit un ArrayBuffer en une chaîne de caractères base64url safe.
+ * Utile pour encoder les clés de l'abonnement push avant de les envoyer au backend.
+ * @param buffer L'ArrayBuffer à convertir.
+ * @returns La chaîne de caractères encodée en base64url.
+ */
 function arrayBufferToBase64Url(buffer: ArrayBuffer | null): string {
     if (!buffer) return '';
     const binary = String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer)));
@@ -13,6 +19,13 @@ function arrayBufferToBase64Url(buffer: ArrayBuffer | null): string {
         .replace(/=+$/, '');
 }
 
+/**
+ * Convertit une chaîne de caractères base64url safe en Uint8Array.
+ * Utile pour décoder la clé publique VAPID reçue du serveur avant de l'utiliser
+ * pour l'abonnement push.
+ * @param base64String La chaîne de caractères encodée en base64url.
+ * @returns L'Uint8Array correspondant.
+ */
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -24,6 +37,15 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     return outputArray;
 }
 
+/**
+ * Composant React représentant un menu de paramètres (accessible via un bouton 'hamburger').
+ * Permet à l'utilisateur de changer la langue de l'interface, d'activer/désactiver
+ * les notifications Web Push, et de gérer ses préférences de notification (tickets, emails)
+ * si l'abonnement est actif. Gère les états de chargement, d'erreur, et vérifie la
+ * compatibilité du navigateur avec les notifications push.
+ *
+ * @returns Le composant JSX affichant le bouton de menu et le menu déroulant si ouvert.
+ */
 const Parametres = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { t, setLang, lang } = useTranslation();
@@ -37,6 +59,11 @@ const Parametres = () => {
     const [notifyEmailPref, setNotifyEmailPref] = useState(true);
     const [isPrefsLoading, setIsPrefsLoading] = useState(false);
 
+    /**
+     * Récupère les préférences de notification actuelles depuis le backend
+     * pour un endpoint d'abonnement donné. Met à jour l'état local des préférences.
+     * @param endpoint L'endpoint de l'abonnement pour lequel récupérer les préférences.
+     */
     const fetchPreferences = useCallback(async (endpoint: string) => {
         setIsPrefsLoading(true);
         setNotificationError(null);
@@ -45,7 +72,7 @@ const Parametres = () => {
             const response = await fetch(`http://localhost:3001/notifications/preferences?endpoint=${encodeURIComponent(endpoint)}`);
             if (!response.ok) {
                 let errorMsg = `${t("Parametre.Notifications.ErreurRecupPrefs")} (${response.status})`;
-                try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch (e) { }
+                try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch (e) {}
                 throw new Error(errorMsg);
             }
             const prefs = await response.json();
@@ -67,6 +94,11 @@ const Parametres = () => {
         }
     }, [t]);
 
+    /**
+     * Effet exécuté au montage pour vérifier la compatibilité des notifications push,
+     * enregistrer le Service Worker, et déterminer l'état actuel de l'abonnement push.
+     * Si un abonnement existe, récupère les préférences associées.
+     */
     useEffect(() => {
         console.log("[Effect Étape 1] Début useEffect. Vérification support SW/Push...");
         setNotificationError(null);
@@ -129,6 +161,11 @@ const Parametres = () => {
             });
     }, [t, fetchPreferences]);
 
+    /**
+     * Envoie les préférences de notification mises à jour au backend via une requête PATCH.
+     * Gère l'état de chargement et les erreurs potentielles.
+     * @param prefsToUpdate Objet contenant les nouvelles valeurs pour `notifyOnTicket` et `notifyOnEmail`.
+     */
     const updateBackendPreferences = useCallback(async (prefsToUpdate: { ticket: boolean, email: boolean }) => {
         if (!currentEndpoint) {
             console.error("Impossible de mettre à jour : endpoint manquant.");
@@ -149,7 +186,7 @@ const Parametres = () => {
             });
             if (!response.ok) {
                 let errorMsg = `Erreur serveur (${response.status})`;
-                try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch (e) { }
+                try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch (e) {}
                 throw new Error(errorMsg);
             }
             const result = await response.json();
@@ -162,17 +199,33 @@ const Parametres = () => {
         }
     }, [currentEndpoint, t]);
 
+    /**
+     * Gère le changement d'état de la case à cocher pour les notifications de ticket.
+     * Met à jour l'état local et appelle la fonction pour sauvegarder les préférences au backend.
+     * @param event L'événement de changement de l'input checkbox.
+     */
     const handleTicketPrefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = event.target.checked;
         setNotifyTicketPref(isChecked);
         updateBackendPreferences({ ticket: isChecked, email: notifyEmailPref });
     };
+    /**
+     * Gère le changement d'état de la case à cocher pour les notifications d'email.
+     * Met à jour l'état local et appelle la fonction pour sauvegarder les préférences au backend.
+     * @param event L'événement de changement de l'input checkbox.
+     */
     const handleEmailPrefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = event.target.checked;
         setNotifyEmailPref(isChecked);
         updateBackendPreferences({ ticket: notifyTicketPref, email: isChecked });
     };
 
+    /**
+     * Tente d'abonner l'utilisateur aux notifications push.
+     * Récupère la clé VAPID, demande la permission à l'utilisateur via le navigateur,
+     * obtient l'objet `PushSubscription`, et envoie ses détails au backend pour enregistrement.
+     * Met à jour l'état de l'interface utilisateur en fonction du succès ou de l'échec.
+     */
     const subscribeUser = useCallback(async () => {
         setIsMainLoading(true);
         setNotificationError(null);
@@ -211,7 +264,7 @@ const Parametres = () => {
             if (!subscribeResponse.ok) {
                 await subscription.unsubscribe();
                 let errorMsg = `Erreur serveur (${subscribeResponse.status})`;
-                try { const errorData = await subscribeResponse.json(); errorMsg = errorData?.message || errorMsg; } catch (e) { }
+                try { const errorData = await subscribeResponse.json(); errorMsg = errorData?.message || errorMsg; } catch (e) {}
                 throw new Error(`${t("Parametre.Notifications.ErreurSauvegardeAbonnement")} ${errorMsg}`);
             }
 
@@ -236,6 +289,12 @@ const Parametres = () => {
         }
     }, [t]);
 
+    /**
+     * Tente de désabonner l'utilisateur des notifications push.
+     * Récupère l'abonnement actuel, appelle `unsubscribe()` sur celui-ci,
+     * et notifie (best effort) le backend pour supprimer l'enregistrement.
+     * Met à jour l'état de l'interface utilisateur.
+     */
     const unsubscribeUser = useCallback(async () => {
         setIsMainLoading(true);
         setNotificationError(null);
@@ -247,7 +306,7 @@ const Parametres = () => {
             const subscription = await registration.pushManager.getSubscription();
 
             if (subscription) {
-                endpointToDelete = subscription.endpoint; 
+                endpointToDelete = subscription.endpoint;
                 const unsubscribed = await subscription.unsubscribe();
 
                 if (unsubscribed) {
@@ -289,6 +348,10 @@ const Parametres = () => {
         }
     }, [t]);
 
+    /**
+     * Gère le clic sur le bouton principal d'activation/désactivation des notifications.
+     * Appelle `subscribeUser` ou `unsubscribeUser` en fonction de l'état actuel `isSubscribed`.
+     */
     const handleNotificationButtonClick = () => {
         if (isSubscribed) { unsubscribeUser(); }
         else { subscribeUser(); }
@@ -303,6 +366,7 @@ const Parametres = () => {
                         {t("Parametre.SwitchLanguage")}
                     </button>
                     <div className={styles.notificationSection}>
+                        <h3>{t("Parametre.Notifications.Titre")}</h3>
                         {supportsNotifications ? (
                             <>
                                 <button onClick={handleNotificationButtonClick} disabled={isMainLoading}>

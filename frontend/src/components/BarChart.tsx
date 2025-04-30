@@ -6,6 +6,14 @@ import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/BarChart.module.scss';
 
+/**
+ * Définit les propriétés acceptées par le composant BarChart.
+ * @property date? Date spécifique pour filtrer les données (format YYYY-MM-DD).
+ * @property month? Mois spécifique pour filtrer les données (1-12). Nécessite `year`.
+ * @property year? Année spécifique pour filtrer les données. Requis si `month` est fourni.
+ * @property colors? Couleurs personnalisées pour le graphique (chaîne ou tableau de chaînes).
+ * @property title Titre à afficher au-dessus du graphique.
+ */
 interface BarChartProps {
     date?: string;
     month?: number;
@@ -14,11 +22,27 @@ interface BarChartProps {
     title: string;
 }
 
+/**
+ * Définit la structure attendue pour chaque élément de données d'opérateur
+ * retourné par l'API et utilisé par le graphique.
+ * @property operator Nom de l'opérateur.
+ * @property ticketCount Nombre de tickets associés à cet opérateur.
+ */
 interface OperatorData {
     operator: string;
     ticketCount: number;
 }
 
+/**
+ * Composant React affichant un graphique en barres (Bar Chart) représentant
+ * le nombre de tickets par opérateur pour une période donnée (jour, mois, année).
+ * Récupère les données depuis une API, les rafraîchit périodiquement,
+ * gère les états de chargement et d'erreur, et formate les noms d'opérateurs.
+ * Utilise la librairie ReactApexCharts pour le rendu du graphique.
+ *
+ * @param props Les propriétés du composant, voir `BarChartProps`.
+ * @returns Le composant JSX affichant le graphique ou un état (chargement, erreur, pas de données).
+ */
 const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title }) => {
 
     const [chartData, setChartData] = useState<OperatorData[]>([]);
@@ -29,7 +53,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
         "#FF4560", "#008FFB", "#00E396", "#FEB019", "#8E44AD", "#2C3E50",
         "#1ABC9C", "#F39C12", "#E74C3C", "#3498DB", "#2ECC71", "#F1C40F",
         "#9B59B6", "#34495E", "#16A085", "#D35400"
-    ]
+    ];
 
     const apiUrl = date
         ? `http://localhost:3001/tickets/tickets-by-operator?date=${date}`
@@ -37,30 +61,36 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             ? `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
             : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`;
 
+    /**
+     * Formate un nom d'opérateur potentiellement brut (ex: "DOMAINE\prenom.nom")
+     * en un format plus lisible (ex: "Prenom Nom").
+     * Extrait la partie nom, remplace les points/tirets par des espaces et met en majuscule.
+     * @param operatorName Le nom d'opérateur brut à formater.
+     * @returns Le nom formaté, ou une chaîne vide si l'entrée est invalide.
+     */
     const formatOperatorName = (operatorName: string): string => {
         if (!operatorName) {
             return '';
         }
-
         const parts = operatorName.split('\\');
-
         if (parts.length === 2) {
             let namePart = parts[1];
             if (namePart.includes('.') || namePart.includes('-')) {
                 namePart = namePart.replace(/\./g, ' ').replace(/-/g, ' ');
             }
-
             const capitalize = (str: string): string => {
                 return str.replace(/\b\w/g, (char) => char.toUpperCase());
             };
-
             return capitalize(namePart);
         }
-
         return operatorName;
     };
 
     useEffect(() => {
+        /**
+         * Fonction asynchrone pour récupérer et traiter les données du graphique depuis l'API.
+         * Gère les états de chargement et d'erreur.
+         */
         const fetchData = async () => {
             setError(null);
             try {
@@ -97,6 +127,7 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
             fixed: { enabled: true, position: "topRight" },
         }
     };
+
     if (loading) return <p className={styles.title}>{t("Charts.Chargement")}</p>;
     if (error) return <p className={styles.title}>{t("Charts.Erreur")} : {error.message}</p>;
     if (chartData.length === 0) return <p className={styles.title}>{t("Charts.PasDeDonneesBarChart")}.</p>;

@@ -4,10 +4,19 @@ import { useTranslation } from "../hooks/useTranslation";
 
 import styles from '../styles/components/MonthYearPickerStats.module.scss';
 
+/**
+ * Définit les propriétés initiales optionnelles pour le composant sélecteur d'année.
+ * @property initialYear? L'année initiale à sélectionner. Défaut: année actuelle.
+ */
 interface YearPickerProps {
     initialYear?: number;
 }
 
+/**
+ * Définit l'interface de la "poignée" (handle) exposée par le composant via `ref`.
+ * Permet aux composants parents d'appeler des méthodes sur ce composant.
+ * @property getTicketData Méthode pour récupérer les données de tickets calculées.
+ */
 export interface YearPickerStatsHandle {
     getTicketData: () => {
         countTicketCreated: number | null;
@@ -15,6 +24,19 @@ export interface YearPickerStatsHandle {
     };
 }
 
+/**
+ * Composant React (actuellement nommé MonthPickerStats mais fonctionnant comme YearPickerStats)
+ * permettant à l'utilisateur de sélectionner une année via un menu déroulant.
+ * Récupère les statistiques de tickets (créés, résolus) pour l'année sélectionnée
+ * depuis une API, calcule le taux de résolution, et affiche ces informations.
+ * Navigue vers une URL `/statistiques_annuelles` lors du changement d'année.
+ * Expose une méthode `getTicketData` via `ref` pour que les composants parents
+ * puissent récupérer les statistiques calculées. Utilise `forwardRef`.
+ *
+ * @param props Les propriétés initiales optionnelles, voir `YearPickerProps`.
+ * @param ref La ref transférée depuis le composant parent pour l'accès impératif.
+ * @returns Le composant JSX avec le sélecteur d'année et les statistiques affichées.
+ */
 const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ initialYear }, ref) => {
     const { t } = useTranslation();
     const [selectedYear, setSelectedYear] = useState<number>(initialYear || new Date().getFullYear());
@@ -28,6 +50,9 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
         ? ((countTicketResolved ?? 0) / countTicketCreated * 100).toFixed(2)
         : null;
 
+    /**
+     * Expose la méthode `getTicketData` au composant parent via la ref.
+     */
     useImperativeHandle(ref, () => ({
         getTicketData: () => ({
             countTicketCreated,
@@ -35,42 +60,60 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
         })
     }));
 
+    /**
+     * Effet pour récupérer les compteurs de tickets créés et résolus annuels
+     * lorsque la prop `selectedYear` change.
+     */
     useEffect(() => {
+        /**
+         * Fonction asynchrone interne pour récupérer les données annuelles.
+         */
         async function fetchData() {
             setLoading(true);
             setError(null);
+            setCountTicketCreated(null);
+            setCountTicketResolved(null);
             try {
-                const response = await fetch(
+                const createdResponse = await fetch(
                     `http://localhost:3001/tickets/count-created-by-year?year=${selectedYear}`
                 );
-                if (!response.ok) {
-                    throw new Error("Erreur lors de la récupération des données");
+                if (!createdResponse.ok) {
+                    throw new Error("Erreur lors de la récupération des tickets créés");
                 }
-                const data = await response.json();
-                setCountTicketCreated(data.count);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Une erreur est survenue");
-            } finally {
-                setLoading(false);
-            }
-            try {
-                const response = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-year?}&year=${selectedYear}`
+                const createdData = await createdResponse.json();
+                setCountTicketCreated(createdData.count ?? 0);
+
+                const resolvedResponse = await fetch(
+                    `http://localhost:3001/tickets/count-resolved-by-year?year=${selectedYear}`
                 );
-                if (!response.ok) {
-                    throw new Error("Erreur lors de la récupération des données");
+                if (!resolvedResponse.ok) {
+                    throw new Error("Erreur lors de la récupération des tickets résolus");
                 }
-                const data = await response.json();
-                setCountTicketResolved(data.count);
+                const resolvedData = await resolvedResponse.json();
+                setCountTicketResolved(resolvedData.count ?? 0);
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Une erreur est survenue");
+                setCountTicketCreated(null);
+                setCountTicketResolved(null);
+                console.error("Erreur fetch ticket counts by year:", err);
             } finally {
                 setLoading(false);
             }
         }
-        fetchData();
+        if (selectedYear > 1900) {
+            fetchData();
+        } else {
+            setError("Année invalide.");
+            setLoading(false);
+        }
     }, [selectedYear]);
 
+    /**
+     * Gère le changement de sélection dans le menu déroulant de l'année.
+     * Met à jour l'état `selectedYear` et navigue vers l'URL annuelle correspondante.
+     * @param event L'événement de changement du select HTML.
+     */
     const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const year = parseInt(event.target.value, 10);
         setSelectedYear(year);
@@ -94,11 +137,11 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
                 {loading ? (
                     <p className={styles.chargement}>{t("Global.Chargement")}</p>
                 ) : error ? (
-                    <p className={styles.error}>{error}</p>
+                    countTicketCreated === null && countTicketResolved === null ? <p className={styles.error}>{error}</p> : null
                 ) : (
                     <>
                         <p className={styles.ticket}>{t("NbTicketAnnee.NbTicketsCreesAnnee")} :
-                            <span className={styles.result}> {countTicketCreated}</span>
+                            <span className={styles.result}> {countTicketCreated ?? '-'}</span>
                         </p>
                         {resolutionRate !== null && (
                             <p className={styles.ticket}>{t("Rapport.TauxResolution")} :
@@ -107,8 +150,13 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
                         )}
                     </>
                 )}
+                {!loading && error && (countTicketCreated !== null || countTicketResolved !== null) && (
+                    <p className={styles.error}>{error}</p>
+                )}
             </div>
         </div>
     );
 });
+
+// ATTENTION: L'export utilise le nom probablement incorrect
 export default MonthPickerStats;
