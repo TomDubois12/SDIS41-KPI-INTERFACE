@@ -6,4 +6,4 @@ import { StatistiquesController } from './statistiques.controller';
     providers: [StatistiquesService],
     controllers: [StatistiquesController],
 })
-export class StatistiquesModule {}
+export class StatistiquesModule { }

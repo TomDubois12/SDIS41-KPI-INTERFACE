@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { ExcelController } from './excel.controller';
 import { ExcelService } from './excel.service';
 
@@ -6,4 +7,4 @@ import { ExcelService } from './excel.service';
     controllers: [ExcelController],
     providers: [ExcelService],
 })
-export class ExcelModule {}
+export class ExcelModule { }

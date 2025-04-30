@@ -1,8 +1,9 @@
 import { Controller, Post, UseInterceptors, UploadedFile, Get } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CsvService } from './csv.service';
+import { Express } from 'express';
 import * as fs from 'fs';
-import { Express } from 'express'; // Importez Express pour le type File
+
+import { CsvService } from './csv.service';
 
 @Controller('csv')
 export class CsvController {
@@ -15,8 +16,8 @@ export class CsvController {
         const outputFile = './src/csv/output_csv.json';
         await this.csvService.convertCsvToJson(filePath, outputFile);
         if (fs.existsSync(outputFile)) {
-        const data = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
-        return data; // Return the entire parsed data
+            const data = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+            return data;
         }
         return null;
     }
@@ -25,7 +26,7 @@ export class CsvController {
     getData(): any {
         const outputFile = './output.json';
         if (fs.existsSync(outputFile)) {
-        return JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+            return JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
         }
         return [];
     }

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+
 import { SubscribeKeysDto } from './subscribe-keys.dto';
 
 export class SubscribeDto {

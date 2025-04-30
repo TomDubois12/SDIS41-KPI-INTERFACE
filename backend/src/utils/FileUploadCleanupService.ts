@@ -16,7 +16,7 @@ export class FileUploadCleanupService {
             try {
                 const stats = fs.statSync(filePath);
 
-                if (stats.isFile() && (now - stats.mtimeMs) > 24 * 60 * 60 * 1000) { // 1 jour
+                if (stats.isFile() && (now - stats.mtimeMs) > 24 * 60 * 60 * 1000) {
                     fs.unlinkSync(filePath);
                     console.log(`Fichier supprimé: ${filePath}`);
                 }

@@ -1,20 +1,22 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DataSource } from 'typeorm';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TicketModule } from './ticket/ticket.module';
 import { ExcelModule } from './excel/excel.module';
 import { CsvModule } from './csv/csv.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { UtilsModule } from './utils/utils.module';
 import { EmailOnduleurModule } from './email_onduleur/email_onduleur.module';
 import { EmailINPTModule } from './email_inpt/email_inpt.module';
+import { ImapPollingModule } from './imap-polling/imap-polling.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { Subscription } from './notifications/entities/subscription.entity';
-import { DataSource } from 'typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ImapPollingModule } from './imap-polling/imap-polling.module';
+
 
 @Module({
     imports: [
@@ -59,7 +61,6 @@ import { ImapPollingModule } from './imap-polling/imap-polling.module';
         }),
         ScheduleModule.forRoot(),
         EventEmitterModule.forRoot(),
-
         TicketModule,
         NotificationsModule,
         ExcelModule,
@@ -80,4 +81,4 @@ import { ImapPollingModule } from './imap-polling/imap-polling.module';
     ],
     exports: ['parc_db_connection']
 })
-export class AppModule {}
+export class AppModule { }
