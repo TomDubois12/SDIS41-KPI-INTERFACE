@@ -2,13 +2,21 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
 import Title from "../components/Title";
-import Button from "../components/Button"
+import Button from "../components/Button";
 import Parametres from "../components/Parametres";
 
 import styles from '../styles/pages/Home.module.scss';
 import logoSDIS from '../assets/images/LogoSDIS.png';
-import ImagesPompiers from '../assets/images/ImagesPompiers.png'
+import ImagesPompiers from '../assets/images/ImagesPompiers.png';
 
+/**
+ * Composant React représentant la page d'accueil principale de l'application.
+ * Affiche une mise en page visuelle avec des logos/images, le titre de l'application,
+ * un accès aux paramètres via le composant `Parametres`, et un bouton principal
+ * ("Entrer") qui redirige l'utilisateur vers le hub de navigation (`/hub`).
+ *
+ * @returns Le composant JSX de la page d'accueil.
+ */
 export default function Home() {
     const { t } = useTranslation();
 
@@ -16,7 +24,7 @@ export default function Home() {
         <div className={styles.divGlobal}>
             <div className={styles.divImg}>
                 <img src={logoSDIS} alt="Logo SDIS" className={styles.logoSDIS} />
-                <img src={ImagesPompiers} alt="Logo SDIS" className={styles.ImagesPompiers} />
+                <img src={ImagesPompiers} alt="Images Pompiers" className={styles.ImagesPompiers} />
             </div>
             <div className={styles.divTitleButton}>
                 <div className={styles.Parametres}>

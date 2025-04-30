@@ -4,11 +4,22 @@ import Header from "../components/Header";
 import Title from "../components/Title";
 import Button from "../components/Button";
 
-import styles from "../styles/pages/Credits.module.scss"
+import styles from "../styles/pages/Credits.module.scss";
 
+/**
+ * Composant React représentant la page "Crédits" de l'application.
+ * Affiche des informations statiques telles que les auteurs, les objectifs du projet,
+ * les technologies utilisées et les informations de contact, en utilisant des clés
+ * de traduction pour le contenu textuel.
+ *
+ * @returns Le composant JSX de la page Crédits.
+ */
 export default function Credits() {
     const { t } = useTranslation();
 
+    /**
+     * Fonction simple pour naviguer vers la page précédente dans l'historique du navigateur.
+     */
     function goBack() {
         window.history.back();
     }
