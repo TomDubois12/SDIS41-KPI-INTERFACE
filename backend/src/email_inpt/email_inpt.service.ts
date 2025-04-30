@@ -5,6 +5,13 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationService } from '../notifications/notifications.service';
 import { ImapEmailPayload, EMAIL_RECEIVED_EVENT } from '../imap-polling/imap-polling.service';
 
+/**
+ * Service chargé du traitement spécifique des emails INPT.
+ * Écoute les événements de réception d'email, filtre les emails pertinents (opérations, incidents),
+ * extrait les informations clés, maintient un historique avec statut corrélé,
+ * envoie des notifications push pour les nouveaux emails pertinents,
+ * et met à jour périodiquement le statut des opérations terminées.
+ */
 @Injectable()
 export class EmailINPTService {
     private readonly logger = new Logger(EmailINPTService.name);
@@ -12,6 +19,11 @@ export class EmailINPTService {
     private notifiedEmailIds: Set<string> = new Set();
     private readonly MAX_HISTORY_SIZE = 200;
 
+    /**
+     * Injecte les dépendances nécessaires.
+     * Gère une dépendance circulaire avec NotificationService via forwardRef.
+     * @param notificationService Service utilisé pour envoyer les notifications push.
+     */
     constructor(
         @Inject(forwardRef(() => NotificationService))
         private readonly notificationService: NotificationService,
@@ -19,6 +31,16 @@ export class EmailINPTService {
         this.logger.log('EmailINPTService initialisé, écoute de ' + EMAIL_RECEIVED_EVENT);
     }
 
+    /**
+     * Gère l'événement de réception d'un nouvel email (`EMAIL_RECEIVED_EVENT`).
+     * Filtre les emails INPT par sujet (opération, début/fin incident).
+     * Extrait les données pertinentes (numéro d'opération, site, date/heure) via regex.
+     * Met à jour l'historique interne (`processedInptEmails`), calcule et met à jour
+     * le statut des opérations en fonction des emails d'incident liés.
+     * Trie l'historique et limite sa taille.
+     * Envoie une notification push via NotificationService si l'email est nouveau et pertinent.
+     * @param payload Données de l'email reçu, incluant l'objet parsé et l'ID du message.
+     */
     @OnEvent(EMAIL_RECEIVED_EVENT, { async: true })
     async handleEmailReceived(payload: ImapEmailPayload) {
         const { seqno, parsed, messageId } = payload;
@@ -144,6 +166,12 @@ export class EmailINPTService {
         }
     }
 
+    /**
+     * Tâche planifiée (Cron Job) exécutée toutes les heures.
+     * Parcourt l'historique des emails d'opération traités.
+     * Vérifie si la date/heure de fin d'une opération (extraite de l'email) est dépassée.
+     * Si une opération est terminée et son statut n'est pas déjà '✅', met à jour son statut à '✅'.
+     */
     @Cron(CronExpression.EVERY_HOUR)
     async checkAndUpdateExpiredOperations() {
         this.logger.log('[CRON Status Check INPT] Démarrage de la vérification des opérations terminées...');
@@ -182,6 +210,10 @@ export class EmailINPTService {
         }
     }
 
+    /**
+     * Retourne l'historique actuel des emails INPT traités et stockés par le service.
+     * @returns Un tableau contenant les objets emails traités.
+     */
     getEmails(): any[] {
         return this.processedInptEmails;
     }

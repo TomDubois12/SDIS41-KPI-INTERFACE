@@ -4,6 +4,12 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationService } from '../notifications/notifications.service';
 import { ImapEmailPayload, EMAIL_RECEIVED_EVENT } from '../imap-polling/imap-polling.service';
 
+/**
+ * Service chargé du traitement spécifique des emails provenant des onduleurs.
+ * Écoute les événements de réception d'email, filtre les emails pertinents
+ * selon l'expéditeur et le sujet, extrait les détails de l'événement,
+ * maintient un historique et envoie des notifications push pour les nouveaux événements.
+ */
 @Injectable()
 export class EmailOnduleurService {
     private readonly logger = new Logger(EmailOnduleurService.name);
@@ -11,12 +17,17 @@ export class EmailOnduleurService {
     private notifiedEmailIds: Set<string> = new Set();
     private readonly MAX_HISTORY_SIZE = 100;
     private readonly adresseEmailSources = [
-        'nicolas.bellier@sdis41.fr',
+        'nicolas.bellier@sdis41.fr', // a retirer plus tard
         'onduleur.alerte@sdis41.fr',
         'onduleur.administratif@sdis41.fr',
     ];
     private readonly sujetEmailSource = 'UPS event notification';
 
+    /**
+     * Injecte les dépendances nécessaires.
+     * Gère une dépendance circulaire avec NotificationService via forwardRef.
+     * @param notificationService Service utilisé pour envoyer les notifications push.
+     */
     constructor(
         @Inject(forwardRef(() => NotificationService))
         private readonly notificationService: NotificationService,
@@ -24,6 +35,15 @@ export class EmailOnduleurService {
         this.logger.log('EmailOnduleurService initialisé, écoute de ' + EMAIL_RECEIVED_EVENT);
     }
 
+    /**
+     * Gère l'événement de réception d'un nouvel email (`EMAIL_RECEIVED_EVENT`).
+     * Filtre les emails pour ne traiter que ceux provenant des adresses et avec le sujet configurés pour les onduleurs.
+     * Extrait les informations clés (type, message, événement, timestamp) du corps de l'email.
+     * Ajoute ou met à jour l'email dans l'historique interne (`processedOnduleurEmails`).
+     * Limite la taille de l'historique.
+     * Envoie une notification push via NotificationService si l'email est nouveau pour la session actuelle.
+     * @param payload Données de l'email reçu, incluant l'objet parsé et l'ID du message.
+     */
     @OnEvent(EMAIL_RECEIVED_EVENT, { async: true })
     async handleEmailReceived(payload: ImapEmailPayload) {
         const { seqno, parsed, messageId } = payload;
@@ -98,6 +118,10 @@ export class EmailOnduleurService {
 
     }
 
+    /**
+     * Retourne l'historique actuel des emails d'onduleur traités et stockés par le service.
+     * @returns Un tableau contenant les objets emails traités.
+     */
     getEmails(): any[] {
         return this.processedOnduleurEmails;
     }

@@ -6,14 +6,30 @@ import * as Imap from 'imap';
 import { simpleParser, ParsedMail } from 'mailparser';
 import { Stream } from 'stream';
 
+/**
+ * Structure de données pour l'événement émis lors de la réception d'un email.
+ * @property seqno Numéro de séquence de l'email dans la boîte IMAP.
+ * @property parsed L'objet email parsé par mailparser.
+ * @property messageId L'ID unique du message extrait des en-têtes, ou null si non trouvé.
+ */
 export interface ImapEmailPayload {
     seqno: number;
     parsed: ParsedMail;
     messageId: string | null;
 }
 
+/**
+ * Nom de l'événement émis lorsqu'un nouvel email est récupéré et parsé.
+ */
 export const EMAIL_RECEIVED_EVENT = 'imap.email.received';
 
+/**
+ * Service responsable de la surveillance (polling) d'une boîte aux lettres IMAP.
+ * Se connecte périodiquement au serveur IMAP configuré, recherche les nouveaux emails
+ * depuis la dernière vérification, les parse, et émet un événement `EMAIL_RECEIVED_EVENT`
+ * pour chaque email trouvé, permettant à d'autres services de réagir.
+ * Implémente les hooks de cycle de vie NestJS pour l'initialisation et la destruction.
+ */
 @Injectable()
 export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
     private imap: Imap.ImapConnection;
@@ -22,23 +38,43 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
     private isProcessing = false;
     private lastSuccessfulFetchTime: Date | null = null;
 
+    /**
+     * Injecte les dépendances ConfigService (pour les paramètres IMAP) et EventEmitter2 (pour émettre les événements).
+     * @param configService Service pour accéder aux variables de configuration.
+     * @param eventEmitter Service pour émettre les événements d'application.
+     */
     constructor(
         private readonly configService: ConfigService,
         private readonly eventEmitter: EventEmitter2,
     ) { }
 
+    /**
+     * Méthode du cycle de vie NestJS appelée à l'initialisation du module.
+     * Configure la connexion IMAP et lance une première récupération différée des emails.
+     */
     async onModuleInit() {
         this.logger.log('ImapPollingService initialisé. Configuration IMAP...');
         this.initializeImap();
         this.logger.log('Lancement du premier fetch des emails récents...');
+        // Lance une première récupération après un court délai pour laisser le temps aux autres services de s'initialiser
         setTimeout(() => this.fetchAndEmitAllEmailsInWindow().catch(err => this.logger.error("Erreur lors du fetch initial différé", err)), 5000);
     }
 
+    /**
+     * Méthode du cycle de vie NestJS appelée à la destruction du module.
+     * Tente de fermer proprement la connexion IMAP.
+     */
     async onModuleDestroy() {
         this.logger.log('Arrêt de ImapPollingService. Déconnexion IMAP...');
         await this.disconnectImap();
     }
 
+    /**
+     * Initialise ou réinitialise l'instance de connexion IMAP avec les paramètres
+     * récupérés depuis ConfigService. Gère la destruction d'une instance précédente si elle existe.
+     * Attache les écouteurs d'événements de base ('ready', 'error', 'end', 'close').
+     * @private
+     */
     private initializeImap() {
         this.logger.log('Création/Réinitialisation instance Imap...');
         if (this.imap) {
@@ -71,6 +107,13 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         this.imap.on('close', (hadError) => { this.imapConnected = false; this.logger.log(`Événement IMAP: Close (Error: ${hadError})`); });
     }
 
+    /**
+     * Établit ou vérifie la connexion au serveur IMAP.
+     * Gère les différents états de la connexion et inclut un timeout.
+     * @private
+     * @returns {Promise<void>} Une promesse qui se résout si la connexion est établie (état 'authenticated').
+     * @throws {Error} Si la connexion échoue ou dépasse le timeout.
+     */
     private connectImap(): Promise<void> {
         return new Promise((resolve, reject) => {
             const operationTimeout = 20000; let timer: NodeJS.Timeout | null = null;
@@ -84,7 +127,7 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
             timer = setTimeout(() => {
                 this.logger.error(`connectImap: Timeout (${operationTimeout}ms)`);
                 cleanupListeners();
-                try { if (this.imap && this.imap.state !== 'disconnected') this.imap.destroy(); } catch (e) { }
+                try { if (this.imap && this.imap.state !== 'disconnected') this.imap.destroy(); } catch (e) { /* ignore destroy error */ }
                 reject(new Error('connectImap: Timeout'));
             }, operationTimeout);
 
@@ -110,6 +153,12 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         });
     }
 
+    /**
+     * Tente de fermer proprement la connexion IMAP (imap.end()) ou force la fermeture (imap.destroy())
+     * si l'état n'est pas approprié pour un 'end'. Gère un timeout.
+     * @private
+     * @returns {Promise<void>} Une promesse qui se résout quand la connexion est fermée ou après un timeout.
+     */
     private disconnectImap(): Promise<void> {
         return new Promise((resolve) => {
             if (this.imap && this.imap.state !== 'disconnected') {
@@ -147,6 +196,11 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         });
     }
 
+    /**
+     * Ouvre la boîte aux lettres INBOX sur la connexion IMAP authentifiée.
+     * @private
+     * @returns {Promise<Imap.Box | null>} Une promesse résolue avec l'objet Box si succès, ou null en cas d'erreur ou si non connecté.
+     */
     private openInbox(): Promise<Imap.Box | null> {
         return new Promise((resolve) => {
             if (!this.imap || this.imap.state !== 'authenticated') { this.logger.error('openInbox: IMAP non authentifié.'); return resolve(null); }
@@ -158,6 +212,13 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         });
     }
 
+    /**
+     * Exécute une recherche IMAP avec les critères fournis sur la connexion authentifiée.
+     * @private
+     * @param criteria Les critères de recherche IMAP (ex: [['SINCE', 'Jan 1, 2023']]).
+     * @returns {Promise<number[] | null>} Une promesse résolue avec un tableau de numéros de séquence (ou UIDs selon la config IMAP) ou null si aucun résultat. Rejette en cas d'erreur.
+     * @throws {Error} Si non authentifié ou si la recherche échoue.
+     */
     private searchImap(criteria: any[]): Promise<number[] | null> {
         return new Promise((resolve, reject) => {
             if (!this.imap || this.imap.state !== 'authenticated') { this.logger.error('searchImap: IMAP non authentifié.'); return reject(new Error('IMAP not authenticated')); }
@@ -168,6 +229,10 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         });
     }
 
+    /**
+     * Méthode exécutée périodiquement par le planificateur de tâches (Cron).
+     * Lance la récupération et l'émission des emails si aucune autre opération n'est en cours.
+     */
     @Cron(CronExpression.EVERY_MINUTE)
     async handleCron() {
         this.logger.log(`CRON JOB Email: Déclenchement ${new Date().toISOString()}`);
@@ -182,8 +247,14 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
+    /**
+     * Orchestre le processus complet de récupération des emails récents.
+     * Établit la connexion, ouvre INBOX, recherche les emails depuis une date donnée,
+     * puis lance le fetch/parse/emit pour les emails trouvés.
+     * Gère les erreurs et assure la déconnexion.
+     */
     async fetchAndEmitAllEmailsInWindow() {
-        if (this.isProcessing) return;
+        if (this.isProcessing) return; // Double vérification du verrou
         this.isProcessing = true;
         this.logger.debug('Début fetchAndEmitAllEmailsInWindow');
         try {
@@ -223,6 +294,16 @@ export class ImapPollingService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
+
+    /**
+     * Récupère le contenu complet des emails spécifiés par leurs numéros de séquence (ou UIDs),
+     * les parse avec `mailparser`, et émet l'événement `EMAIL_RECEIVED_EVENT` pour chacun.
+     * Gère un timeout global pour l'ensemble du fetch.
+     * @private
+     * @param uidsOrSeqnos Tableau de numéros de séquence (ou UIDs) des emails à récupérer.
+     * @returns {Promise<void>} Une promesse qui se résout quand tous les emails ont été traités ou après un timeout/erreur.
+     * @throws {Error} Si non authentifié, si une erreur survient pendant le fetch, ou si le timeout est atteint.
+     */
     private async fetchAndParseAndEmit(uidsOrSeqnos: number[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (!uidsOrSeqnos || uidsOrSeqnos.length === 0) return resolve();

@@ -2,8 +2,26 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as fastCsv from 'fast-csv';
 
+/**
+ * Service responsable des tâches de traitement des fichiers CSV.
+ * Fournit des fonctionnalités pour convertir un format CSV spécifique en une sortie JSON structurée.
+ */
 @Injectable()
 export class CsvService {
+
+    /**
+     * Lit un fichier CSV à partir du chemin spécifié, le parse selon une structure
+     * particulière (identifiant la plage de temps, le résumé et les lignes de données
+     * basées sur des marqueurs et des positions de colonnes), et écrit les données
+     * extraites dans un fichier JSON structuré au chemin de sortie spécifié.
+     *
+     * Le parsing suppose un délimiteur ';' et des marqueurs de ligne spécifiques comme 'MPLS', 'Hosts', 'Status'.
+     *
+     * @param filePath Le chemin absolu ou relatif vers le fichier CSV d'entrée.
+     * @param outputFile Le chemin absolu ou relatif où le fichier JSON de sortie doit être écrit.
+     * @returns Une Promise qui se résout lorsque le processus de conversion et d'écriture est terminé,
+     * ou qui rejette si une erreur survient lors de la lecture, du parsing ou de l'écriture du fichier.
+     */
     async convertCsvToJson(filePath: string, outputFile: string): Promise<void> {
         return new Promise((resolve, reject) => {
             let timeRange: any = null;

@@ -2,14 +2,29 @@ import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+/**
+ * Service responsable de l'accès et de la récupération des données
+ * relatives aux tickets depuis la base de données 'parc_db'.
+ * Utilise des requêtes SQL brutes via TypeORM DataSource pour interroger la base.
+ */
 @Injectable()
 export class TicketService {
     private readonly logger = new Logger(TicketService.name);
+    /**
+     * Injecte l'instance DataSource configurée pour la connexion 'parc_db_connection'.
+     * @param dataSource L'instance DataSource de TypeORM pour la connexion 'parc_db'.
+     */
     constructor(
         @Inject(getDataSourceToken('parc_db_connection'))
         private readonly dataSource: DataSource,
-    ) { }
+    ) {}
 
+    /**
+     * Calcule et retourne le nombre de tickets créés à une date spécifique,
+     * en excluant certains statuts (probablement fermés/annulés).
+     * @param date La date au format 'YYYY-MM-DD'.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsCreated(date: string): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(DISTINCT t.TicketId) AS count
@@ -20,11 +35,18 @@ export class TicketService {
                     SELECT 1
                     FROM [parc_db].[dbo].[SD_TicketHistory] h
                     WHERE h.TicketId = t.TicketId
-                    AND h.TicketStatus IN (3, 6, 11)
+                    AND h.TicketStatus IN (3, 6, 11) -- Statuts exclus (ex: Résolu, Fermé, Annulé)
                 );`;
         return this.dataSource.query(query, [date]);
     }
 
+    /**
+     * Calcule et retourne le nombre de tickets créés pour un mois et une année donnés,
+     * en excluant certains statuts.
+     * @param month Le mois (1-12).
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsByMonthYear(month: number, year: number): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(DISTINCT t.TicketId) AS count
@@ -40,6 +62,12 @@ export class TicketService {
         return this.dataSource.query(query, [month, year]);
     }
 
+    /**
+     * Calcule et retourne le nombre de tickets créés pour une année donnée,
+     * en excluant certains statuts.
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsByYear(year: number): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(DISTINCT t.TicketId) AS count
@@ -55,6 +83,11 @@ export class TicketService {
         return this.dataSource.query(query, [year]);
     }
 
+    /**
+     * Calcule et retourne le nombre de tickets marqués comme résolus à une date spécifique.
+     * @param date La date au format 'YYYY-MM-DD'.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsResolved(date: string): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(*) AS count
@@ -63,6 +96,12 @@ export class TicketService {
         return this.dataSource.query(query, [date]);
     }
 
+    /**
+     * Calcule et retourne le nombre de tickets marqués comme résolus pour un mois et une année donnés.
+     * @param month Le mois (1-12).
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsResolvedByMonthYear(month: number, year: number): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(*) AS count
@@ -71,6 +110,11 @@ export class TicketService {
         return this.dataSource.query(query, [month, year]);
     }
 
+    /**
+     * Calcule et retourne le nombre de tickets marqués comme résolus pour une année donnée.
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau contenant un objet `{ count: number }`.
+     */
     async getNbTicketsResolvedByYear(year: number): Promise<{ count: number }[]> {
         const query = `
             SELECT COUNT(*) AS count
@@ -79,6 +123,12 @@ export class TicketService {
         return this.dataSource.query(query, [year]);
     }
 
+    /**
+     * Récupère une liste de tickets créés à une date spécifique avec des informations de base.
+     * @param date La date au format 'YYYY-MM-DD'.
+     * @returns Une promesse résolue avec un tableau d'objets représentant les tickets.
+     * @throws {Error} Si une erreur de base de données survient.
+     */
     async getTickets(date: string): Promise<any[]> {
         this.logger.log(`[getTickets] Service: Date reçue : ${date}`);
         const query = `
@@ -101,10 +151,17 @@ export class TicketService {
             return tickets;
         } catch (error) {
             this.logger.error('[getTickets] Service: Error fetching tickets:', error instanceof Error ? error.stack : error);
-            throw error;
+            throw error; // Relance l'erreur pour le contrôleur
         }
     }
 
+    /**
+     * Récupère les détails complets d'un ticket par son ID, incluant le temps de résolution calculé.
+     * @param id L'ID numérique du ticket.
+     * @returns Une promesse résolue avec un objet contenant les détails du ticket.
+     * @throws {NotFoundException} Si le ticket avec l'ID spécifié n'est pas trouvé ou si l'ID est invalide.
+     * @throws {Error} Si une autre erreur de base de données survient.
+     */
     async getTicketById(id: number): Promise<any> {
         if (isNaN(id)) {
             throw new NotFoundException(`Ticket ID invalid: ${id}`);
@@ -151,6 +208,11 @@ export class TicketService {
         }
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par opérateur pour une date spécifique.
+     * @param date La date au format 'YYYY-MM-DD'.
+     * @returns Une promesse résolue avec un tableau d'objets `{ operator: string, ticketCount: number }`.
+     */
     async getTicketsByOperator(date: string): Promise<any> {
         const query = `
             SELECT o.operator_helpdesk_login AS operator, COUNT(DISTINCT t.TicketId) AS ticketCount
@@ -161,6 +223,12 @@ export class TicketService {
         return this.dataSource.query(query, [date]);
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par opérateur pour un mois et une année donnés.
+     * @param month Le mois (1-12).
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau d'objets `{ operator: string, ticketCount: number }`.
+     */
     async getTicketsByOperatorByMonthYear(month: number, year: number): Promise<any> {
         const query = `
             SELECT o.operator_helpdesk_login AS operator, COUNT(DISTINCT t.TicketId) AS ticketCount
@@ -171,6 +239,11 @@ export class TicketService {
         return this.dataSource.query(query, [month, year]);
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par opérateur pour une année donnée.
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau d'objets `{ operator: string, ticketCount: number }`.
+     */
     async getTicketsByOperatorByYear(year: number): Promise<any> {
         const query = `
             SELECT o.operator_helpdesk_login AS operator, COUNT(DISTINCT t.TicketId) AS ticketCount
@@ -181,6 +254,12 @@ export class TicketService {
         return this.dataSource.query(query, [year]);
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par type (classe) pour une date spécifique,
+     * en excluant certains statuts.
+     * @param date La date au format 'YYYY-MM-DD'.
+     * @returns Une promesse résolue avec un tableau d'objets `{ TicketClassLabel: string | null, NombreTickets: number }`.
+     */
     async getTicketsTypes(date: string): Promise<any> {
         const query = `
             SELECT tc.TicketClassLabel, COUNT(t.TicketId) AS NombreTickets
@@ -199,6 +278,13 @@ export class TicketService {
         return this.dataSource.query(query, [date]);
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par type (classe) pour un mois et une année donnés,
+     * en excluant certains statuts.
+     * @param month Le mois (1-12).
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau d'objets `{ TicketClassLabel: string | null, NombreTickets: number }`.
+     */
     async getTicketsTypesByMonthYear(month: number, year: number): Promise<any> {
         const query = `
             SELECT tc.TicketClassLabel, COUNT(t.TicketId) AS NombreTickets
@@ -217,6 +303,12 @@ export class TicketService {
         return this.dataSource.query(query, [month, year]);
     }
 
+    /**
+     * Récupère le nombre de tickets groupés par type (classe) pour une année donnée,
+     * en excluant certains statuts.
+     * @param year L'année.
+     * @returns Une promesse résolue avec un tableau d'objets `{ TicketClassLabel: string | null, NombreTickets: number }`.
+     */
     async getTicketsTypesByYear(year: number): Promise<any> {
         const query = `
             SELECT tc.TicketClassLabel, COUNT(t.TicketId) AS NombreTickets

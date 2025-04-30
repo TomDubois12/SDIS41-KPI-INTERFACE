@@ -18,6 +18,19 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { Subscription } from './notifications/entities/subscription.entity';
 
 
+/**
+ * Module racine de l'application NestJS.
+ * Ce module est responsable de l'importation et de la configuration
+ * de tous les autres modules, services et configurations nécessaires
+ * au fonctionnement global de l'application.
+ * Il configure notamment :
+ * - Le module de configuration (`ConfigModule`) pour charger les variables d'environnement.
+ * - Deux connexions TypeORM (`parc_db_connection` et `push_notifications_connection`) de manière asynchrone.
+ * - Le module de planification des tâches (`ScheduleModule`).
+ * - Le module d'événements (`EventEmitterModule`).
+ * Il importe également tous les modules fonctionnels (Tickets, Notifications, Emails, etc.).
+ * Il fournit et exporte un provider personnalisé pour la connexion 'parc_db_connection'.
+ */
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -43,7 +56,6 @@ import { Subscription } from './notifications/entities/subscription.entity';
             }),
             inject: [ConfigService],
         }),
-
         TypeOrmModule.forRootAsync({
             name: 'push_notifications_connection',
             imports: [ConfigModule],
@@ -81,4 +93,4 @@ import { Subscription } from './notifications/entities/subscription.entity';
     ],
     exports: ['parc_db_connection']
 })
-export class AppModule { }
+export class AppModule {}
