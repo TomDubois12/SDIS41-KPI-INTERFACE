@@ -8,6 +8,7 @@ import Calendar from "react-calendar";
 import Button from "../components/Button";
 
 import '../styles/components/Calendar.css';
+import styles from '../styles/components/Calendar.module.scss'
 
 /**
  * Composant React affichant un calendrier interactif (`react-calendar`)
@@ -144,12 +145,14 @@ const CalendarComponent = () => {
                 onClickView={handleHeaderClick}
                 locale={lang}
             />
-            <Button
-                backgroundColor={"#2B3244"}
-                text={t("Calendar.GoToYear")}
-                textColor={"white"}
-                onClick={handleYearPageClick}
-            />
+            <div className={styles.buttonGoTo}>
+                <Button
+                    backgroundColor={"#2B3244"}
+                    text={t("Calendar.GoToYear")}
+                    textColor={"white"}
+                    onClick={handleYearPageClick}
+                />
+            </div>
         </div>
     );
 };
