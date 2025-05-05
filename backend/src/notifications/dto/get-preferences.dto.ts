@@ -1,14 +1,16 @@
-// src/notifications/dto/get-preferences.dto.ts (Nouveau fichier)
 import { IsString, IsNotEmpty, IsUrl } from 'class-validator';
 
 /**
- * DTO pour valider le paramètre 'endpoint' de la requête GET /preferences
+ * Data Transfer Object (DTO) utilisé pour valider les données nécessaires
+ * à la récupération des préférences utilisateur associées à un endpoint spécifique.
  */
 export class GetPreferencesDto {
+    /**
+     * L'URL du point de terminaison (endpoint) pour lequel les préférences sont demandées.
+     * Doit être une chaîne de caractères non vide et une URL valide (http ou https).
+     */
     @IsNotEmpty({ message: 'Le paramètre endpoint ne peut pas être vide.' })
     @IsString({ message: 'Le paramètre endpoint doit être une chaîne de caractères.' })
-    // Ajoute une validation basique pour s'assurer que c'est une URL https ou http
-    // Attention: ceci n'est pas exhaustif pour tous les types d'endpoints push possibles
     @IsUrl({ require_protocol: true, protocols: ['https', 'http'] }, { message: 'Le paramètre endpoint doit être une URL valide (http ou https).' })
     endpoint: string;
 }

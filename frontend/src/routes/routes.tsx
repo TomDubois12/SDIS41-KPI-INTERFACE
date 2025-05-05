@@ -1,10 +1,11 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "../pages/Home.tsx"
-import Hub from "../pages/Hub.tsx"
-import Clarilog from "../pages/Clarilog.tsx"
-import StatistiquesMensuelles from "../pages/StatistiquesMensuelles.tsx"
-import StatistiquesAnnuelles from "../pages/StatistiquesAnnuelles.tsx"
-import Alertes from "../pages/Alertes.tsx"
+
+import Home from "../pages/Home.tsx";
+import Hub from "../pages/Hub.tsx";
+import Clarilog from "../pages/Clarilog.tsx";
+import StatistiquesMensuelles from "../pages/StatistiquesMensuelles.tsx";
+import StatistiquesAnnuelles from "../pages/StatistiquesAnnuelles.tsx";
+import Alertes from "../pages/Alertes.tsx";
 import AlertesOnduleurs from "../pages/AlertesOnduleurs.tsx";
 import AlertesINPT from "../pages/AlertesINPT.tsx";
 import ClarilogMensuel from "../pages/ClarilogMensuel.tsx";
@@ -13,6 +14,14 @@ import ClarilogTicketDetail from "../pages/ClarilogTicketDetail.tsx";
 import Credits from "../pages/Credits.tsx";
 import HowToGetCSV from "../pages/HowToGetCSV.tsx";
 
+/**
+ * Composant React centralisant la définition des routes de l'application
+ * à l'aide de `react-router-dom`. Chaque `Route` associe un chemin d'URL (`path`)
+ * à un composant de page spécifique (`element`) qui sera rendu lorsque
+ * l'utilisateur navigue vers ce chemin.
+ *
+ * @returns Le composant `Routes` contenant la configuration de toutes les routes de l'application.
+ */
 export default function AppRoutes() {
     return (
         <Routes>

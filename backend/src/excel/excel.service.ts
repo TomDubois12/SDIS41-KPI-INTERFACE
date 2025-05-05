@@ -3,8 +3,24 @@ import { Workbook } from 'exceljs';
 import * as path from 'path';
 import { Response } from 'express';
 
+/**
+ * Service responsable de la génération de fichiers Excel, notamment des rapports de performance SIC.
+ * Utilise un template Excel prédéfini pour structurer et remplir les données.
+ */
 @Injectable()
 export class ExcelService {
+
+    /**
+     * Génère un rapport de performance SIC au format Excel à partir des données fournies
+     * et d'un template prédéfini.
+     * Le fichier Excel généré est directement écrit dans le flux de la réponse HTTP.
+     *
+     * @param data Un objet contenant les métriques à insérer dans le rapport
+     * (countTicketCreated, resolutionRate, etc.).
+     * @param res L'objet Response d'Express, utilisé pour envoyer le fichier Excel généré au client.
+     * @throws {HttpException} Si le template ou la feuille de calcul est introuvable,
+     * ou si une autre erreur survient lors de la génération.
+     */
     async generateReport(data: {
         countTicketCreated: number;
         resolutionRate: string;

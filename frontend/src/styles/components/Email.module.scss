@@ -4,12 +4,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
+
     .gestionTitle {
         width: 50%;
         margin-top: 5vh;
         margin-bottom: 2vh;
         text-align: center;
+
         @media (max-width: 950px) {
             width: 100%;
         }
@@ -75,7 +76,6 @@
     background-color: #f1f1f1;
 }
 
-/* Responsive: réduire la taille de police sur petit écran */
 @media (max-width: 768px) {
     .tickettable {
         font-size: 12px;

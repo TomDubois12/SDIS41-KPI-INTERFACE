@@ -1,14 +1,13 @@
 .button {
-    font-weight: 900;
-    -webkit-text-stroke: 0.75px #C2BEB5;
-    border: none;
-    border-radius: 13px;
-    cursor: pointer;
-    text-align: center;
-    transition: 0.3s ease-in-out;
-  }
-  
-.button:hover {
-    transform: scale(1.05);
+  font-weight: 900;
+  -webkit-text-stroke: 0.75px #C2BEB5;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.3s ease-in-out;
 }
-  
+
+.button:hover {
+  transform: scale(1.05);
+}

@@ -1,14 +1,18 @@
 import { forwardRef, Module } from '@nestjs/common';
+
 import { TicketService } from './ticket.service';
 import { TicketController } from './ticket.controller';
-import { NotificationsModule } from '../notifications/notifications.module';
-//import { TypeOrmModule } from '@nestjs/typeorm'; // Importez TypeOrmModule
-//import { Subscription } from '../notifications/entities/subscription.entity'; // Importez l'entité
+import { NotificationsModule } from '../notifications/notifications.module'; // Assurez-vous que ce chemin est correct
 
+/**
+ * Module NestJS encapsulant les fonctionnalités relatives aux tickets (probablement Clarilog).
+ * Ce module déclare le contrôleur (`TicketController`) et le service (`TicketService`) associés.
+ * Il gère une dépendance circulaire avec le `NotificationsModule` en utilisant `forwardRef`.
+ * Il exporte `TicketService` pour permettre son injection dans d'autres modules (comme NotificationsModule).
+ */
 @Module({
     imports: [
-        forwardRef(() => NotificationsModule),       
-        //TypeOrmModule.forFeature([Subscription], 'push_notifications_connection'), // Importez TypeOrmModule.forFeature
+        forwardRef(() => NotificationsModule),
     ],
     providers: [TicketService],
     controllers: [TicketController],

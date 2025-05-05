@@ -1,42 +1,77 @@
-// src/notifications/entities/subscription.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
-@Entity('subscriptions') // Le nom de la table dans la base de données MySQL
+/**
+ * Entité TypeORM représentant un enregistrement d'abonnement Web Push
+ * dans la table 'subscriptions'. Stocke les informations nécessaires
+ * pour envoyer des notifications push à un utilisateur/appareil spécifique.
+ */
+@Entity('subscriptions')
 export class Subscription {
+    /**
+     * Identifiant unique auto-incrémenté de l'enregistrement d'abonnement (clé primaire).
+     */
     @PrimaryGeneratedColumn()
     id: number;
 
+    /**
+     * L'URL unique (endpoint) fournie par le service push (navigateur/OS)
+     * pour cet abonnement spécifique. Utilisée comme identifiant unique métier.
+     */
     @Column({ length: 768, unique: true })
     endpoint: string;
 
+    /**
+     * La clé publique P-256 ECDH de l'abonnement, encodée en base64url,
+     * utilisée pour le chiffrement des notifications.
+     */
     @Column()
     p256dh: string;
 
+    /**
+     * Le secret d'authentification de l'abonnement, encodé en base64url,
+     * utilisé pour sécuriser l'envoi des notifications.
+     */
     @Column()
     auth: string;
 
-    @Column({ type: 'int', nullable: true, name: 'user_id' }) // Colonne user_id, peut être null
+    /**
+     * Identifiant de l'utilisateur associé à cet abonnement (optionnel).
+     * Permet de lier un abonnement à un compte utilisateur spécifique.
+     * Correspond à la colonne 'user_id' dans la base de données.
+     */
+    @Column({
+        type: 'int',
+        nullable: true,
+        name: 'user_id'
+    })
     userId: number | null;
 
+    /**
+     * Date et heure de création de l'enregistrement d'abonnement.
+     * Gérée automatiquement par TypeORM.
+     */
     @CreateDateColumn()
     createdAt: Date;
 
-    // --- NOUVELLES COLONNES POUR LES PRÉFÉRENCES ---
-
     /**
-     * Indique si l'utilisateur souhaite recevoir des notifications pour les nouveaux tickets.
-     * Par défaut à true lors de la création de l'abonnement.
+     * Préférence de l'utilisateur pour recevoir des notifications concernant les tickets.
+     * Vrai par défaut. Correspond à la colonne 'notify_on_ticket'.
      */
-    @Column({ type: 'boolean', default: true, name: 'notify_on_ticket' })
+    @Column({
+        type: 'boolean',
+        default: true,
+        name: 'notify_on_ticket'
+    })
     notifyOnTicket: boolean;
 
     /**
-     * Indique si l'utilisateur souhaite recevoir des notifications pour les nouveaux emails
-     * (peut être affiné plus tard si nécessaire pour INPT vs Onduleur).
-     * Par défaut à true lors de la création de l'abonnement.
+     * Préférence de l'utilisateur pour recevoir des notifications concernant les emails.
+     * Vrai par défaut. Correspond à la colonne 'notify_on_email'.
      */
-    @Column({ type: 'boolean', default: true, name: 'notify_on_email' })
+    @Column({
+        type: 'boolean',
+        default: true,
+        name: 'notify_on_email'
+    })
     notifyOnEmail: boolean;
-
-    // --- FIN DES NOUVELLES COLONNES ---
 }

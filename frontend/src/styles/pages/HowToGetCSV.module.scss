@@ -1,6 +1,6 @@
 .container {
     text-align: center;
-    
+
     h2 {
         margin-top: 8vh;
         font-size: 36px;
@@ -8,7 +8,7 @@
         font-weight: 900;
         -webkit-text-stroke: 0.25px #C2BEB5;
     }
-    
+
     p {
         font-size: 24px;
         color: #2B3244;
@@ -16,7 +16,7 @@
         -webkit-text-stroke: 0.25px #C2BEB5;
     }
 
-    > img {
+    >img {
         width: 25%;
         height: auto;
         max-width: 80%;
@@ -25,15 +25,14 @@
         border-radius: 13px;
         border: 2px solid #2B3244;
         margin: auto;
-    
+
         @media (max-width: 950px) {
             width: 100%;
         }
     }
-    
+
     button {
         margin-top: 3vh;
         padding: 1.5vh 3vw;
     }
 }
-

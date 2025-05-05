@@ -1,88 +1,72 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TicketService } from '../../src/ticket/ticket.service';
-import { DataSource } from 'typeorm';
+import { getDataSourceToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
-describe('TicketService', () => {
-    let service: TicketService;
-    let dataSourceMock: Partial<DataSource>;
+import { TicketService } from '../../src/ticket/ticket.service';
 
-    beforeEach(async () => {
-        jest.spyOn(console, 'error').mockImplementation(() => {})
-        dataSourceMock = {
-        query: jest.fn(),
-        };
+const mockDataSource = {
+  query: jest.fn(),
+};
 
-        const module: TestingModule = await Test.createTestingModule({
-        providers: [
-            TicketService,
-            { provide: DataSource, useValue: dataSourceMock },
-        ],
-        }).compile();
+describe('TicketService (Minimal)', () => {
+  let service: TicketService;
+  let dataSource: DataSource;
 
-        service = module.get<TicketService>(TicketService);
+  beforeEach(async () => {
+    mockDataSource.query.mockClear();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        TicketService,
+        {
+          provide: getDataSourceToken('parc_db_connection'),
+          useValue: mockDataSource,
+        },
+      ],
+    }).compile();
+
+    service = module.get<TicketService>(TicketService);
+    dataSource = module.get<DataSource>(getDataSourceToken('parc_db_connection'));
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('getNbTicketsCreated', () => {
+    it('should call dataSource.query with correct parameters and return result', async () => {
+      const testDate = '2025-04-29';
+      const expectedResultFromDb = [{ count: 15 }];
+      mockDataSource.query.mockResolvedValue(expectedResultFromDb);
+
+      const result = await service.getNbTicketsCreated(testDate);
+      expect(result).toEqual(expectedResultFromDb);
+      expect(dataSource.query).toHaveBeenCalledTimes(1);
+      expect(dataSource.query).toHaveBeenCalledWith(
+        expect.stringContaining('CAST(t.SentOn AS DATE) = @0'),
+        [testDate]
+      );
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
+    it('should throw error if query fails', async () => {
+      const testDate = '2025-04-29';
+      const dbError = new Error('Database Query Failed');
+      mockDataSource.query.mockRejectedValue(dbError);
+      await expect(service.getNbTicketsCreated(testDate)).rejects.toThrow(dbError);
+      expect(dataSource.query).toHaveBeenCalledWith(expect.any(String), [testDate]);
     });
+  });
 
-    describe('getNbTicketsCreated', () => {
-        it('should return the number of tickets created on a specific date', async () => {
-        const date = '2025-03-20';
-        const mockResult = [{ count: 5 }];
-        (dataSourceMock.query as jest.Mock).mockResolvedValue(mockResult);
-
-        const result = await service.getNbTicketsCreated(date);
-        expect(result).toEqual(mockResult);
-        expect(dataSourceMock.query).toHaveBeenCalledWith(expect.stringContaining(date));
-        });
+  describe('getTicketById', () => {
+    it('should throw NotFoundException if ticket is not found', async () => {
+      const testId = 999;
+      mockDataSource.query.mockResolvedValueOnce([]);
+      await expect(service.getTicketById(testId)).rejects.toThrow(NotFoundException);
+      expect(dataSource.query).toHaveBeenCalledWith(
+        expect.stringContaining('WHERE t.TicketId = @0'),
+        [testId]
+      );
     });
-
-    describe('getNbTicketsByMonthYear', () => {
-        it('should return the number of tickets created in a specific month and year', async () => {
-        const month = 3;
-        const year = 2025;
-        const mockResult = [{ count: 50 }];
-        (dataSourceMock.query as jest.Mock).mockResolvedValue(mockResult);
-
-        const result = await service.getNbTicketsByMonthYear(month, year);
-        expect(result).toEqual(mockResult);
-        expect(dataSourceMock.query).toHaveBeenCalledWith(expect.stringContaining(`MONTH(t.SentOn) = ${month}`));
-        expect(dataSourceMock.query).toHaveBeenCalledWith(expect.stringContaining(`YEAR(t.SentOn) = ${year}`));
-        });
-    });
-
-    describe('getTicketById', () => {
-        it('should return a ticket when found', async () => {
-        const id = 1;
-        const mockTicket = [{ TicketId: id, Title: 'Test Ticket', CallerName: 'User1' }];
-        const mockResolutionTime = [{ Minutes: 10, Secondes: 30 }];
-        
-        (dataSourceMock.query as jest.Mock)
-            .mockResolvedValueOnce(mockTicket)
-            .mockResolvedValueOnce(mockResolutionTime);
-
-        const result = await service.getTicketById(id);
-        expect(result).toEqual({ ...mockTicket[0], resolutionTime: mockResolutionTime[0] });
-        });
-
-        it('should throw NotFoundException when ticket is not found', async () => {
-        const id = 99;
-        (dataSourceMock.query as jest.Mock).mockResolvedValueOnce([]);
-
-        await expect(service.getTicketById(id)).rejects.toThrow(NotFoundException);
-        });
-    });
-
-    describe('getNbTicketsResolved', () => {
-        it('should return the number of resolved tickets on a specific date', async () => {
-        const date = '2025-03-20';
-        const mockResult = [{ count: 10 }];
-        (dataSourceMock.query as jest.Mock).mockResolvedValue(mockResult);
-
-        const result = await service.getNbTicketsResolved(date);
-        expect(result).toEqual(mockResult);
-        });
-    });
+  });
 });

@@ -1,0 +1,33 @@
+.container {
+    margin-left: 2%;
+    text-align: center;
+
+    .chargement {
+        font-size: 24px;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+
+    .error {
+        font-size: 24px;
+        color: #C54844;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+
+    .ticket {
+        font-size: 24px;
+        margin-bottom: 5vh;
+        color: #2B3244;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+
+    .result {
+        font-size: 24px;
+        color: #C54844;
+        font-weight: 900;
+        -webkit-text-stroke: 0.25px #C2BEB5;
+    }
+}

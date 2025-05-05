@@ -6,6 +6,20 @@
         "Reessayer": "Retry",
         "Enregistrement": "Saving..."
     },
+    "Mois": {
+        "JAN": "January",
+        "FEV": "February",
+        "MAR": "March",
+        "AVR": "April",
+        "MAI": "May",
+        "JUIN": "June",
+        "JUI": "July",
+        "AOU": "August",
+        "SEP": "September",
+        "OCT": "October",
+        "NOV": "November",
+        "DEC": "December"
+    },
     "Parametre": {
         "SwitchLanguage": "Switch to French",
         "SwitchToDT": "Switch to dark theme",

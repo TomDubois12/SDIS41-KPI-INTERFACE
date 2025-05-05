@@ -5,7 +5,7 @@
         color: #2B3244;
         font-weight: 900;
         -webkit-text-stroke: 0.25px #C2BEB5;
-        
+
         button {
             margin-left: 1.5vw;
             margin-top: 0vh;
@@ -22,7 +22,7 @@
             padding: 0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-    }    
+    }
 
     .dragdrop {
         border: 2px groove gray;
@@ -60,6 +60,7 @@
         display: none;
     }
 }
+
 .tickettable {
     width: 100%;
     border-collapse: collapse;
@@ -67,7 +68,8 @@
     table-layout: fixed;
 }
 
-.tickettable th, .tickettable td {
+.tickettable th,
+.tickettable td {
     padding: 8px;
     border-bottom: 1px solid #ddd;
     white-space: nowrap;

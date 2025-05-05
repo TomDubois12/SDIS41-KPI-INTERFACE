@@ -1,11 +1,14 @@
-.container {   
+.container {
     margin-left: 0.5vw;
+    text-align: center;
+
     @media (max-width: 950px) {
         margin-left: 0vw;
     }
 
     .containerP {
         text-align: center;
+
         p {
             font-size: 22px;
             color: #2B3244;
@@ -14,9 +17,31 @@
         }
     }
 
+    .containerDonnees {
+        justify-content: center;
+        text-align: center;
+    }
+
     button {
         margin-top: 3vh;
         padding: 1.5vh 3vw;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h1 {
+            padding-left: 3vw;
+            padding-right: 3vw;
+            font-size: 32px;
+            text-align: center;
+
+            @media (max-width: 950px) {
+                font-size: 26px;
+            }
+        }
     }
 }
 
@@ -24,6 +49,8 @@
     width: 50%;
     margin-top: 5vh;
     margin-bottom: 2vh;
+    text-align: center;
+
     @media (max-width: 950px) {
         width: 100%;
     }

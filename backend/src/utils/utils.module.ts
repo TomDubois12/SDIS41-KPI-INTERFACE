@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-//import { ScheduleModule } from '@nestjs/schedule';
+
 import { FileUploadCleanupService } from './FileUploadCleanupService';
 
+/**
+ * Module NestJS regroupant divers services utilitaires transverses à l'application.
+ * Actuellement, il fournit et exporte le service de nettoyage des fichiers uploadés.
+ */
 @Module({
-    //imports: [ScheduleModule.forRoot()], // Important: Import and register ScheduleModule
     providers: [FileUploadCleanupService],
-    exports: [FileUploadCleanupService], // If you need to use this service elsewhere
+    exports: [FileUploadCleanupService],
 })
 export class UtilsModule {}

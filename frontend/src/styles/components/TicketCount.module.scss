@@ -12,6 +12,7 @@
         width: 100%
     }
 }
+
 .tickettable {
     width: 100%;
     border-collapse: collapse;
@@ -19,7 +20,8 @@
     table-layout: fixed;
 }
 
-.tickettable th, .tickettable td {
+.tickettable th,
+.tickettable td {
     padding: 8px;
     border-bottom: 1px solid #ddd;
     white-space: nowrap;
@@ -64,6 +66,7 @@
 }
 
 @media (max-width: 900px) {
+
     .tickettable th,
     .tickettable td {
         padding: 12px 8px;
