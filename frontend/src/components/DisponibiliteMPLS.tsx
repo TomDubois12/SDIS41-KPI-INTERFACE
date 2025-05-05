@@ -146,7 +146,6 @@ export default function DisponibiliteMPLS({ onAvailabilityData }: DisponibiliteM
                     </div>
                     {showDetails && detailedData && detailedData.length > 0 && (
                         <div className={styles.tablecontainer}>
-                            <h2>Détails</h2>
                             <table className={styles.tickettable}>
                                 <thead>
                                     <tr>
