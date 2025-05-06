@@ -299,10 +299,11 @@ export class NotificationService implements OnModuleInit {
                     this.logger.log(`[checkForNewTicket] Traitement nouveau ticket ID=${newTicket.TicketId}`);
                     const formattedCallerName = this.formatOperatorName(newTicket.CallerName);
                     const title = newTicket.Title || 'Sans titre';
+                    // Construction du payload AVEC l'URL dans data
                     const payload = JSON.stringify({
                         title: 'Nouveau ticket !',
                         body: `Ticket ${newTicket.TicketId} \nSujet : ${title.substring(0, 100)} \npar ${formattedCallerName}.`,
-                        data: { url: `/clarilog_detail?id=${newTicket.TicketId}` }
+                        data: { url: `/clarilog_detail?id=${newTicket.TicketId}` } // URL pour la redirection au clic
                     });
 
                     this.logger.log(`[checkForNewTicket] Envoi notification ticket ID=${newTicket.TicketId} à ${subscriptions.length} abonnés.`);
