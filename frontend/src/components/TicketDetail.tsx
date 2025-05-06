@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "../hooks/useTranslation";
 
 import Button from "../components/Button";
@@ -45,7 +45,7 @@ interface TicketDetail {
  * L'ID du ticket est récupéré depuis le paramètre 'id' de l'URL (`?id=...`).
  * Récupère les informations détaillées via un appel API, formate certains noms,
  * et affiche les données dans une mise en page structurée avec des styles conditionnels.
- * Gère les états de chargement et d'erreur.
+ * Gère les états de chargement et d'erreur. Le bouton "Retour" a un comportement adaptatif.
  *
  * @returns Le composant JSX affichant les détails du ticket ou un état alternatif.
  */
@@ -57,6 +57,7 @@ const ClarilogTicketDetail: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const ticketId = searchParams.get('id');
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     /**
      * Formate un nom d'opérateur/demandeur potentiellement brut (ex: "DOMAINE\prenom.nom")
@@ -129,10 +130,21 @@ const ClarilogTicketDetail: React.FC = () => {
     }, [ticketId, t]);
 
     /**
-     * Fonction pour déclencher la navigation vers la page précédente de l'historique.
+     * Gère le clic sur le bouton de retour.
+     * Si une page précédente existe dans l'historique de session du navigateur
+     * (longueur de l'historique > 1), effectue un retour en arrière standard (`history.back()`).
+     * Sinon (ex: page ouverte dans un nouvel onglet via notification ou lien direct),
+     * redirige vers la vue mensuelle par défaut (`/clarilog_mensuel` pour le mois et l'année courants).
      */
     const handleGoBack = () => {
-        window.history.back();
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            const today = new Date();
+            const month = today.getMonth() + 1;
+            const year = today.getFullYear();
+            navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
+        }
     };
 
     if (loading) return <p>{t("TicketDetail.ChargementDetail")}</p>;

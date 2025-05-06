@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from "../hooks/useTranslation";
+import { useNavigate } from 'react-router-dom';
 
 import Title from './Title';
 import Button from './Button';
@@ -37,12 +38,13 @@ function EmailOnduleur() {
     const [emails, setEmails] = useState<EmailOnduleur[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const navigate = useNavigate();
 
     /**
-     * Fonction simple pour naviguer vers la page précédente dans l'historique du navigateur.
+     * Fonction simple pour naviguer vers la page précédente (page des alertes) dans l'historique du navigateur.
      */
     function goBack() {
-        window.history.back();
+        navigate(`/alertes`);
     }
 
     useEffect(() => {
