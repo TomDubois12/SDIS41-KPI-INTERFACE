@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode } from "react"; // Import 'React' supprimé
 
 import fr from "../locales/fr.json"; // Assurez-vous que le chemin est correct
 import en from "../locales/en.json"; // Assurez-vous que le chemin est correct
@@ -32,7 +32,7 @@ const translations: Record<string, any> = { fr, en };
  * @property setLang Fonction pour changer la langue active.
  * @property lang La langue actuellement active ('fr' ou 'en').
  */
-interface TranslationContextType {
+export interface TranslationContextType { // <- EXPORT ajouté ici
     t: (key: TranslationKeys) => string;
     setLang: (lang: "fr" | "en") => void;
     lang: "fr" | "en";

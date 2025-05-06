@@ -1,18 +1,18 @@
 import { Route, Routes } from "react-router-dom";
 
-import Home from "../pages/Home.tsx";
-import Hub from "../pages/Hub.tsx";
-import Clarilog from "../pages/Clarilog.tsx";
-import StatistiquesMensuelles from "../pages/StatistiquesMensuelles.tsx";
-import StatistiquesAnnuelles from "../pages/StatistiquesAnnuelles.tsx";
-import Alertes from "../pages/Alertes.tsx";
-import AlertesOnduleurs from "../pages/AlertesOnduleurs.tsx";
-import AlertesINPT from "../pages/AlertesINPT.tsx";
-import ClarilogMensuel from "../pages/ClarilogMensuel.tsx";
-import ClarilogAnnuel from "../pages/ClarilogAnnuel.tsx";
-import ClarilogTicketDetail from "../pages/ClarilogTicketDetail.tsx";
-import Credits from "../pages/Credits.tsx";
-import HowToGetCSV from "../pages/HowToGetCSV.tsx";
+import Home from "../pages/Home";
+import Hub from "../pages/Hub";
+import Clarilog from "../pages/Clarilog";
+import StatistiquesMensuelles from "../pages/StatistiquesMensuelles";
+import StatistiquesAnnuelles from "../pages/StatistiquesAnnuelles";
+import Alertes from "../pages/Alertes";
+import AlertesOnduleurs from "../pages/AlertesOnduleurs";
+import AlertesINPT from "../pages/AlertesINPT";
+import ClarilogMensuel from "../pages/ClarilogMensuel";
+import ClarilogAnnuel from "../pages/ClarilogAnnuel";
+import ClarilogTicketDetail from "../pages/ClarilogTicketDetail";
+import Credits from "../pages/Credits";
+import HowToGetCSV from "../pages/HowToGetCSV";
 
 /**
  * Composant React centralisant la définition des routes de l'application

@@ -1,41 +1,56 @@
 import { Tooltip } from "react-tooltip";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "../hooks/useTranslation";
 
+// Importe Calendar et les types nécessaires qui SONT exportés
 import Calendar from "react-calendar";
+import type {
+    CalendarProps, // Type principal des props
+    // Value n'est PAS exporté, on le définit ci-dessous
+    TileClassNameFunc,
+    TileContentFunc,
+    OnClickFunc
+} from 'react-calendar';
+
 import Button from "../components/Button";
 
 import '../styles/components/Calendar.css';
-import styles from '../styles/components/Calendar.module.scss'
+import styles from '../styles/components/Calendar.module.scss';
+
+// Définit manuellement le type de la valeur retournée par onChange
+// Il peut s'agir d'une date, de null, ou d'un tableau [début, fin] si selectRange=true
+type CalendarValue = Date | null | [Date | null, Date | null];
+// Définit le type pour la vue du calendrier en utilisant le type de la prop
+type CalendarView = CalendarProps['view']; // 'month' | 'year' | 'decade' | 'century'
 
 /**
  * Composant React affichant un calendrier interactif (`react-calendar`)
  * permettant à l'utilisateur de naviguer vers différentes vues de rapports (Clarilog)
  * en sélectionnant une date (jour), un mois ou une année.
- * Gère l'état de la date sélectionnée et la vue actuelle du calendrier (mois/année/décennie).
+ * Gère l'état de la date sélectionnée et la vue actuelle du calendrier.
  * Redirige l'utilisateur vers les URL appropriées en fonction de ses interactions.
  *
  * @returns Le composant JSX affichant le calendrier et un bouton de navigation annuelle.
  */
 const CalendarComponent = () => {
     const { t, lang } = useTranslation();
-    const [date, setDate] = useState<Date | null>(new Date());
-    const [calendarView, setCalendarView] = useState<'month' | 'year' | 'decade'>('month');
+    const [date, setDate] = useState<CalendarValue>(new Date()); // Utilise CalendarValue
+    const [calendarView, setCalendarView] = useState<CalendarView>('month');
     const navigate = useNavigate();
 
     /**
      * Gère le changement de date sélectionnée par l'utilisateur sur le calendrier.
-     * Met à jour l'état `date` et navigue vers la vue journalière (`/clarilog`)
-     * avec la date sélectionnée (formatée en YYYY-MM-DD du jour *suivant*).
-     * @param newDate La nouvelle date sélectionnée (ou null).
+     * Correspond à la prop `onChange` de `react-calendar`.
+     * @param value La nouvelle valeur sélectionnée.
+     * @param _event L'événement clic de la souris (non utilisé).
      */
-    const handleDateChange = (newDate: Date | null) => {
-        setDate(newDate);
-        if (newDate) {
-            const nextDay = new Date(newDate);
-            nextDay.setDate(newDate.getDate() + 1);
+    // La signature doit correspondre à CalendarProps['onChange']
+    const handleDateChange: CalendarProps['onChange'] = (value: CalendarValue, _event: React.MouseEvent<HTMLButtonElement>) => { // _event préfixé
+        if (value instanceof Date) {
+            setDate(value);
+            const nextDay = new Date(value);
+            nextDay.setDate(value.getDate() + 1);
             const formattedDate = nextDay.toLocaleDateString('en-CA', {
                 timeZone: 'UTC',
                 year: 'numeric',
@@ -43,29 +58,26 @@ const CalendarComponent = () => {
                 day: '2-digit'
             });
             navigate(`/clarilog?date=${formattedDate}`);
+        } else {
+             setDate(value); // Met à jour l'état même si ce n'est pas une date simple (ex: null ou range)
         }
     };
 
     /**
-     * Gère le changement de la période affichée par le calendrier (mois/année/décennie).
-     * Si la vue est 'month' (changement de mois), navigue vers la vue mensuelle (`/clarilog_mensuel`)
-     * avec le mois et l'année correspondants.
-     * @param activeStartDate La date de début de la nouvelle période affichée.
-     * @param view La nouvelle vue ('month', 'year', 'decade').
+     * Gère le changement de la période affichée par le calendrier.
+     * Correspond à la prop `onActiveStartDateChange` de `react-calendar`.
+     * @param args Objet contenant les détails de l'événement.
      */
-    const handleMonthYearChange = ({ activeStartDate, view }: { activeStartDate: Date | null, view: 'month' | 'year' | 'decade' }) => {
-        if (activeStartDate) {
-            if (view === 'month') {
-                const month = (activeStartDate.getMonth() + 1).toString();
-                const year = activeStartDate.getFullYear().toString();
-                navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
-            }
+    const handleMonthYearChange: CalendarProps['onActiveStartDateChange'] = ({ activeStartDate, view }) => {
+        if (activeStartDate && view === 'month') {
+            const month = (activeStartDate.getMonth() + 1).toString();
+            const year = activeStartDate.getFullYear().toString();
+            navigate(`/clarilog_mensuel?month=${month}&year=${year}`);
         }
     };
 
     /**
      * Gère le clic sur le bouton personnalisé "Accéder à la page annuelle".
-     * Navigue vers la vue annuelle (`/clarilog_annuel`) pour l'année en cours.
      */
     const handleYearPageClick = () => {
         const year = new Date().getFullYear();
@@ -74,58 +86,73 @@ const CalendarComponent = () => {
 
     /**
      * Fonction pour ajouter des classes CSS personnalisées aux tuiles du calendrier.
-     * Actuellement ajoute une classe spécifique pour les années en vue 'year'.
-     * @param date La date de la tuile.
-     * @param view La vue actuelle du calendrier.
-     * @returns Le nom de la classe CSS ou null.
+     * @param args Objet contenant la date et la vue de la tuile.
+     * @returns Le nom de la classe CSS ou null/undefined.
      */
-    const tileClassName = ({ date, view }) => {
-        if (view === 'year' && date.getFullYear() === date.getFullYear()) {
-            return 'react-calendar__year-view__years__year';
+    const tileClassName: TileClassNameFunc = ({ date, view }) => {
+        // view est de type CalendarView
+        if (view === 'year' && date.getFullYear() === new Date().getFullYear()) {
+            return styles.currentYearTile;
         }
         return null;
     };
 
     /**
-     * Fonction pour ajouter du contenu personnalisé à l'intérieur des tuiles du calendrier.
-     * Ajoute une infobulle (Tooltip) affichant la date complète au survol des jours/mois/années.
-     * @param date La date de la tuile.
-     * @param view La vue actuelle du calendrier.
-     * @returns Le contenu JSX à ajouter ou null.
+     * Fonction pour ajouter du contenu personnalisé (ex: Tooltip) à l'intérieur des tuiles.
+     * @param args Objet contenant la date et la vue de la tuile.
+     * @returns Le contenu ReactNode à ajouter ou null.
      */
-    const tileContent = ({ date, view }) => {
-        if (view === 'month' || view === 'decade') {
+    const tileContent: TileContentFunc = ({ date, view }) => {
+        // view est de type CalendarView
+        if (view === 'month' || view === 'year' || view === 'decade') {
+            const dateString = date.toISOString();
+            const displayDate = date.toLocaleDateString(lang || "fr-FR", {
+                day: view === 'month' ? 'numeric' : undefined,
+                month: (view === 'month' || view === 'year') ? 'long' : undefined,
+                year: 'numeric'
+            });
             return (
-                <div>
+                <React.Fragment key={dateString}>
                     <span
-                        data-tooltip-id={`tooltip-${date.toISOString()}`}
-                        data-tooltip-content={date.toLocaleDateString("fr-FR")}
+                        data-tooltip-id={`tooltip-${dateString}`}
+                        data-tooltip-content={displayDate}
+                        data-tooltip-place="top"
                     />
-                    <Tooltip id={`tooltip-${date.toISOString()}`} />
-                </div>
+                    <Tooltip id={`tooltip-${dateString}`} />
+                </React.Fragment>
             );
         }
         return null;
     };
-    
+
     /**
-     * Met à jour l'état interne `calendarView` lorsque la vue du calendrier change.
-     * @param view La nouvelle vue active ('month', 'year', 'decade').
+     * Met à jour l'état interne `calendarView` lorsque l'utilisateur change de vue.
+     * Correspond à la prop `onViewChange` de `react-calendar`.
+     * @param args Objet contenant les détails de l'événement de changement de vue.
      */
-    const handleViewChange = ({ view }: { view: 'month' | 'year' | 'decade' }) => {
+    const handleViewChange: CalendarProps['onViewChange'] = ({ view }) => {
+         // view est de type CalendarView
         setCalendarView(view);
     };
 
     /**
-     * Gère le clic sur l'en-tête principal du calendrier pour changer de vue (zoom/dezoom).
-     * Cycle : mois -> année -> décennie.
+     * Gère le clic sur un mois dans la vue année. Force le retour à la vue mois.
+     * Correspond à la prop `onClickMonth` de `react-calendar`.
+     * @param _value La date (début du mois) cliquée (non utilisée).
+     * @param _event L'événement clic (non utilisé).
      */
-    const handleHeaderClick = () => {
-        if (calendarView === 'month') {
-            setCalendarView('year');
-        } else if (calendarView === 'year') {
-            setCalendarView('decade');
-        }
+    const handleMonthClick: OnClickFunc = (_value, _event) => {
+         setCalendarView('month');
+    };
+
+     /**
+     * Gère le clic sur une année dans la vue décennie. Force le retour à la vue année.
+     * Correspond à la prop `onClickYear` de `react-calendar`.
+     * @param _value La date (début de l'année) cliquée (non utilisée).
+     * @param _event L'événement clic (non utilisé).
+     */
+    const handleYearClick: OnClickFunc = (_value, _event) => {
+         setCalendarView('year');
     };
 
     return (
@@ -139,10 +166,8 @@ const CalendarComponent = () => {
                 tileContent={tileContent}
                 view={calendarView}
                 onViewChange={handleViewChange}
-                onClickMonth={() => setCalendarView('month')}
-                onClickYear={() => setCalendarView('year')}
-                onClickDecade={() => setCalendarView('decade')}
-                onClickView={handleHeaderClick}
+                onClickMonth={handleMonthClick}
+                onClickYear={handleYearClick}
                 locale={lang}
             />
             <div className={styles.buttonGoTo}>

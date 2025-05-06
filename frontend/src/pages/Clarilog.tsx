@@ -41,11 +41,11 @@ export default function Clarilog() {
                         date={selectedDate ?? ""}
                     />
                     <BarChart
-                        date={selectedDate}
+                        date={selectedDate ?? undefined}
                         title={t("Charts.TicketsAttributionDay")}
                     />
                     <PieChart
-                        date={selectedDate}
+                        date={selectedDate ?? undefined}
                         title={t("Charts.TiketsTypesDay")}
                     />
                 </div>
