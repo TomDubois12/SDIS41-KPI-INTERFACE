@@ -65,7 +65,7 @@ function EmailINPT() {
          */
         async function fetchEmails() {
             try {
-                const response = await axios.get<EmailINPT[]>('http://localhost:3001/emails_inpt');
+                const response = await axios.get<EmailINPT[]>('/emails_inpt');
                 const operationEmails = response.data.filter(email => email.typeEmail === 'operation');
                 setEmails(operationEmails);
                 setError(null);

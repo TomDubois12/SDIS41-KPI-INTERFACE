@@ -34,7 +34,7 @@ const Performance: React.FC<PerformanceProps> = ({ date }) => {
      * Met à jour l'état `resolvedTickets` lorsque la prop `date` change.
      */
     useEffect(() => {
-        axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${date}`)
+        axios.get<{ count: number }>(`/tickets/count-resolved?date=${date}`)
             .then(response => setResolvedTickets(response.data.count))
             .catch(error => console.error("Erreur lors de la récupération du nombre de tickets résolus :", error));
     }, [date]);

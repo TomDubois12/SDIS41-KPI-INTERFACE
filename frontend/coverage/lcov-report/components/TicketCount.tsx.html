@@ -489,9 +489,9 @@ const TicketCount: React.FC = () =&gt; {
             setError(null);
 &nbsp;
             const [NbTicketCreated, NbTicketResolved, ticketsResponse] = await Promise.allSettled([
-                axios.get&lt;{ count: number }&gt;(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
-                axios.get&lt;{ count: number }&gt;(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get&lt;Ticket[]&gt;(`http://localhost:3001/tickets/tickets?date=${selectedDate}`), // Correction ici
+                axios.get&lt;{ count: number }&gt;(`/tickets/count-created?date=${selectedDate}`),
+                axios.get&lt;{ count: number }&gt;(`/tickets/count-resolved?date=${selectedDate}`),
+                axios.get&lt;Ticket[]&gt;(`/tickets/tickets?date=${selectedDate}`), // Correction ici
             ]);
 &nbsp;
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || <span class="branch-1 cbranch-no" title="branch not covered" >0)</span>;
@@ -516,9 +516,9 @@ const TicketCount: React.FC = () =&gt; {
     const fetchLiveUpdates = useCallback(async () =&gt; {
         try {
             const [NbTicketCreated, NbTicketResolved, ticketsResponse] = await Promise.allSettled([
-                axios.get&lt;{ count: number }&gt;(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
-                axios.get&lt;{ count: number }&gt;(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get&lt;Ticket[]&gt;(`http://localhost:3001/tickets/tickets?date=${selectedDate}`), // Correction ici
+                axios.get&lt;{ count: number }&gt;(`/tickets/count-created?date=${selectedDate}`),
+                axios.get&lt;{ count: number }&gt;(`/tickets/count-resolved?date=${selectedDate}`),
+                axios.get&lt;Ticket[]&gt;(`/tickets/tickets?date=${selectedDate}`), // Correction ici
             ]);
 &nbsp;
             if (NbTicketCreated.status === 'fulfilled') setNbTicketCreated(NbTicketCreated.value.data.count || <span class="branch-1 cbranch-no" title="branch not covered" >0)</span>;

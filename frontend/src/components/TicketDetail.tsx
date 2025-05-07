@@ -102,7 +102,7 @@ const ClarilogTicketDetail: React.FC = () => {
             setError(null);
             setTicket(null);
             try {
-                const response = await axios.get<TicketDetail>(`http://localhost:3001/tickets/ticket/${ticketId}`);
+                const response = await axios.get<TicketDetail>(`/tickets/ticket/${ticketId}`);
                 if (response.data) {
                     let formattedAssignedToName = response.data.AssignedToName;
                     if (formattedAssignedToName) {

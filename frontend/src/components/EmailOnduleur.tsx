@@ -54,7 +54,7 @@ function EmailOnduleur() {
          */
         async function fetchEmails() {
             try {
-                const response = await axios.get<EmailOnduleur[]>('http://localhost:3001/emails_onduleurs');
+                const response = await axios.get<EmailOnduleur[]>('/emails_onduleurs');
                 setEmails(response.data);
                 setError(null);
             } catch (err: any) {

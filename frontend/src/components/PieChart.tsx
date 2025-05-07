@@ -61,10 +61,10 @@ const PieChart: React.FC<PieChartProps> = ({ date, month, year, colors, title })
     const { t } = useTranslation();
 
     const apiUrl = date
-        ? `http://localhost:3001/tickets/tickets-types?date=${date}`
+        ? `/tickets/tickets-types?date=${date}`
         : month
-            ? `http://localhost:3001/tickets/tickets-types-by-month-year?month=${month}&year=${year}`
-            : `http://localhost:3001/tickets/tickets-types-by-year?year=${year}`;
+            ? `/tickets/tickets-types-by-month-year?month=${month}&year=${year}`
+            : `/tickets/tickets-types-by-year?year=${year}`;
 
     useEffect(() => {
         /**

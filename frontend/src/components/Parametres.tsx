@@ -69,7 +69,7 @@ const Parametres = () => {
         setNotificationError(null);
         console.log(`Récupération des préférences pour: ${endpoint.substring(0, 40)}...`);
         try {
-            const response = await fetch(`http://localhost:3001/notifications/preferences?endpoint=${encodeURIComponent(endpoint)}`);
+            const response = await fetch(`/notifications/preferences?endpoint=${encodeURIComponent(endpoint)}`);
             if (!response.ok) {
                 let errorMsg = `${t("Parametre.Notifications.ErreurRecupPrefs")} (${response.status})`;
                 try { const errorData = await response.json(); errorMsg = errorData?.message || errorMsg; } catch (e) {}
@@ -175,7 +175,7 @@ const Parametres = () => {
         setIsPrefsLoading(true);
         setNotificationError(null);
         try {
-            const response = await fetch('http://localhost:3001/notifications/preferences', {
+            const response = await fetch('/notifications/preferences', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -232,7 +232,7 @@ const Parametres = () => {
         setMainNotificationButtonText(t("Parametre.Notifications.ActivationEnCours"));
         try {
             const registration = await navigator.serviceWorker.ready;
-            const response = await fetch('http://localhost:3001/notifications/vapid-public-key');
+            const response = await fetch('/notifications/vapid-public-key');
             if (!response.ok) throw new Error('Impossible de récupérer la clé VAPID.');
             const keyData = await response.json();
             const vapidPublicKey = keyData?.publicKey;
@@ -255,7 +255,7 @@ const Parametres = () => {
             };
             console.log('Payload envoyé (manuel):', JSON.stringify(payloadToSend));
 
-            const subscribeResponse = await fetch('http://localhost:3001/notifications/subscribe', {
+            const subscribeResponse = await fetch('/notifications/subscribe', {
                 method: 'POST',
                 body: JSON.stringify(payloadToSend),
                 headers: { 'Content-Type': 'application/json' },
@@ -320,7 +320,7 @@ const Parametres = () => {
                     if (endpointToDelete) {
                         console.log(`Notification du backend pour désinscrire: ${endpointToDelete.substring(0, 40)}...`);
                         try {
-                            const deleteResponse = await fetch('http://localhost:3001/notifications/unsubscribe', {
+                            const deleteResponse = await fetch('/notifications/unsubscribe', {
                                 method: 'POST',
                                 body: JSON.stringify({ endpoint: endpointToDelete }),
                                 headers: { 'Content-Type': 'application/json' },

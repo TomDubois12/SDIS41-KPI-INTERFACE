@@ -73,7 +73,7 @@ export default function DisponibiliteESX({ onAvailabilityData }: DisponibiliteES
         formData.append("file", file);
         setValidationMessage("Validation en cours...");
         try {
-            const response = await axios.post("http://localhost:3001/csv/upload", formData, {
+            const response = await axios.post("/csv/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             const data = response.data;

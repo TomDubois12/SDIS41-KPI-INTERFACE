@@ -41,7 +41,7 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
             setCountTicketResolved(null);
             try {
                 const createdResponse = await fetch(
-                    `http://localhost:3001/tickets/count-created-by-year?year=${year}`
+                    `/tickets/count-created-by-year?year=${year}`
                 );
                 if (!createdResponse.ok) {
                     throw new Error("Erreur lors de la récupération des tickets créés");
@@ -50,7 +50,7 @@ export default function TicketCountByYear({ year }: TicketCountByYearProps) {
                 setCountTicketCreated(createdData.count ?? 0);
 
                 const resolvedResponse = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-year?year=${year}`
+                    `/tickets/count-resolved-by-year?year=${year}`
                 );
                 if (!resolvedResponse.ok) {
                     throw new Error("Erreur lors de la récupération des tickets résolus");

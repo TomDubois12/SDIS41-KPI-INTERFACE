@@ -216,7 +216,7 @@ const Performance: React.FC&lt;PerformanceProps&gt; = ({ date }) =&gt; {
 &nbsp;
     useEffect(() =&gt; {
         // Récupérer le nombre de tickets résolus pour la date sélectionnée
-        axios.get&lt;{ count: number }&gt;(`http://localhost:3001/tickets/count-resolved?date=${date}`)
+        axios.get&lt;{ count: number }&gt;(`/tickets/count-resolved?date=${date}`)
             .then(response =&gt; setResolvedTickets(response.data.count))
             .catch(error =&gt; console.error("Erreur lors de la récupération du nombre de tickets résolus :", error));
     }, [date]);

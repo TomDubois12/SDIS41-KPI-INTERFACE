@@ -56,10 +56,10 @@ const BarChart: React.FC<BarChartProps> = ({ date, month, year, colors, title })
     ];
 
     const apiUrl = date
-        ? `http://localhost:3001/tickets/tickets-by-operator?date=${date}`
+        ? `/tickets/tickets-by-operator?date=${date}`
         : month
-            ? `http://localhost:3001/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
-            : `http://localhost:3001/tickets/tickets-by-operator-by-year?year=${year}`;
+            ? `/tickets/tickets-by-operator-by-month-year?month=${month}&year=${year}`
+            : `/tickets/tickets-by-operator-by-year?year=${year}`;
 
     /**
      * Formate un nom d'opérateur potentiellement brut (ex: "DOMAINE\prenom.nom")

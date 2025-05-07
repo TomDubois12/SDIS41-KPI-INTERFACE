@@ -75,7 +75,7 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
             setCountTicketResolved(null);
             try {
                 const createdResponse = await fetch(
-                    `http://localhost:3001/tickets/count-created-by-year?year=${selectedYear}`
+                    `/tickets/count-created-by-year?year=${selectedYear}`
                 );
                 if (!createdResponse.ok) {
                     throw new Error("Erreur lors de la récupération des tickets créés");
@@ -84,7 +84,7 @@ const MonthPickerStats = forwardRef<YearPickerStatsHandle, YearPickerProps>(({ i
                 setCountTicketCreated(createdData.count ?? 0);
 
                 const resolvedResponse = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-year?year=${selectedYear}`
+                    `/tickets/count-resolved-by-year?year=${selectedYear}`
                 );
                 if (!resolvedResponse.ok) {
                     throw new Error("Erreur lors de la récupération des tickets résolus");

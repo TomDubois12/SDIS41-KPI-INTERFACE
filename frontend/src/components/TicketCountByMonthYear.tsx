@@ -43,7 +43,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
             setCountTicketResolved(null);
             try {
                 const createdResponse = await fetch(
-                    `http://localhost:3001/tickets/count-created-by-month-year?month=${month}&year=${year}`
+                    `/tickets/count-created-by-month-year?month=${month}&year=${year}`
                 );
                 if (!createdResponse.ok) {
                     throw new Error("Erreur lors de la récupération des données créées");
@@ -52,7 +52,7 @@ export default function TicketCountByMonthYear({ month, year }: TicketCountByMon
                 setCountTicketCreated(createdData.count ?? 0);
 
                 const resolvedResponse = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-month-year?month=${month}&year=${year}`
+                    `/tickets/count-resolved-by-month-year?month=${month}&year=${year}`
                 );
                 if (!resolvedResponse.ok) {
                     throw new Error("Erreur lors de la récupération des données résolues");

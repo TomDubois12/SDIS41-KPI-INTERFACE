@@ -86,9 +86,9 @@ const TicketCount: React.FC = () => {
             setLoading(true);
             setError(null);
             const [NbTicketCreatedRes, NbTicketResolvedRes, ticketsResponseRes] = await Promise.allSettled([
-                axios.get<{ count: number }>(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
-                axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
+                axios.get<{ count: number }>(`/tickets/count-created?date=${selectedDate}`),
+                axios.get<{ count: number }>(`/tickets/count-resolved?date=${selectedDate}`),
+                axios.get<Ticket[]>(`/tickets/tickets?date=${selectedDate}`),
             ]);
 
             if (NbTicketCreatedRes.status === 'fulfilled') setNbTicketCreated(NbTicketCreatedRes.value.data.count ?? 0);
@@ -128,9 +128,9 @@ const TicketCount: React.FC = () => {
         if (!selectedDate) return;
         try {
             const [NbTicketCreatedRes, NbTicketResolvedRes, ticketsResponseRes] = await Promise.allSettled([
-                axios.get<{ count: number }>(`http://localhost:3001/tickets/count-created?date=${selectedDate}`),
-                axios.get<{ count: number }>(`http://localhost:3001/tickets/count-resolved?date=${selectedDate}`),
-                axios.get<Ticket[]>(`http://localhost:3001/tickets/tickets?date=${selectedDate}`),
+                axios.get<{ count: number }>(`/tickets/count-created?date=${selectedDate}`),
+                axios.get<{ count: number }>(`/tickets/count-resolved?date=${selectedDate}`),
+                axios.get<Ticket[]>(`/tickets/tickets?date=${selectedDate}`),
             ]);
 
             if (NbTicketCreatedRes.status === 'fulfilled') setNbTicketCreated(NbTicketCreatedRes.value.data.count || 0);

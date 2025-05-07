@@ -72,7 +72,7 @@ export default function StatistiquesAnnuelles() {
             };
 
             const response = await fetch(
-                'http://localhost:3001/api/excel/generate-report',
+                '/api/excel/generate-report',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

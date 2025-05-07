@@ -76,14 +76,14 @@ const MonthPickerStats = forwardRef<MonthPickerStatsHandle, MonthPickerProps>(({
             setCountTicketResolved(null);
             try {
                 const createdResponse = await fetch(
-                    `http://localhost:3001/tickets/count-created-by-month-year?month=${selectedMonth}&year=${selectedYear}`
+                    `/tickets/count-created-by-month-year?month=${selectedMonth}&year=${selectedYear}`
                 );
                 if (!createdResponse.ok) throw new Error("Erreur récupération tickets créés");
                 const createdData = await createdResponse.json();
                 setCountTicketCreated(createdData.count);
 
                 const resolvedResponse = await fetch(
-                    `http://localhost:3001/tickets/count-resolved-by-month-year?month=${selectedMonth}&year=${selectedYear}`
+                    `/tickets/count-resolved-by-month-year?month=${selectedMonth}&year=${selectedYear}`
                 );
                 if (!resolvedResponse.ok) throw new Error("Erreur récupération tickets résolus");
                 const resolvedData = await resolvedResponse.json();

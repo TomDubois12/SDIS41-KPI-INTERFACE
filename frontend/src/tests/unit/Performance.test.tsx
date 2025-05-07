@@ -30,7 +30,7 @@ describe('Performance Component', () => {
         expect(screen.getByText(/Performance: ❌/i)).toBeInTheDocument();
         await waitFor(() => {
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                'http://localhost:3001/tickets/count-resolved?date=2025-03-19'
+                '/tickets/count-resolved?date=2025-03-19'
             );
         });
         expect(screen.getByText(/Performance: ❌/i)).toBeInTheDocument();
@@ -62,14 +62,14 @@ describe('Performance Component', () => {
         const { rerender } = render(<Performance date="2025-03-19" />);
         await waitFor(() => {
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                'http://localhost:3001/tickets/count-resolved?date=2025-03-19'
+                '/tickets/count-resolved?date=2025-03-19'
             );
         });
         mockedAxios.get.mockResolvedValueOnce({ data: { count: 7 } });
         rerender(<Performance date="2025-03-20" />);
         await waitFor(() => {
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                'http://localhost:3001/tickets/count-resolved?date=2025-03-20'
+                '/tickets/count-resolved?date=2025-03-20'
             );
             expect(screen.getByText(/Performance: ✅/i)).toBeInTheDocument();
         });
