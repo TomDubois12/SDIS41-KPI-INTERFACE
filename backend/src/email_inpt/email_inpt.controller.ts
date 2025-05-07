@@ -4,9 +4,9 @@ import { EmailINPTService } from './email_inpt.service';
 
 /**
  * Contrôleur gérant les requêtes HTTP relatives aux emails INPT.
- * Route de base : /emails_impt
+ * Route de base : /emails_inpt
  */
-@Controller('emails_impt')
+@Controller('emails_inpt')
 export class EmailINPTController {
     /**
      * Injecte le service nécessaire pour la logique métier des emails.
